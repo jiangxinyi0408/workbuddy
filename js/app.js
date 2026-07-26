@@ -86,6 +86,11 @@ export async function navigate(page) {
   main.innerHTML = '';
   main.scrollTop = 0;
 
+  // 🔒 导航离开资产管理时清除验证标记（下次进入需重新解锁）
+  if (page !== 'finance' && isAuthed()) {
+    clearAuth();
+  }
+
   // 🔒 资产管理密码锁
   if (page === 'finance' && hasPassword() && !isAuthed()) {
     await showFinanceLock(main);

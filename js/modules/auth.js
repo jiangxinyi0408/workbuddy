@@ -7,7 +7,7 @@
 const PWD_HASH_KEY = 'workbuddy_finance_pwd_hash';
 const FAIL_COUNT_KEY = 'workbuddy_finance_fail_count';
 const LOCK_UNTIL_KEY = 'workbuddy_finance_lock_until';
-const AUTH_OK_KEY = 'workbuddy_finance_authed'; // 本次会话已验证标记
+const AUTH_OK_KEY = 'workbuddy_finance_authed'; // 本次页面内已验证标记（导航离开即清除）
 
 // 锁定阈值
 const LOCK_5_TIMES = 5;
