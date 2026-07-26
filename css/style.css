@@ -641,6 +641,16 @@ body {
   background: none;
   border: none;
 }
+.task-delete:active { color: var(--danger); }
+.task-edit {
+  color: var(--primary);
+  font-size: 17px;
+  cursor: pointer;
+  padding: 4px 6px;
+  background: none;
+  border: none;
+}
+.task-edit:active { opacity: 0.6; }
 
 /* 筛选标签 */
 .filter-tabs {

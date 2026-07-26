@@ -2,7 +2,7 @@
 // modules/finance.js - 模块6：存款还款
 // ============================================================
 
-import { put, getAll, del, getByIndex, getSetting } from '../db.js';
+import { put, get, getAll, del, getByIndex, getSetting } from '../db.js';
 import { genId, today, fmtDate, monthStr, lastMonth, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
 
 let initialized = false;
@@ -47,6 +47,22 @@ async function addIncome(data) {
   };
   await put('incomes', income);
   return income;
+}
+
+async function updateIncome(id, data) {
+  const existing = await get('incomes', id);
+  if (!existing) return null;
+  const updated = {
+    ...existing,
+    month: data.month || existing.month,
+    amount: parseFloat(data.amount) || 0,
+    source: data.source || existing.source,
+    note: data.note !== undefined ? data.note : existing.note,
+    date: data.date || existing.date,
+    updatedAt: new Date().toISOString(),
+  };
+  await put('incomes', updated);
+  return updated;
 }
 
 async function addRepayment(loanId, month, amount) {
@@ -105,6 +121,7 @@ export async function renderFinance(container) {
       renderFinance(container);
     }
   };
+  window.__editIncome = (id) => showAddIncomeDialog(container, id);
 
   await renderFinanceContent();
 }
@@ -300,12 +317,13 @@ async function renderIncome(container) {
       </div>
       ${monthIncomes.map(i => `
         <div class="flex-between" style="padding:8px 0;border-bottom:1px solid var(--gray-100)">
-          <div>
+          <div style="flex:1" onclick="window.__editIncome('${i.id}')">
             <div class="text-sm">${escapeHtml(i.source)}</div>
             <div class="text-xs text-gray">${fmtDate(i.date)}${i.note ? ' · ' + escapeHtml(i.note) : ''}</div>
           </div>
           <div class="flex gap-8 items-center">
             <span class="font-bold text-success">+¥${formatNum(i.amount)}</span>
+            <button class="task-edit" onclick="window.__editIncome('${i.id}')">✎</button>
             <button class="task-delete" onclick="window.__delIncome('${i.id}')">✕</button>
           </div>
         </div>
@@ -390,51 +408,80 @@ function showAddLoanDialog(container) {
 // 添加收入对话框
 // ============================================================
 
-function showAddIncomeDialog(container) {
+async function showAddIncomeDialog(container, editId) {
+  const isEdit = !!editId;
   const currentMonth = monthStr(new Date());
+
+  // 编辑模式：预填已有数据
+  let existing = null;
+  if (isEdit) {
+    const all = await getAll('incomes');
+    existing = all.find(i => i.id === editId);
+    if (!existing) { toast('记录不存在'); return; }
+  }
+
   const html = `
     <div class="settings-form">
       <div class="form-group">
         <label>月份</label>
-        <input type="month" id="income-month" value="${currentMonth}">
+        <input type="month" id="income-month" value="${existing ? existing.month : currentMonth}">
       </div>
       <div class="form-group">
         <label>收入来源</label>
         <select id="income-source">
-          <option value="工作收入">💼 工作收入</option>
-          <option value="乒乓">🏓 乒乓</option>
-          <option value="投资">📈 投资</option>
-          <option value="其他">📌 其他</option>
+          <option value="工作收入" ${existing && existing.source === '工作收入' ? 'selected' : ''}>💼 工作收入</option>
+          <option value="乒乓" ${existing && existing.source === '乒乓' ? 'selected' : ''}>🏓 乒乓</option>
+          <option value="投资" ${existing && existing.source === '投资' ? 'selected' : ''}>📈 投资</option>
+          <option value="其他" ${existing && existing.source === '其他' ? 'selected' : ''}>📌 其他</option>
         </select>
       </div>
       <div class="form-group">
         <label>金额 (元)</label>
-        <input type="number" step="0.01" id="income-amount" placeholder="如：8000.00">
+        <input type="number" step="0.01" id="income-amount" placeholder="如：8000.00" value="${existing ? existing.amount : ''}">
       </div>
       <div class="form-group">
         <label>备注</label>
-        <input type="text" id="income-note" placeholder="如：5月工资+提成">
+        <input type="text" id="income-note" placeholder="如：5月工资+提成" value="${existing ? escapeHtml(existing.note || '') : ''}">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__saveIncome()">保存</button>
+      <button class="btn-primary btn-full" onclick="window.__saveIncome()">${isEdit ? '保存修改' : '保存'}</button>
+      ${isEdit ? `<button class="btn-danger-outline btn-full mt-8" onclick="window.__deleteIncomeFromEdit('${editId}')">删除此条记录</button>` : ''}
     </div>
   `;
 
-  const sheet = openBottomSheet('添加收入', html);
+  const sheet = openBottomSheet(isEdit ? '编辑收入' : '添加收入', html);
   window.__currentSheet = sheet;
 
   window.__saveIncome = async () => {
     const amount = document.getElementById('income-amount').value;
     if (!amount) { toast('请输入金额'); return; }
-    await addIncome({
+    const payload = {
       month: document.getElementById('income-month').value,
       source: document.getElementById('income-source').value,
       amount,
       note: document.getElementById('income-note').value.trim(),
-    });
-    toast('收入已记录');
+    };
+    if (isEdit) {
+      await updateIncome(editId, payload);
+      toast('已修改');
+    } else {
+      await addIncome(payload);
+      toast('收入已记录');
+    }
     sheet.close();
     renderFinance(document.getElementById('main-content'));
   };
+
+  // 编辑模式下的删除按钮（独立函数，不覆盖列表的 __delIncome）
+  if (isEdit) {
+    window.__deleteIncomeFromEdit = async (id) => {
+      if (await confirmDialog('删除这条收入记录？')) {
+        await del('incomes', id);
+        toast('已删除');
+        sheet.close();
+        renderFinance(document.getElementById('main-content'));
+      }
+    };
+  }
 }
 
 // ============================================================
