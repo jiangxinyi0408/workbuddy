@@ -2,7 +2,7 @@
 // modules/finance.js - 模块6：存款还款
 // ============================================================
 
-import { put, get, getAll, del, getByIndex, getSetting } from '../db.js';
+import { put, bulkPut, get, getAll, del, getByIndex, getSetting } from '../db.js';
 import { genId, today, fmtDate, monthStr, lastMonth, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
 import { hasPassword, isAuthed } from './auth.js';
 
@@ -101,7 +101,8 @@ export async function renderFinance(container) {
       <button class="filter-tab ${currentTab==='income'?'active':''}" onclick="window.__finTab('income')">收入</button>
     </div>
     <div id="finance-content"></div>
-    <button class="fab" onclick="window.__finAdd()">+</button>
+    <button class="fab" onclick="window.__finAdd()" style="right:72px">+</button>
+    ${currentTab === 'income' ? '<button class="fab fab-secondary" onclick="window.__finBatchAdd()">≡</button>' : ''}
   `;
 
   window.__finTab = (t) => { currentTab = t; renderFinance(container); };
@@ -109,6 +110,7 @@ export async function renderFinance(container) {
     if (currentTab === 'overview' || currentTab === 'loans') showAddLoanDialog(container);
     else if (currentTab === 'income') showAddIncomeDialog(container);
   };
+  window.__finBatchAdd = () => showBatchAddIncomeDialog(container);
   window.__repayLoan = (loanId) => showRepayDialog(container, loanId);
   window.__delLoan = async (id) => {
     if (await confirmDialog('删除这笔贷款记录？')) {
@@ -483,6 +485,83 @@ async function showAddIncomeDialog(container, editId) {
       }
     };
   }
+}
+
+// ============================================================
+// 批量添加收入对话框
+// ============================================================
+
+function showBatchAddIncomeDialog(container) {
+  const currentMonth = monthStr(new Date());
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>统一月份</label>
+        <input type="month" id="batch-income-month" value="${currentMonth}">
+      </div>
+      <div class="form-group">
+        <label>批量收入（每行一条）</label>
+        <textarea id="batch-income-text" placeholder="格式：来源,金额,备注（备注可省略）&#10;每行一条，例如：&#10;工作收入,8000,7月工资&#10;乒乓,500&#10;投资,1500,基金分红" rows="8" style="font-size:14px;line-height:1.6"></textarea>
+        <div class="form-hint">每行格式：来源,金额,备注（逗号分隔，备注可省略）</div>
+      </div>
+      <div class="form-group">
+        <label>可用来源</label>
+        <div class="form-hint">工作收入 / 乒乓 / 投资 / 其他</div>
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__saveBatchIncome()">批量添加</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('批量添加收入', html);
+  window.__currentSheet = sheet;
+
+  window.__saveBatchIncome = async () => {
+    const month = document.getElementById('batch-income-month').value || currentMonth;
+    const text = document.getElementById('batch-income-text').value.trim();
+    if (!text) { toast('请输入收入数据'); return; }
+
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) { toast('请输入收入数据'); return; }
+
+    const validSources = ['工作收入', '乒乓', '投资', '其他'];
+    const incomes = [];
+    const errors = [];
+
+    lines.forEach((line, idx) => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length < 2) {
+        errors.push(`第${idx + 1}行：格式错误`);
+        return;
+      }
+      const source = parts[0];
+      const amount = parseFloat(parts[1]);
+      const note = parts[2] || '';
+
+      if (!source) { errors.push(`第${idx + 1}行：缺少来源`); return; }
+      if (isNaN(amount) || amount <= 0) { errors.push(`第${idx + 1}行：金额无效`); return; }
+
+      incomes.push({
+        id: genId(),
+        month,
+        amount,
+        source: validSources.includes(source) ? source : '其他',
+        note,
+        date: today(),
+        createdAt: new Date().toISOString(),
+      });
+    });
+
+    if (incomes.length === 0) {
+      toast(errors[0] || '无有效数据');
+      return;
+    }
+
+    await bulkPut('incomes', incomes);
+    const msg = `已添加 ${incomes.length} 条收入` + (errors.length > 0 ? `，${errors.length}条格式错误已跳过` : '');
+    toast(msg);
+    sheet.close();
+    renderFinance(document.getElementById('main-content'));
+  };
 }
 
 // ============================================================

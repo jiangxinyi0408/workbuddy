@@ -2,7 +2,7 @@
 // modules/work.js - 模块1：保险工作台
 // ============================================================
 
-import { put, getAll, del, getByIndex, getByRange, getSetting } from '../db.js';
+import { put, bulkPut, getAll, del, getByIndex, getByRange, getSetting } from '../db.js';
 import { genId, today, tomorrow, fmtDate, fmtTime, weekRange, weekdayName, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
 
 let initialized = false;
@@ -86,11 +86,13 @@ export async function renderWork(container) {
       <button class="filter-tab ${currentFilter==='done'?'active':''}" onclick="window.__workFilter('done')">已完成</button>
     </div>
     <div id="task-list-container"></div>
-    <button class="fab" onclick="window.__addTask()">+</button>
+    <button class="fab" onclick="window.__addTask()" style="right:72px">+</button>
+    <button class="fab fab-secondary" onclick="window.__batchAddTask()">≡</button>
   `;
 
   window.__workFilter = (f) => { currentFilter = f; renderWork(container); };
   window.__addTask = () => showAddTaskDialog(container);
+  window.__batchAddTask = () => showBatchAddTaskDialog(container);
   window.__toggleTask = async (id) => { await toggleTask(id); renderWork(container); };
   window.__deleteTask = async (id) => {
     if (await confirmDialog('确定删除这个任务吗？')) {
@@ -233,6 +235,87 @@ function showAddTaskDialog(container) {
       estimateHours: parseFloat(document.getElementById('task-hours').value) || null,
     });
     toast('任务已添加');
+    sheet.close();
+    renderWork(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 批量添加任务
+// ============================================================
+
+function showBatchAddTaskDialog(container) {
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>批量任务（每行一个任务）</label>
+        <textarea id="batch-tasks" placeholder="每行输入一个任务，例如：&#10;联系张总确认车险续保&#10;整理企财险报价单&#10;跟进李姐理赔进度" rows="8" style="font-size:14px;line-height:1.6"></textarea>
+        <div class="form-hint">每行一个任务，空行自动忽略</div>
+      </div>
+      <div class="form-group">
+        <label>统一日期</label>
+        <select id="batch-date">
+          <option value="${today()}">今天 (${weekdayName(today())})</option>
+          <option value="${tomorrow()}">明天 (${weekdayName(tomorrow())})</option>
+          <option value="custom">自定义日期</option>
+        </select>
+      </div>
+      <div class="form-group" id="batch-custom-date-group" style="display:none">
+        <label>自定义日期</label>
+        <input type="date" id="batch-custom-date">
+      </div>
+      <div class="form-group">
+        <label>统一优先级</label>
+        <select id="batch-priority">
+          <option value="high">高优先级</option>
+          <option value="medium" selected>中优先级</option>
+          <option value="low">低优先级</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>统一业务分类（可选）</label>
+        <input type="text" id="batch-category" placeholder="如：车险、企财险、理赔...">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__saveBatchTasks()">批量添加</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('批量添加任务', html);
+  window.__currentSheet = sheet;
+
+  document.getElementById('batch-date').onchange = (e) => {
+    document.getElementById('batch-custom-date-group').style.display = e.target.value === 'custom' ? 'block' : 'none';
+  };
+
+  window.__saveBatchTasks = async () => {
+    const text = document.getElementById('batch-tasks').value.trim();
+    if (!text) { toast('请输入任务内容'); return; }
+
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) { toast('请输入任务内容'); return; }
+
+    let dueDate = document.getElementById('batch-date').value;
+    if (dueDate === 'custom') {
+      dueDate = document.getElementById('batch-custom-date').value || today();
+    }
+    const priority = document.getElementById('batch-priority').value;
+    const category = document.getElementById('batch-category').value.trim();
+
+    const tasks = lines.map(title => ({
+      id: genId(),
+      title,
+      type: 'daily',
+      dueDate,
+      priority,
+      status: 'pending',
+      category,
+      estimateHours: null,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+    }));
+
+    await bulkPut('tasks', tasks);
+    toast(`已添加 ${tasks.length} 个任务`);
     sheet.close();
     renderWork(document.getElementById('main-content'));
   };
@@ -436,7 +519,7 @@ export async function dashboardWork() {
   return `
     <div class="dash-card" onclick="window.__navigate('work')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">📋 业务情况</div>
+        <div class="dash-card-title">📋 每日业务安排</div>
         <div class="dash-card-more">查看全部 ›</div>
       </div>
       <div class="dash-stats">

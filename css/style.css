@@ -423,6 +423,13 @@ body {
   transition: transform 0.2s;
 }
 .fab:active { transform: scale(0.92); }
+.fab-secondary {
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  background: var(--primary-light);
+  box-shadow: 0 2px 10px rgba(123,107,166,0.3);
+}
 
 /* ============================================================
    表单
