@@ -3,7 +3,7 @@
 // ============================================================
 
 import { getSetting, setSetting, getAll, getByIndex, getByRange } from './db.js';
-import { today, tomorrow, weekRange, fmtDate, toast, openBottomSheet } from './utils.js';
+import { today, tomorrow, weekRange, fmtDate, toast, openBottomSheet, escapeHtml } from './utils.js';
 import { initWork, renderWork, dashboardWork } from './modules/work.js';
 import { initWeight, renderWeight, dashboardWeight } from './modules/weight.js';
 import { initFinance, renderFinance, dashboardFinance } from './modules/finance.js';
@@ -11,6 +11,7 @@ import { initEnglish, renderEnglish, dashboardEnglish } from './modules/english.
 import { initPingpong, renderPingpong, dashboardPingpong } from './modules/pingpong.js';
 import { initNews, renderNews, dashboardNews } from './news.js';
 import { autoRestoreIfNeeded, backupToLocalStorage, formatBackupTime } from './backup.js';
+import { hasPassword, isAuthed, verifyPassword, getLockRemaining, getFailCount, setPassword, changePassword, removePassword, clearAuth } from './modules/auth.js';
 
 // 页面定义
 const PAGES = {
@@ -80,10 +81,23 @@ export async function navigate(page) {
     toggleSidebar(false);
   }
 
-  // 渲染页面内容
+  // 渲染页���内容
   const main = document.getElementById('main-content');
   main.innerHTML = '';
   main.scrollTop = 0;
+
+  // 🔒 资产管理密码锁
+  if (page === 'finance' && hasPassword() && !isAuthed()) {
+    await showFinanceLock(main);
+    window.scrollTo(0, 0);
+    return;
+  }
+  // 🔒 首次进入 finance 但未设密码 → 引导设置
+  if (page === 'finance' && !hasPassword()) {
+    await showSetPasswordScreen(main);
+    window.scrollTo(0, 0);
+    return;
+  }
 
   // 显示加载状态
   main.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
@@ -97,6 +111,115 @@ export async function navigate(page) {
 
   // 滚动恢复
   window.scrollTo(0, 0);
+}
+
+// ============================================================
+// 🔒 资产管理密码锁界面
+// ============================================================
+
+async function showFinanceLock(container) {
+  const lockRemaining = getLockRemaining();
+
+  const renderLockScreen = (msg, isError) => {
+    const locked = getLockRemaining();
+    container.innerHTML = `
+      <div class="lock-screen">
+        <div class="lock-icon">${locked > 0 ? '⏳' : '🔒'}</div>
+        <div class="lock-title">资产管理</div>
+        ${locked > 0 ? `
+          <div class="lock-warning">已锁定</div>
+          <div class="lock-countdown" id="lock-countdown">${locked} 秒后可重试</div>
+          <button class="btn-outline mt-16" onclick="window.__navigate('home')">返回首页</button>
+        ` : `
+          <div class="lock-hint">请输入8位数字密码</div>
+          <input type="password" id="lock-pwd" class="lock-input" maxlength="8" inputmode="numeric" placeholder="••••••••" autocomplete="off">
+          <button class="btn-primary btn-full mt-16" onclick="window.__unlockFinance()">解锁</button>
+          ${msg ? `<div class="lock-error">${escapeHtml(msg)}</div>` : ''}
+          ${isError ? '' : `<div class="text-xs text-gray mt-16">提示：密码为8位纯数字</div>`}
+          <button class="btn-outline mt-16" onclick="window.__navigate('home')">返回首页</button>
+        `}
+      </div>
+    `;
+    const input = document.getElementById('lock-pwd');
+    if (input) {
+      input.focus();
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') window.__unlockFinance();
+      });
+    }
+    if (locked > 0) startLockCountdown(locked);
+  };
+
+  const startLockCountdown = (seconds) => {
+    let remain = seconds;
+    const tick = () => {
+      const el = document.getElementById('lock-countdown');
+      if (!el) return;
+      remain = getLockRemaining();
+      if (remain <= 0) {
+        renderLockScreen();
+        return;
+      }
+      el.textContent = `${remain} 秒后可重试`;
+      setTimeout(tick, 1000);
+    };
+    setTimeout(tick, 1000);
+  };
+
+  window.__unlockFinance = async () => {
+    const input = document.getElementById('lock-pwd');
+    if (!input) return;
+    const pwd = input.value.trim();
+    if (!/^\d{8}$/.test(pwd)) {
+      renderLockScreen('请输入8位数字密码', true);
+      return;
+    }
+    const result = await verifyPassword(pwd);
+    if (result.success) {
+      toast('解锁成功');
+      navigate('finance');
+    } else if (result.locked) {
+      renderLockScreen(result.error, true);
+    } else {
+      renderLockScreen(result.error, true);
+    }
+  };
+
+  renderLockScreen();
+}
+
+// ============================================================
+// 🔒 首次设置密码界面
+// ============================================================
+
+async function showSetPasswordScreen(container) {
+  container.innerHTML = `
+    <div class="lock-screen">
+      <div class="lock-icon">🔐</div>
+      <div class="lock-title">设置资产管理密码</div>
+      <div class="lock-hint">为保护财务隐私，请设置8位数字密码</div>
+      <input type="password" id="set-pwd-1" class="lock-input" maxlength="8" inputmode="numeric" placeholder="输入8位数字密码" autocomplete="off">
+      <input type="password" id="set-pwd-2" class="lock-input mt-8" maxlength="8" inputmode="numeric" placeholder="再次输入确认" autocomplete="off">
+      <button class="btn-primary btn-full mt-16" onclick="window.__confirmSetPwd()">设置密码</button>
+      <button class="btn-outline mt-8" onclick="window.__navigate('home')">暂不设置</button>
+      <div class="text-xs text-gray mt-16">密码为8位纯数字，建议不要用生日</div>
+    </div>
+  `;
+  document.getElementById('set-pwd-1').focus();
+
+  window.__confirmSetPwd = async () => {
+    const p1 = document.getElementById('set-pwd-1').value.trim();
+    const p2 = document.getElementById('set-pwd-2').value.trim();
+    if (!/^\d{8}$/.test(p1)) { toast('密码必须是8位数字'); return; }
+    if (p1 !== p2) { toast('两次输入不一致'); return; }
+    const result = await setPassword(p1);
+    if (result.success) {
+      toast('密码已设置');
+      navigate('finance');
+    } else {
+      toast(result.error);
+    }
+  };
 }
 
 // ============================================================
@@ -242,6 +365,20 @@ window.__showSettings = async function() {
         <div class="form-hint">自动备份每5分钟执行一次，切换App回来时也会备份</div>
       </div>
 
+      <div class="form-group">
+        <label>🔒 资产管理密码锁</label>
+        <div class="lock-setting-status" id="lock-status">⏳ 读取中...</div>
+        <div class="data-actions">
+          ${hasPassword() ? `
+            <button class="btn-outline" onclick="window.__changePwd()">修改密码</button>
+            <button class="btn-danger-outline" onclick="window.__removePwd()">关闭密码锁</button>
+          ` : `
+            <button class="btn-primary" onclick="window.__setPwd()">设置密码</button>
+          `}
+        </div>
+        <div class="form-hint">保护资产管理模块，错误5次锁1分钟，10次锁5分钟</div>
+      </div>
+
       <button class="btn-primary btn-full" onclick="window.__saveSettings()">保存设置</button>
     </div>
   `;
@@ -255,6 +392,113 @@ window.__showSettings = async function() {
     if (el) el.textContent = '✅ ' + formatBackupTime();
   };
   updateBackupStatus();
+
+  // 更新密码锁状态显示
+  const updateLockStatus = () => {
+    const el = document.getElementById('lock-status');
+    if (el) {
+      el.textContent = hasPassword() ? '✅ 已启用密码保护' : '⚪ 未设置密码';
+    }
+  };
+  updateLockStatus();
+};
+
+// ============================================================
+// 🔒 密码锁管理函数
+// ============================================================
+
+window.__setPwd = function() {
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>设置8位数字密码</label>
+        <input type="password" id="new-pwd-1" class="lock-input" maxlength="8" inputmode="numeric" placeholder="输入8位数字" autocomplete="off">
+        <input type="password" id="new-pwd-2" class="lock-input mt-8" maxlength="8" inputmode="numeric" placeholder="再次输入确认" autocomplete="off">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__doSetPwd()">确认设置</button>
+    </div>
+  `;
+  const sheet = openBottomSheet('设置密码', html);
+  window.__currentSheet = sheet;
+  document.getElementById('new-pwd-1').focus();
+
+  window.__doSetPwd = async () => {
+    const p1 = document.getElementById('new-pwd-1').value.trim();
+    const p2 = document.getElementById('new-pwd-2').value.trim();
+    if (!/^\d{8}$/.test(p1)) { toast('密码必须是8位数字'); return; }
+    if (p1 !== p2) { toast('两次输入不一致'); return; }
+    const result = await setPassword(p1);
+    if (result.success) {
+      toast('密码已设置');
+      sheet.close();
+      window.__showSettings();
+    } else {
+      toast(result.error);
+    }
+  };
+};
+
+window.__changePwd = function() {
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>旧密码</label>
+        <input type="password" id="old-pwd" class="lock-input" maxlength="8" inputmode="numeric" placeholder="输入旧密码" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>新密码（8位数字）</label>
+        <input type="password" id="chg-pwd-1" class="lock-input" maxlength="8" inputmode="numeric" placeholder="输入新密码" autocomplete="off">
+        <input type="password" id="chg-pwd-2" class="lock-input mt-8" maxlength="8" inputmode="numeric" placeholder="再次输入确认" autocomplete="off">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__doChangePwd()">确认修改</button>
+    </div>
+  `;
+  const sheet = openBottomSheet('修改密码', html);
+  window.__currentSheet = sheet;
+  document.getElementById('old-pwd').focus();
+
+  window.__doChangePwd = async () => {
+    const oldP = document.getElementById('old-pwd').value.trim();
+    const p1 = document.getElementById('chg-pwd-1').value.trim();
+    const p2 = document.getElementById('chg-pwd-2').value.trim();
+    if (!/^\d{8}$/.test(p1)) { toast('新密码必须是8位数字'); return; }
+    if (p1 !== p2) { toast('两次输入不一致'); return; }
+    const result = await changePassword(oldP, p1);
+    if (result.success) {
+      toast('密码已修改');
+      sheet.close();
+    } else {
+      toast(result.error);
+    }
+  };
+};
+
+window.__removePwd = function() {
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>输入密码以关闭密码锁</label>
+        <input type="password" id="rm-pwd" class="lock-input" maxlength="8" inputmode="numeric" placeholder="输入当前密码" autocomplete="off">
+        <div class="form-hint">关闭后资产管理不再需要密码</div>
+      </div>
+      <button class="btn-danger-outline btn-full" onclick="window.__doRemovePwd()">确认关闭</button>
+    </div>
+  `;
+  const sheet = openBottomSheet('关闭密码锁', html);
+  window.__currentSheet = sheet;
+  document.getElementById('rm-pwd').focus();
+
+  window.__doRemovePwd = async () => {
+    const pwd = document.getElementById('rm-pwd').value.trim();
+    const result = await removePassword(pwd);
+    if (result.success) {
+      toast('密码锁已关闭');
+      sheet.close();
+      window.__showSettings();
+    } else {
+      toast(result.error);
+    }
+  };
 };
 
 window.__saveSettings = async function() {

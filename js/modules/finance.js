@@ -4,6 +4,7 @@
 
 import { put, get, getAll, del, getByIndex, getSetting } from '../db.js';
 import { genId, today, fmtDate, monthStr, lastMonth, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
+import { hasPassword, isAuthed } from './auth.js';
 
 let initialized = false;
 let financeChart = null;
@@ -542,27 +543,37 @@ export async function dashboardFinance() {
     .filter(i => i.month && i.month.startsWith(String(currentYear)))
     .reduce((sum, i) => sum + (i.amount || 0), 0);
 
+  // 🔒 已设密码且未验证时，不显示金额
+  const locked = hasPassword() && !isAuthed();
+
   return `
     <div class="dash-card" onclick="window.__navigate('finance')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">💰 资产管理</div>
-        <div class="dash-card-more">查看详情 ›</div>
+        <div class="dash-card-title">💰 资产管理 ${locked ? '🔒' : ''}</div>
+        <div class="dash-card-more">${locked ? '点击解锁' : '查看详情 ›'}</div>
       </div>
-      <div class="dash-stats">
-        <div class="dash-stat success">
-          <div class="dash-stat-num">¥${formatNum(yearIncome)}</div>
-          <div class="dash-stat-label">当年收入</div>
+      ${locked ? `
+        <div class="dash-locked">
+          <div class="dash-locked-icon">🔐</div>
+          <div class="dash-locked-text">已加密，点击解锁查看</div>
         </div>
-        <div class="dash-stat danger">
-          <div class="dash-stat-num">¥${formatNum(totalDebt)}</div>
-          <div class="dash-stat-label">欠款总额</div>
+      ` : `
+        <div class="dash-stats">
+          <div class="dash-stat success">
+            <div class="dash-stat-num">¥${formatNum(yearIncome)}</div>
+            <div class="dash-stat-label">当年收入</div>
+          </div>
+          <div class="dash-stat danger">
+            <div class="dash-stat-num">¥${formatNum(totalDebt)}</div>
+            <div class="dash-stat-label">欠款总额</div>
+          </div>
+          <div class="dash-stat warning">
+            <div class="dash-stat-num">¥${formatNum(totalMonthly)}</div>
+            <div class="dash-stat-label">月供</div>
+          </div>
         </div>
-        <div class="dash-stat warning">
-          <div class="dash-stat-num">¥${formatNum(totalMonthly)}</div>
-          <div class="dash-stat-label">月供</div>
-        </div>
-      </div>
-      <div class="text-xs text-gray mt-8">${loans.length}笔贷款 · 月供 ¥${formatNum(totalMonthly)}/月</div>
+        <div class="text-xs text-gray mt-8">${loans.length}笔贷款 · 月供 ¥${formatNum(totalMonthly)}/月</div>
+      `}
     </div>
   `;
 }
