@@ -45,24 +45,26 @@ export async function initNews() {
 }
 
 // ============================================================
-// RSS 抓取与解析
+// RSS 抓取与解析（优化：5秒内超时）
 // ============================================================
 
 async function fetchRSS(url) {
-  for (const proxy of CORS_PROXIES) {
-    try {
-      const response = await fetch(proxy + encodeURIComponent(url), {
-        signal: AbortSignal.timeout(8000),
-      });
-      if (response.ok) {
-        const text = await response.text();
-        return text;
-      }
-    } catch (e) {
-      continue;
-    }
+  // 并行尝试所有代理，谁先成功用谁
+  const fetchPromises = CORS_PROXIES.map(proxy =>
+    fetch(proxy + encodeURIComponent(url), {
+      signal: AbortSignal.timeout(4000),
+    }).then(res => {
+      if (res.ok) return res.text();
+      throw new Error('HTTP ' + res.status);
+    })
+  );
+  try {
+    // 任一代理成功即返回，最多等4秒
+    const text = await Promise.any(fetchPromises);
+    return text;
+  } catch (e) {
+    return null;
   }
-  return null;
 }
 
 function parseRSS(xmlText) {
@@ -115,19 +117,24 @@ async function fetchCategoryNews(category) {
     return { news: cached.news, fromCache: true };
   }
 
-  // 抓取所有源
-  for (const source of sources) {
-    try {
+  // 并行抓取所有源（5秒内完成）
+  const fetchResults = await Promise.allSettled(
+    sources.map(async (source) => {
       const xmlText = await fetchRSS(source.url);
       if (xmlText) {
         const news = parseRSS(xmlText);
         news.forEach(n => n.source = source.name);
-        allNews = allNews.concat(news);
+        return news;
       }
-    } catch (e) {
-      console.log(`抓取 ${source.name} 失败:`, e);
+      return [];
+    })
+  );
+
+  fetchResults.forEach(result => {
+    if (result.status === 'fulfilled') {
+      allNews = allNews.concat(result.value);
     }
-  }
+  });
 
   // 按时间排序
   allNews.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
@@ -239,19 +246,22 @@ function formatTime(date) {
 // ============================================================
 
 export async function dashboardNews() {
-  // 尝试获取热点新闻 Top 3
+  // 尝试获取热点新闻 Top 3，3秒超时不阻塞首页
   let topNews = [];
   try {
-    const result = await fetchCategoryNews('top');
+    const result = await Promise.race([
+      fetchCategoryNews('top'),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+    ]);
     topNews = (result?.news || []).slice(0, 3);
   } catch (e) {
-    // 静默失败
+    // 静默失败，不阻塞首页
   }
 
   return `
     <div class="dash-card" onclick="window.__navigate('news')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">📰 热点资讯</div>
+        <div class="dash-card-title">📰 每日资讯</div>
         <div class="dash-card-more">查看更多 ›</div>
       </div>
       ${topNews.length > 0 ? topNews.map(n => `

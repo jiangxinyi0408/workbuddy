@@ -40,7 +40,8 @@ async function addIncome(data) {
     id: genId(),
     month: data.month || monthStr(new Date()),
     amount: parseFloat(data.amount) || 0,
-    source: data.source || '收入',
+    source: data.source || '工作收入',
+    note: data.note || '',
     date: data.date || today(),
     createdAt: new Date().toISOString(),
   };
@@ -124,13 +125,12 @@ async function renderFinanceContent() {
 async function renderOverview(container) {
   const loans = await getAll('loans');
   const incomes = await getAll('incomes');
-  const currentMonth = monthStr(new Date());
+  const currentYear = new Date().getFullYear();
 
   const totalDebt = loans.reduce((sum, l) => sum + (l.currentBalance || 0), 0);
   const totalMonthlyPayment = loans.reduce((sum, l) => sum + (l.monthlyPayment || 0), 0);
-  const monthIncomes = incomes.filter(i => i.month === currentMonth);
-  const monthIncome = monthIncomes.reduce((sum, i) => sum + (i.amount || 0), 0);
-  const netCashflow = monthIncome - totalMonthlyPayment;
+  const yearIncomes = incomes.filter(i => i.month && i.month.startsWith(String(currentYear)));
+  const yearIncome = yearIncomes.reduce((sum, i) => sum + (i.amount || 0), 0);
 
   // 按银行分组
   const bankGroups = {};
@@ -142,8 +142,8 @@ async function renderOverview(container) {
   container.innerHTML = `
     <div class="finance-overview">
       <div class="finance-card income">
-        <div class="finance-card-label">本月收入</div>
-        <div class="finance-card-value">¥${formatNum(monthIncome)}</div>
+        <div class="finance-card-label">当年总收入</div>
+        <div class="finance-card-value">¥${formatNum(yearIncome)}</div>
       </div>
       <div class="finance-card debt">
         <div class="finance-card-label">欠款总额</div>
@@ -152,10 +152,6 @@ async function renderOverview(container) {
       <div class="finance-card">
         <div class="finance-card-label">月供总额</div>
         <div class="finance-card-value" style="color:var(--warning)">¥${formatNum(totalMonthlyPayment)}</div>
-      </div>
-      <div class="finance-card">
-        <div class="finance-card-label">本月净现金流</div>
-        <div class="finance-card-value" style="color:${netCashflow >= 0 ? 'var(--success)' : 'var(--danger)'}">${netCashflow >= 0 ? '+' : ''}¥${formatNum(netCashflow)}</div>
       </div>
     </div>
 
@@ -306,7 +302,7 @@ async function renderIncome(container) {
         <div class="flex-between" style="padding:8px 0;border-bottom:1px solid var(--gray-100)">
           <div>
             <div class="text-sm">${escapeHtml(i.source)}</div>
-            <div class="text-xs text-gray">${fmtDate(i.date)}</div>
+            <div class="text-xs text-gray">${fmtDate(i.date)}${i.note ? ' · ' + escapeHtml(i.note) : ''}</div>
           </div>
           <div class="flex gap-8 items-center">
             <span class="font-bold text-success">+¥${formatNum(i.amount)}</span>
@@ -405,15 +401,19 @@ function showAddIncomeDialog(container) {
       <div class="form-group">
         <label>收入来源</label>
         <select id="income-source">
-          <option value="底薪">底薪</option>
-          <option value="提成">提成</option>
-          <option value="奖金">奖金</option>
-          <option value="其他">其他</option>
+          <option value="工作收入">💼 工作收入</option>
+          <option value="乒乓">🏓 乒乓</option>
+          <option value="投资">📈 投资</option>
+          <option value="其他">📌 其他</option>
         </select>
       </div>
       <div class="form-group">
         <label>金额 (元)</label>
         <input type="number" id="income-amount" placeholder="如：8000">
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <input type="text" id="income-note" placeholder="如：5月工资+提成">
       </div>
       <button class="btn-primary btn-full" onclick="window.__saveIncome()">保存</button>
     </div>
@@ -429,6 +429,7 @@ function showAddIncomeDialog(container) {
       month: document.getElementById('income-month').value,
       source: document.getElementById('income-source').value,
       amount,
+      note: document.getElementById('income-note').value.trim(),
     });
     toast('收入已记录');
     sheet.close();
@@ -486,32 +487,32 @@ export async function dashboardFinance() {
 
   const totalDebt = loans.reduce((sum, l) => sum + (l.currentBalance || 0), 0);
   const totalMonthly = loans.reduce((sum, l) => sum + (l.monthlyPayment || 0), 0);
-  const monthIncome = incomes
-    .filter(i => i.month === currentMonth)
+  const currentYear = new Date().getFullYear();
+  const yearIncome = incomes
+    .filter(i => i.month && i.month.startsWith(String(currentYear)))
     .reduce((sum, i) => sum + (i.amount || 0), 0);
-  const netCashflow = monthIncome - totalMonthly;
 
   return `
     <div class="dash-card" onclick="window.__navigate('finance')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">💰 存款还款</div>
+        <div class="dash-card-title">💰 资产管理</div>
         <div class="dash-card-more">查看详情 ›</div>
       </div>
       <div class="dash-stats">
         <div class="dash-stat success">
-          <div class="dash-stat-num">¥${formatNum(monthIncome)}</div>
-          <div class="dash-stat-label">本月收入</div>
+          <div class="dash-stat-num">¥${formatNum(yearIncome)}</div>
+          <div class="dash-stat-label">当年收入</div>
         </div>
         <div class="dash-stat danger">
           <div class="dash-stat-num">¥${formatNum(totalDebt)}</div>
           <div class="dash-stat-label">欠款总额</div>
         </div>
-        <div class="dash-stat ${netCashflow >= 0 ? 'success' : 'danger'}">
-          <div class="dash-stat-num">${netCashflow >= 0 ? '+' : ''}¥${formatNum(netCashflow)}</div>
-          <div class="dash-stat-label">净现金流</div>
+        <div class="dash-stat warning">
+          <div class="dash-stat-num">¥${formatNum(totalMonthly)}</div>
+          <div class="dash-stat-label">月供</div>
         </div>
       </div>
-      <div class="text-xs text-gray mt-8">月供 ¥${formatNum(totalMonthly)}/月 · ${loans.length}笔贷款</div>
+      <div class="text-xs text-gray mt-8">${loans.length}笔贷款 · 月供 ¥${formatNum(totalMonthly)}/月</div>
     </div>
   `;
 }

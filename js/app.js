@@ -13,13 +13,13 @@ import { initNews, renderNews, dashboardNews } from './news.js';
 
 // 页面定义
 const PAGES = {
-  home: { title: '首页概览', render: renderHome },
+  home: { title: '当日安排', render: renderHome },
   work: { title: '每日业务安排', render: renderWork },
   pingpong: { title: '打球时间', render: renderPingpong },
   english: { title: '英语能力提升', render: renderEnglish },
-  weight: { title: '身材管理', render: renderWeight },
+  weight: { title: '健康管理', render: renderWeight },
   news: { title: '每日资讯', render: renderNews },
-  finance: { title: '还款进度', render: renderFinance },
+  finance: { title: '资产管理', render: renderFinance },
   more: { title: '设置', render: renderMore },
 };
 
@@ -130,14 +130,7 @@ async function renderHome(container) {
 }
 
 function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 6) return '夜深了，注意休息';
-  if (h < 9) return '早上好，新的一天开始了';
-  if (h < 12) return '上午好，工作顺利';
-  if (h < 14) return '中午好，记得吃饭';
-  if (h < 18) return '下午好，继续加油';
-  if (h < 22) return '晚上好，辛苦了';
-  return '夜晚好，早点休息';
+  return '欢迎小姜总';
 }
 
 // ============================================================

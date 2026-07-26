@@ -436,7 +436,7 @@ export async function dashboardWork() {
   return `
     <div class="dash-card" onclick="window.__navigate('work')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">📋 今日工作</div>
+        <div class="dash-card-title">📋 业务情况</div>
         <div class="dash-card-more">查看全部 ›</div>
       </div>
       <div class="dash-stats">

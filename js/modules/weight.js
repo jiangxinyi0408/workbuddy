@@ -301,7 +301,7 @@ async function renderDietTab(container) {
         </div>
         ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="食物">` : ''}
         <div class="flex-between mt-8">
-          <span class="text-xs text-gray">${m.source === 'ai' ? '🤖 AI识别' : '✍️ 手动录入'}</span>
+          <span class="text-xs text-gray">${m.source === 'ai' ? '🤖 AI识别' : m.source === 'photo' ? '📷 照片记录' : '✍️ 手动录入'}</span>
           <button class="task-delete" onclick="window.__delMeal('${m.id}')">✕</button>
         </div>
       </div>
@@ -334,12 +334,12 @@ function showAddMealDialog(container) {
       </div>
 
       <div class="form-group">
-        <label>拍照识别（AI自动分析卡路里）</label>
-        <div class="meal-photo-area" onclick="document.getElementById('meal-photo-input').click()">
+        <label>食物照片（可直接上传保存）</label>
+        <div class="meal-photo-area" onclick="document.getElementById('meal-photo-input').click()" style="border:2px dashed var(--gray-300);border-radius:12px;padding:20px;text-align:center;cursor:pointer">
           <div id="meal-photo-preview" class="meal-photo-placeholder">
             <div style="font-size:36px">📷</div>
             <div class="text-sm text-gray">点击拍照或选择图片</div>
-            <div class="text-xs text-gray mt-8">AI将自动识别食物和卡路里</div>
+            <div class="text-xs text-gray mt-8">上传后可直接保存，也可AI识别卡路里</div>
           </div>
           <input type="file" id="meal-photo-input" accept="image/*" capture="environment" style="display:none">
         </div>
@@ -353,7 +353,10 @@ function showAddMealDialog(container) {
         <button class="btn-outline" onclick="window.__addFoodRow()" style="margin-top:8px">+ 添加食物</button>
       </div>
 
-      <button class="btn-primary btn-full" onclick="window.__saveMeal()">保存记录</button>
+      <div class="flex gap-8 mt-16">
+        <button class="btn-outline" style="flex:1" onclick="window.__saveMealOnly()">仅保存照片</button>
+        <button class="btn-primary" style="flex:1" onclick="window.__saveMeal()">保存记录</button>
+      </div>
     </div>
   `;
 
@@ -468,6 +471,25 @@ function showAddMealDialog(container) {
     });
 
     toast('饮食已记录');
+    sheet.close();
+    renderWeight(document.getElementById('main-content'));
+  };
+
+  // 仅保存照片（不需要识别和手动输入）
+  window.__saveMealOnly = async () => {
+    if (!currentImageBase64) {
+      toast('请先上传食物照片');
+      return;
+    }
+    const mealType = document.getElementById('meal-type').value;
+    await addMeal({
+      mealType,
+      foods: [],
+      totalCalories: 0,
+      imageBase64: currentImageBase64,
+      source: 'photo',
+    });
+    toast('照片已保存');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
@@ -637,7 +659,7 @@ export async function dashboardWeight() {
   return `
     <div class="dash-card" onclick="window.__navigate('weight')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">⚖️ 减肥管理</div>
+        <div class="dash-card-title">🏃🏿 健康管理</div>
         <div class="dash-card-more">查看详情 ›</div>
       </div>
       <div class="dash-stats">

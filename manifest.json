@@ -1,7 +1,7 @@
 {
-  "name": "个人工作台",
-  "short_name": "工作台",
-  "description": "保险业务员一站式移动工作台",
+  "name": "jxy的小助理",
+  "short_name": "小助理",
+  "description": "jxy的个人专属小助理",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

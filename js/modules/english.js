@@ -1,9 +1,10 @@
 // ============================================================
-// modules/english.js - 模块3：英语口语学习
+// modules/english.js - 模块3：英语能力提升
+// 每天5+5+5分钟：词汇打卡 + 对话跟练 + 听力训练
 // ============================================================
 
 import { put, getAll, getSetting, setSetting } from '../db.js';
-import { genId, today, fmtDate, toast, escapeHtml } from '../utils.js';
+import { genId, today, fmtDate, toast, escapeHtml, openBottomSheet } from '../utils.js';
 
 let initialized = false;
 
@@ -13,135 +14,200 @@ export async function initEnglish() {
 }
 
 // ============================================================
-// 90天学习计划
+// 词汇库（按天分组，每天5个词）
 // ============================================================
 
-const STUDY_PLAN = generateStudyPlan();
-
-function generateStudyPlan() {
-  const plan = [];
-
-  // 阶段1：1-30天 基础重建
-  for (let day = 1; day <= 30; day++) {
-    const weekday = (day - 1) % 7;
-    let type, title, detail;
-    if (weekday === 0 || weekday === 2 || weekday === 4) {
-      type = '口语';
-      title = `旅游口语跟读 Day ${day}`;
-      detail = '跟读旅游场景对话，练习发音和语调。重点：机场值机、酒店入住、餐厅点餐';
-    } else if (weekday === 1 || weekday === 3 || weekday === 5) {
-      type = '听力';
-      title = `听力训练 Day ${day}`;
-      detail = '慢速英语听力练习，听写旅游短片对白。训练抓取关键词和主旨';
-    } else {
-      type = '词汇';
-      title = `词汇巩固 Day ${day}`;
-      detail = '复习本周词汇 + 学习20个旅游高频词，用联想记忆法巩固';
-    }
-    plan.push({ day, phase: 1, type, title, detail, duration: 15 + Math.floor(day / 10) * 5 });
-  }
-
-  // 阶段2：31-60天 场景强化
-  const scenes = ['机场出行', '酒店住宿', '餐厅用餐', '问路交通', '购物退税', '紧急情况', '社交对话'];
-  for (let day = 31; day <= 60; day++) {
-    const sceneIdx = (day - 31) % scenes.length;
-    const weekday = (day - 1) % 7;
-    let type, title, detail;
-    if (weekday === 6) {
-      type = '词汇';
-      title = `场景词汇 Day ${day}`;
-      detail = `巩固${scenes[sceneIdx]}相关词汇和表达`;
-    } else if (weekday % 2 === 0) {
-      type = '口语';
-      title = `${scenes[sceneIdx]}口语 Day ${day}`;
-      detail = `角色扮演${scenes[sceneIdx]}场景，练习完整对话流程，注意地道表达`;
-    } else {
-      type = '听力';
-      title = `影视听写 Day ${day}`;
-      detail = `观看英语影视片段，逐句听写，对照字幕纠正。提升连读和弱读识别`;
-    }
-    plan.push({ day, phase: 2, type, title, detail, duration: 20 + Math.floor((day - 30) / 10) * 5 });
-  }
-
-  // 阶段3：61-90天 实战提升
-  for (let day = 61; day <= 90; day++) {
-    const weekday = (day - 1) % 7;
-    let type, title, detail;
-    if (weekday === 6) {
-      type = '词汇';
-      title = `高级词汇 Day ${day}`;
-      detail = '学习影视/新闻高级词汇，习语和俚语表达';
-    } else if (weekday % 3 === 0) {
-      type = '口语';
-      title = `自由表达 Day ${day}`;
-      detail = '给定话题，用英语自由表达2分钟。录音回听，纠正语法和发音';
-    } else {
-      type = '听力';
-      title = `无字幕理解 Day ${day}`;
-      detail = '观看无字幕英语视频，理解主旨和细节。逐步提升到能理解80%内容';
-    }
-    plan.push({ day, phase: 3, type, title, detail, duration: 25 + Math.floor((day - 60) / 10) * 5 });
-  }
-
-  return plan;
-}
-
-// 每日实用口语
-const DAILY_PHRASES = [
-  { en: "Could you help me with this?", cn: "你能帮我一下吗？" },
-  { en: "I'd like to check in, please.", cn: "我想办理入住。" },
-  { en: "What time does it open?", cn: "几点开门？" },
-  { en: "Can I have the menu, please?", cn: "请给我菜单好吗？" },
-  { en: "How much does this cost?", cn: "这个多少钱？" },
-  { en: "Where is the nearest station?", cn: "最近的车站在哪里？" },
-  { en: "I'll have what she's having.", cn: "我要和她一样的。" },
-  { en: "Could you say that again?", cn: "你能再说一遍吗？" },
-  { en: "I'm looking for a pharmacy.", cn: "我在找药店。" },
-  { en: "Is there a discount?", cn: "有折扣吗？" },
-  { en: "I'd like to book a room.", cn: "我想预订一个房间。" },
-  { en: "Can I pay by credit card?", cn: "可以用信用卡支付吗？" },
-  { en: "What do you recommend?", cn: "你推荐什么？" },
-  { en: "I have a reservation.", cn: "我有预约。" },
-  { en: "Could I get a receipt?", cn: "能给我收据吗？" },
-  { en: "Where can I exchange money?", cn: "哪里可以换钱？" },
-  { en: "I'm allergic to seafood.", cn: "我对海鲜过敏。" },
-  { en: "How long does it take?", cn: "需要多长时间？" },
-  { en: "Could you call a taxi for me?", cn: "能帮我叫辆出租车吗？" },
-  { en: "I'd like to return this.", cn: "我想退货。" },
-  { en: "What's your specialty?", cn: "你们的特色菜是什么？" },
-  { en: "I need to see a doctor.", cn: "我需要看医生。" },
-  { en: "Can you lower the price?", cn: "能便宜点吗？" },
-  { en: "I'm checking out today.", cn: "我今天退房。" },
-  { en: "Is breakfast included?", cn: "包含早餐吗？" },
-  { en: "Which platform is the train?", cn: "火车在哪个站台？" },
-  { en: "I'd like a window seat.", cn: "我想要靠窗的座位。" },
-  { en: "Can I try this on?", cn: "我可以试穿吗？" },
-  { en: "Where is the restroom?", cn: "洗手间在哪里？" },
-  { en: "Could you wrap it up?", cn: "能帮我打包吗？" },
+const VOCAB_GROUPS = [
+  [
+    { word: 'reservation', meaning: '预订', example: 'I have a reservation for tonight.' },
+    { word: 'departure', meaning: '出发', example: 'What is the departure time?' },
+    { word: 'luggage', meaning: '行李', example: 'Where can I store my luggage?' },
+    { word: 'itinerary', meaning: '行程', example: 'Here is your travel itinerary.' },
+    { word: 'accommodation', meaning: '住宿', example: 'The accommodation is included.' },
+  ],
+  [
+    { word: 'souvenir', meaning: '纪念品', example: 'I bought some souvenirs.' },
+    { word: 'currency', meaning: '货币', example: 'What currency do they use?' },
+    { word: 'visa', meaning: '签证', example: 'Do I need a visa?' },
+    { word: 'terminal', meaning: '航站楼', example: 'Which terminal is for international flights?' },
+    { word: 'boarding pass', meaning: '登机牌', example: 'Show your boarding pass please.' },
+  ],
+  [
+    { word: 'delay', meaning: '延误', example: 'The flight is delayed.' },
+    { word: 'upgrade', meaning: '升级', example: 'Can I upgrade to business class?' },
+    { word: 'receipt', meaning: '收据', example: 'Could I have a receipt?' },
+    { word: 'discount', meaning: '折扣', example: 'Is there a discount?' },
+    { word: 'allergy', meaning: '过敏', example: 'I have a peanut allergy.' },
+  ],
+  [
+    { word: 'appetizer', meaning: '开胃菜', example: 'Would you like an appetizer?' },
+    { word: 'tip', meaning: '小费', example: 'How much should I tip?' },
+    { word: 'downtown', meaning: '市中心', example: 'The hotel is downtown.' },
+    { word: 'suburb', meaning: '郊区', example: 'They live in the suburbs.' },
+    { word: 'landmark', meaning: '地标', example: 'The tower is a famous landmark.' },
+  ],
+  [
+    { word: 'checkout', meaning: '退房', example: 'Checkout is at 11 AM.' },
+    { word: 'concierge', meaning: '礼宾部', example: 'Ask the concierge for directions.' },
+    { word: 'amenity', meaning: '设施', example: 'What amenities does the hotel have?' },
+    { word: 'shuttle', meaning: '班车', example: 'Is there an airport shuttle?' },
+    { word: 'deposit', meaning: '押金', example: 'We need a security deposit.' },
+  ],
+  [
+    { word: 'prescription', meaning: '处方', example: 'I need to fill a prescription.' },
+    { word: 'emergency', meaning: '紧急情况', example: 'Call 911 in an emergency.' },
+    { word: 'pharmacy', meaning: '药店', example: 'Is there a pharmacy nearby?' },
+    { word: 'appointment', meaning: '预约', example: 'I have a doctor appointment.' },
+    { word: 'symptom', meaning: '症状', example: 'What are your symptoms?' },
+  ],
+  [
+    { word: 'bargain', meaning: '讨价还价', example: 'Can I bargain here?' },
+    { word: 'refund', meaning: '退款', example: 'I would like a refund.' },
+    { word: 'exchange', meaning: '换货', example: 'Can I exchange this for a different size?' },
+    { word: 'warranty', meaning: '保修', example: 'Does this have a warranty?' },
+    { word: 'delivery', meaning: '配送', example: 'Is delivery free?' },
+  ],
 ];
 
-// 核心词汇库
-const VOCABULARY = [
-  { word: 'reservation', meaning: '预订', example: 'I have a reservation for tonight.' },
-  { word: 'departure', meaning: '出发', example: 'What is the departure time?' },
-  { word: 'luggage', meaning: '行李', example: 'Where can I store my luggage?' },
-  { word: 'itinerary', meaning: '行程', example: 'Here is your travel itinerary.' },
-  { word: 'accommodation', meaning: '住宿', example: 'The accommodation is included.' },
-  { word: 'souvenir', meaning: '纪念品', example: 'I bought some souvenirs.' },
-  { word: 'currency', meaning: '货币', example: 'What currency do they use?' },
-  { word: 'visa', meaning: '签证', example: 'Do I need a visa?' },
-  { word: 'terminal', meaning: '航站楼', example: 'Which terminal is for international flights?' },
-  { word: 'boarding pass', meaning: '登机牌', example: 'Show your boarding pass please.' },
-  { word: 'delay', meaning: '延误', example: 'The flight is delayed.' },
-  { word: 'upgrade', meaning: '升级', example: 'Can I upgrade to business class?' },
-  { word: 'receipt', meaning: '收据', example: 'Could I have a receipt?' },
-  { word: 'discount', meaning: '折扣', example: 'Is there a discount?' },
-  { word: 'allergy', meaning: '过敏', example: 'I have a peanut allergy.' },
-  { word: 'appetizer', meaning: '开胃菜', example: 'Would you like an appetizer?' },
-  { word: 'tip', meaning: '小费', example: 'How much should I tip?' },
-  { word: 'downtown', meaning: '市中心', example: 'The hotel is downtown.' },
-  { word: 'suburb', meaning: '郊区', example: 'They live in the suburbs.' },
-  { word: 'landmark', meaning: '地标', example: 'The tower is a famous landmark.' },
+// 对话场景库（使用当天词汇）
+const DIALOGUE_SCENES = [
+  {
+    title: '酒店入住',
+    lines: [
+      { speaker: 'Clerk', en: 'Welcome! Do you have a reservation?', cn: '欢迎！您有预订吗？' },
+      { speaker: 'You', en: 'Yes, I have a reservation for tonight.', cn: '是的，我预订了今晚的。' },
+      { speaker: 'Clerk', en: 'May I see your ID and boarding pass?', cn: '请出示您的身份证件和登机牌。' },
+      { speaker: 'You', en: 'Sure, here you are. What time is checkout?', cn: '好的，给你。请问几点退房？' },
+      { speaker: 'Clerk', en: 'Checkout is at 11 AM. Here is your room key.', cn: '退房时间是上午11点。这是您的房间钥匙。' },
+    ],
+  },
+  {
+    title: '机场值机',
+    lines: [
+      { speaker: 'Staff', en: 'Where are you flying today?', cn: '您今天飞往哪里？' },
+      { speaker: 'You', en: 'I am flying to Tokyo. What is the departure time?', cn: '我飞往东京。出发时间是几点？' },
+      { speaker: 'Staff', en: 'Your flight departs at 3 PM. Any luggage to check?', cn: '您的航班下午3点出发。有行李要托运吗？' },
+      { speaker: 'You', en: 'Yes, one suitcase. Can I get a window seat?', cn: '是的，一个行李箱。能给我靠窗的座位吗？' },
+      { speaker: 'Staff', en: 'Sure. Here is your boarding pass.', cn: '好的。这是您的登机牌。' },
+    ],
+  },
+  {
+    title: '餐厅点餐',
+    lines: [
+      { speaker: 'Waiter', en: 'Would you like an appetizer to start?', cn: '您想先来个开胃菜吗？' },
+      { speaker: 'You', en: 'Yes, please. I have a peanut allergy.', cn: '好的。我对花生过敏。' },
+      { speaker: 'Waiter', en: 'No problem. What would you like for your main course?', cn: '没问题。主菜您想吃什么？' },
+      { speaker: 'You', en: 'I will have the grilled salmon. Is there a discount today?', cn: '我要烤三文鱼。今天有折扣吗？' },
+      { speaker: 'Waiter', en: 'Yes, 20% off. Could I get you a receipt later?', cn: '有的，打八折。稍后需要收据吗？' },
+    ],
+  },
+  {
+    title: '购物退税',
+    lines: [
+      { speaker: 'Assistant', en: 'How can I help you today?', cn: '今天需要什么帮助？' },
+      { speaker: 'You', en: 'I bought some souvenirs. Can I get a refund on tax?', cn: '我买了一些纪念品。可以退税吗？' },
+      { speaker: 'Assistant', en: 'Sure. What currency do you need?', cn: '可以。您需要什么货币？' },
+      { speaker: 'You', en: 'Chinese currency, please. Where can I exchange money?', cn: '人民币，谢谢。哪里可以换钱？' },
+      { speaker: 'Assistant', en: 'There is an exchange counter downstairs.', cn: '楼下有个兑换柜台。' },
+    ],
+  },
+  {
+    title: '酒店退房',
+    lines: [
+      { speaker: 'You', en: 'I am checking out today.', cn: '我今天退房。' },
+      { speaker: 'Clerk', en: 'How was your stay? Did you enjoy the amenity?', cn: '您住得怎么样？喜欢酒店的设施吗？' },
+      { speaker: 'You', en: 'Yes, very much. I left my luggage in the room.', cn: '非常喜欢。我把行李留在房间了。' },
+      { speaker: 'Clerk', en: 'We will send it via shuttle to the airport.', cn: '我们会用班车送到机场。' },
+      { speaker: 'You', en: 'Thank you. Please keep the deposit as tip.', cn: '谢谢。押金就当小费吧。' },
+    ],
+  },
+  {
+    title: '药店就医',
+    lines: [
+      { speaker: 'You', en: 'I need to fill a prescription.', cn: '我需要配药。' },
+      { speaker: 'Pharmacist', en: 'Do you have an appointment with a doctor?', cn: '您有医生预约吗？' },
+      { speaker: 'You', en: 'Yes. My symptom is a sore throat.', cn: '有的。我的症状是喉咙痛。' },
+      { speaker: 'Pharmacist', en: 'Is this an emergency?', cn: '这是紧急情况吗？' },
+      { speaker: 'You', en: 'No, just a mild symptom. Where is the pharmacy?', cn: '不是，只是轻微症状。药店在哪里？' },
+    ],
+  },
+  {
+    title: '商场购物',
+    lines: [
+      { speaker: 'You', en: 'Can I exchange this for a different size?', cn: '可以换个尺码吗？' },
+      { speaker: 'Assistant', en: 'Sure. Does this have a warranty?', cn: '可以。这个有保修吗？' },
+      { speaker: 'You', en: 'Yes. Is delivery free to downtown?', cn: '有的。配送到市中心免费吗？' },
+      { speaker: 'Assistant', en: 'Yes, free delivery. Would you like to bargain on the price?', cn: '免费配送。您想讨价还价吗？' },
+      { speaker: 'You', en: 'Can I get a refund if I do not like it?', cn: '如果不喜欢可以退款吗？' },
+    ],
+  },
+];
+
+// 听力训练素材
+const LISTENING_EXERCISES = [
+  {
+    title: '机场广播',
+    text: 'Attention passengers. The departure for flight CA981 to Tokyo has been delayed by 30 minutes. The new boarding time is 3:30 PM. Please wait near the terminal gate. Thank you for your patience.',
+    questions: [
+      { q: '航班飞往哪里？', a: 'Tokyo（东京）' },
+      { q: '原登机时间是多少？', a: '3:00 PM' },
+      { q: '延误了多久？', a: '30分钟' },
+    ],
+  },
+  {
+    title: '酒店前台',
+    text: 'Welcome to our hotel. Your accommodation includes breakfast and free WiFi. Checkout is at 11 AM. If you need anything, please call the concierge. We also have an airport shuttle every hour.',
+    questions: [
+      { q: '住宿包含什么？', a: '早餐和免费WiFi' },
+      { q: '退房时间是几点？', a: '上午11点' },
+      { q: '班车多久一班？', a: '每小时一班' },
+    ],
+  },
+  {
+    title: '餐厅对话',
+    text: 'Good evening. Would you like an appetizer? Our specialty is grilled salmon. If you have any allergy, please let us know. We offer a 20% discount today, and a receipt will be provided.',
+    questions: [
+      { q: '特色菜是什么？', a: '烤三文鱼' },
+      { q: '今天有什么优惠？', a: '八折（20% off）' },
+      { q: '有什么需要注意的？', a: '如有过敏请告知' },
+    ],
+  },
+  {
+    title: '购物退税',
+    text: 'You can get a tax refund for your souvenirs. Please show your receipt at the counter. The refund can be given in different currency. There is also an exchange office next door.',
+    questions: [
+      { q: '什么可以退税？', a: '纪念品（souvenirs）' },
+      { q: '需要出示什么？', a: '收据（receipt）' },
+      { q: '退款可以什么形式？', a: '不同货币（currency）' },
+    ],
+  },
+  {
+    title: '紧急就医',
+    text: 'I understand your symptom. This is not an emergency, but you should see a doctor. I can help you make an appointment. The pharmacy is on the first floor, and you can fill your prescription there.',
+    questions: [
+      { q: '这是紧急情况吗？', a: '不是' },
+      { q: '建议做什么？', a: '看医生（see a doctor）' },
+      { q: '药店在几楼？', a: '一楼' },
+    ],
+  },
+  {
+    title: '商场退换货',
+    text: 'You can exchange this item within 30 days. Please bring your receipt. If you want a refund, it will take 3 to 5 business days. Does this have a warranty? Yes, one year warranty is included.',
+    questions: [
+      { q: '换货期限是多久？', a: '30天内' },
+      { q: '退款需要几天？', a: '3-5个工作日' },
+      { q: '保修期多久？', a: '一年' },
+    ],
+  },
+  {
+    title: '交通问路',
+    text: 'To get to downtown, you can take the shuttle from the suburb. It runs every 20 minutes. The landmark you are looking for is the tall tower. You cannot miss it. The journey takes about 30 minutes.',
+    questions: [
+      { q: '去市中心坐什么？', a: '班车（shuttle）' },
+      { q: '班车多久一班？', a: '20分钟一班' },
+      { q: '路程需要多久？', a: '约30分钟' },
+    ],
+  },
 ];
 
 // ============================================================
@@ -163,22 +229,28 @@ async function getCurrentDay() {
   const start = new Date(startDay);
   const now = new Date();
   const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24)) + 1;
-  return Math.min(Math.max(diff, 1), 90);
+  return Math.max(diff, 1);
 }
 
 async function getStreak() {
   const records = await getProgress();
-  if (records.length === 0) return 0;
+  // 只看完成了3项任务的日期
+  const fullDays = {};
+  records.forEach(r => {
+    if (!fullDays[r.date]) fullDays[r.date] = new Set();
+    fullDays[r.date].add(r.type);
+  });
+  const completedDates = Object.keys(fullDays).filter(d => fullDays[d].size >= 3);
+
+  if (completedDates.length === 0) return 0;
   let streak = 0;
   let checkDate = new Date();
   for (;;) {
     const dateStr = fmtDate(checkDate);
-    const hasRecord = records.some(r => r.date === dateStr);
-    if (hasRecord) {
+    if (completedDates.includes(dateStr)) {
       streak++;
       checkDate.setDate(checkDate.getDate() - 1);
     } else {
-      // 今天还没学不算断
       if (streak === 0 && dateStr === today()) {
         checkDate.setDate(checkDate.getDate() - 1);
         continue;
@@ -193,8 +265,8 @@ async function logStudy(type, minutes, content) {
   const record = {
     id: genId(),
     date: today(),
-    type,
-    minutes: parseInt(minutes) || 15,
+    type, // '词汇' | '对话' | '听力'
+    minutes: parseInt(minutes) || 5,
     content: content || '',
     createdAt: new Date().toISOString(),
   };
@@ -202,31 +274,53 @@ async function logStudy(type, minutes, content) {
   return record;
 }
 
+async function getTodayProgress() {
+  const records = await getProgress();
+  const todayRecords = records.filter(r => r.date === today());
+  return {
+    vocab: todayRecords.some(r => r.type === '词汇'),
+    dialogue: todayRecords.some(r => r.type === '对话'),
+    listening: todayRecords.some(r => r.type === '听力'),
+    all: todayRecords,
+  };
+}
+
 // ============================================================
-// 渲染：英语学习主页面
+// 获取当天内容
+// ============================================================
+
+async function getTodayContent() {
+  const day = await getCurrentDay();
+  const groupIdx = (day - 1) % VOCAB_GROUPS.length;
+  const sceneIdx = (day - 1) % DIALOGUE_SCENES.length;
+  const listeningIdx = (day - 1) % LISTENING_EXERCISES.length;
+
+  return {
+    day,
+    vocab: VOCAB_GROUPS[groupIdx],
+    dialogue: DIALOGUE_SCENES[sceneIdx],
+    listening: LISTENING_EXERCISES[listeningIdx],
+  };
+}
+
+// ============================================================
+// 渲染：英语能力提升主页面
 // ============================================================
 
 export async function renderEnglish(container) {
-  const currentDay = await getCurrentDay();
-  const todayTask = STUDY_PLAN[currentDay - 1];
-  const phase = todayTask.phase;
-  const phaseNames = ['', '基础重建', '场景强化', '实战提升'];
-  const phaseDescs = ['', '旅游口语跟读 + 基础听力 + 核心词汇', '全场景对话 + 影视听写', '无字幕理解 + 自由表达'];
-
-  const records = await getProgress();
-  const totalMinutes = records.reduce((s, r) => s + r.minutes, 0);
+  const content = await getTodayContent();
+  const progress = await getTodayProgress();
   const streak = await getStreak();
-  const completionRate = Math.round(records.length / 90 * 100);
-
-  // 每日一句
-  const phraseIdx = (currentDay - 1) % DAILY_PHRASES.length;
-  const phrase = DAILY_PHRASES[phraseIdx];
+  const allRecords = await getProgress();
+  const totalMinutes = allRecords.reduce((s, r) => s + r.minutes, 0);
+  const completedCount = (progress.vocab ? 1 : 0) + (progress.dialogue ? 1 : 0) + (progress.listening ? 1 : 0);
+  const completionRate = Math.round(completedCount / 3 * 100);
 
   container.innerHTML = `
     <div class="english-stage">
-      <div class="english-stage-num">阶段 ${phase} / 3</div>
-      <div class="english-stage-name">${phaseNames[phase]}</div>
-      <div class="english-stage-desc">${phaseDescs[phase]} · 第 ${currentDay} 天</div>
+      <div class="english-stage-num">每日学习 5+5+5</div>
+      <div class="english-stage-name">英语能力提升</div>
+      <div class="english-stage-desc">词汇打卡 · 对话跟练 · 听力训练</div>
       <div class="progress-ring">
         <svg width="80" height="80">
           <circle class="progress-ring-bg" cx="40" cy="40" r="34" fill="none" stroke-width="6"/>
@@ -237,41 +331,75 @@ export async function renderEnglish(container) {
         </svg>
         <div class="progress-ring-text">${completionRate}%</div>
       </div>
-      <div class="text-sm" style="opacity:0.9">连续学习 ${streak} 天 · 累计 ${totalMinutes} 分钟</div>
+      <div class="text-sm" style="opacity:0.9">连续 ${streak} 天 · 累计 ${totalMinutes} 分钟</div>
     </div>
 
-    <div class="english-task-card">
-      <div class="english-task-day">第 ${currentDay} 天 · ${todayTask.type} · 建议 ${todayTask.duration}分钟</div>
-      <div class="english-task-title">${escapeHtml(todayTask.title)}</div>
-      <div class="english-task-detail">${escapeHtml(todayTask.detail)}</div>
-      <button class="btn-primary btn-full mt-16" onclick="window.__completeEnglish()">完成今日学习</button>
-    </div>
-
-    <div class="english-phrase">
-      <div class="text-xs text-gray mb-8">💬 每日一句</div>
-      <div class="english-phrase-en">"${escapeHtml(phrase.en)}"</div>
-      <div class="english-phrase-cn">${escapeHtml(phrase.cn)}</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span class="title-left">📚 核心词汇（${VOCABULARY.length}个）</span></div>
-      <div id="vocab-list">
-        ${VOCABULARY.slice(0, 5).map(v => `
-          <div style="padding:8px 0;border-bottom:1px solid var(--gray-100)">
-            <div class="font-bold text-sm">${escapeHtml(v.word)} <span class="text-gray text-xs">${escapeHtml(v.meaning)}</span></div>
-            <div class="text-xs text-gray mt-4">${escapeHtml(v.example)}</div>
+    <!-- 任务1：词汇打卡 -->
+    <div class="english-task-card" style="border-left: 4px solid ${progress.vocab ? 'var(--success)' : 'var(--primary)'}">
+      <div class="english-task-day">📝 任务一 · 5分钟词汇打卡 · 第${content.day}天</div>
+      <div class="english-task-title">今日词汇（${content.vocab.length}个）</div>
+      <div id="vocab-learn-area">
+        ${content.vocab.map((v, i) => `
+          <div class="vocab-item" style="padding:10px 0;border-bottom:1px solid var(--gray-100)">
+            <div class="font-bold text-sm">${i+1}. ${escapeHtml(v.word)} <span class="text-gray text-xs">${escapeHtml(v.meaning)}</span></div>
+            <div class="text-xs text-gray mt-4">例：${escapeHtml(v.example)}</div>
           </div>
         `).join('')}
       </div>
-      <button class="btn-outline btn-full mt-8" onclick="window.__showAllVocab()">查看全部词汇</button>
+      <button class="btn-primary btn-full mt-16" onclick="window.__completeVocab()" ${progress.vocab ? 'disabled style="opacity:0.5"' : ''}>
+        ${progress.vocab ? '✅ 已完成词汇打卡' : '完成词汇打卡（5分钟）'}
+      </button>
+    </div>
+
+    <!-- 任务2：对话跟练 -->
+    <div class="english-task-card" style="border-left: 4px solid ${progress.dialogue ? 'var(--success)' : 'var(--purple)'}">
+      <div class="english-task-day">🗣️ 任务二 · 5分钟对话跟练</div>
+      <div class="english-task-title">场景：${escapeHtml(content.dialogue.title)}</div>
+      <div class="english-task-detail text-xs text-gray">运用今日词汇的日常对话，跟读练习发音和语调</div>
+      <div class="dialogue-area mt-16">
+        ${content.dialogue.lines.map((line, i) => `
+          <div class="dialogue-line" style="padding:10px;margin-bottom:6px;border-radius:8px;background:${line.speaker === 'You' ? 'var(--primary-bg)' : 'var(--gray-100)'}">
+            <div class="text-xs font-bold" style="color:${line.speaker === 'You' ? 'var(--primary-dark)' : 'var(--gray-600)'}">${escapeHtml(line.speaker)}（你）</div>
+            <div class="text-sm font-bold mt-4">${escapeHtml(line.en)}</div>
+            <div class="text-xs text-gray mt-4">${escapeHtml(line.cn)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-primary btn-full mt-16" onclick="window.__completeDialogue()" ${progress.dialogue ? 'disabled style="opacity:0.5"' : ''}>
+        ${progress.dialogue ? '✅ 已完成对话跟练' : '完成对话跟练（5分钟）'}
+      </button>
+    </div>
+
+    <!-- 任务3：听力训练 -->
+    <div class="english-task-card" style="border-left: 4px solid ${progress.listening ? 'var(--success)' : 'var(--cyan)'}">
+      <div class="english-task-day">👂 任务三 · 5分钟听力训练</div>
+      <div class="english-task-title">${escapeHtml(content.listening.title)}</div>
+      <div class="english-task-detail text-xs text-gray">阅读以下短文，理解内容后回答问题</div>
+      <div class="listening-text mt-16" style="padding:14px;background:var(--gray-50);border-radius:8px;line-height:1.8;font-size:14px">
+        ${escapeHtml(content.listening.text)}
+      </div>
+      <div class="listening-questions mt-16">
+        <div class="text-xs text-gray mb-8">理解问题（点击查看答案）：</div>
+        ${content.listening.questions.map((q, i) => `
+          <div class="listening-q" style="padding:8px 0;border-bottom:1px solid var(--gray-100)">
+            <div class="text-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'" style="cursor:pointer">
+              ${i+1}. ${escapeHtml(q.q)} <span class="text-xs text-primary">▾ 点击查看答案</span>
+            </div>
+            <div class="text-xs text-success mt-4" style="display:none">答案：${escapeHtml(q.a)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-primary btn-full mt-16" onclick="window.__completeListening()" ${progress.listening ? 'disabled style="opacity:0.5"' : ''}>
+        ${progress.listening ? '✅ 已完成听力训练' : '完成听力训练（5分钟）'}
+      </button>
     </div>
 
     <div class="card">
       <div class="card-title"><span class="title-left">📊 学习记录</span></div>
-      ${records.length > 0 ? records.slice(0, 10).map(r => `
+      ${allRecords.length > 0 ? allRecords.slice(0, 15).map(r => `
         <div class="flex-between" style="padding:6px 0;border-bottom:1px solid var(--gray-100)">
           <div>
-            <span class="text-sm">${escapeHtml(r.type)}</span>
+            <span class="text-sm">${r.type === '词汇' ? '📝' : r.type === '对话' ? '🗣️' : '👂'} ${escapeHtml(r.type)}</span>
             <span class="text-xs text-gray ml-8">${fmtDate(r.date)}</span>
           </div>
           <span class="text-sm font-bold">${r.minutes}分钟</span>
@@ -286,46 +414,31 @@ export async function renderEnglish(container) {
         <div>🎬 看英语电影大多不用中文字幕</div>
         <div>🗣️ 日常口语流利交流</div>
         <div>👂 听力理解能力显著提升</div>
+        <div class="mt-8 text-xs">💡 每天15分钟（5+5+5），坚持就能看到变化</div>
       </div>
     </div>
   `;
 
-  window.__completeEnglish = async () => {
-    await logStudy(todayTask.type, todayTask.duration, todayTask.title);
-    toast(`太棒了！已记录 ${todayTask.duration} 分钟学习`);
+  window.__completeVocab = async () => {
+    if (progress.vocab) return;
+    await logStudy('词汇', 5, `第${content.day}天词汇：${content.vocab.map(v => v.word).join(', ')}`);
+    toast('词汇打卡完成！+5分钟');
     renderEnglish(container);
   };
 
-  window.__showAllVocab = () => {
-    const html = `
-      <div class="settings-form">
-        ${VOCABULARY.map(v => `
-          <div style="padding:10px 0;border-bottom:1px solid var(--gray-100)">
-            <div class="font-bold">${escapeHtml(v.word)} <span class="text-gray text-sm">${escapeHtml(v.meaning)}</span></div>
-            <div class="text-xs text-gray mt-4">${escapeHtml(v.example)}</div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    const sheet = openBottomSheet2('全部词汇', html);
+  window.__completeDialogue = async () => {
+    if (progress.dialogue) return;
+    await logStudy('对话', 5, `对话跟练：${content.dialogue.title}`);
+    toast('对话跟练完成！+5分钟');
+    renderEnglish(container);
   };
-}
 
-function openBottomSheet2(title, html) {
-  const overlay = document.createElement('div');
-  overlay.className = 'sheet-overlay';
-  overlay.innerHTML = `
-    <div class="bottom-sheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-header"><h3>${escapeHtml(title)}</h3><button class="sheet-close">✕</button></div>
-      <div class="sheet-body">${html}</div>
-    </div>`;
-  document.body.appendChild(overlay);
-  requestAnimationFrame(() => overlay.classList.add('show'));
-  const close = () => { overlay.classList.remove('show'); setTimeout(() => overlay.remove(), 300); };
-  overlay.querySelector('.sheet-close').onclick = close;
-  overlay.onclick = (e) => { if (e.target === overlay) close(); };
-  return { overlay, close };
+  window.__completeListening = async () => {
+    if (progress.listening) return;
+    await logStudy('听力', 5, `听力训练：${content.listening.title}`);
+    toast('听力训练完成！+5分钟');
+    renderEnglish(container);
+  };
 }
 
 // ============================================================
@@ -333,32 +446,32 @@ function openBottomSheet2(title, html) {
 // ============================================================
 
 export async function dashboardEnglish() {
-  const currentDay = await getCurrentDay();
-  const todayTask = STUDY_PLAN[currentDay - 1];
+  const content = await getTodayContent();
+  const progress = await getTodayProgress();
   const streak = await getStreak();
-  const phraseIdx = (currentDay - 1) % DAILY_PHRASES.length;
-  const phrase = DAILY_PHRASES[phraseIdx];
+  const completedCount = (progress.vocab ? 1 : 0) + (progress.dialogue ? 1 : 0) + (progress.listening ? 1 : 0);
 
   return `
     <div class="dash-card" onclick="window.__navigate('english')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">📚 英语学习</div>
-        <div class="dash-card-more">第${currentDay}天 ›</div>
+        <div class="dash-card-title">📚 英语能力提升</div>
+        <div class="dash-card-more">${completedCount}/3 ›</div>
       </div>
       <div class="dash-stats">
         <div class="dash-stat primary">
           <div class="dash-stat-num">${streak}</div>
           <div class="dash-stat-label">连续天数</div>
         </div>
-        <div class="dash-stat warning">
-          <div class="dash-stat-num">${todayTask.duration}</div>
-          <div class="dash-stat-label">今日分钟</div>
+        <div class="dash-stat success">
+          <div class="dash-stat-num">${completedCount}/3</div>
+          <div class="dash-stat-label">今日完成</div>
         </div>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100)">
-        <div class="text-xs text-gray mb-8">今日任务：${escapeHtml(todayTask.title)}</div>
-        <div class="english-phrase-en" style="font-size:13px">"${escapeHtml(phrase.en)}"</div>
-        <div class="english-phrase-cn" style="font-size:12px">${escapeHtml(phrase.cn)}</div>
+        <div class="text-xs text-gray mb-8">今日任务（5+5+5分钟）</div>
+        <div class="text-sm" style="padding:3px 0">${progress.vocab ? '✅' : '⬜'} 📝 词汇打卡</div>
+        <div class="text-sm" style="padding:3px 0">${progress.dialogue ? '✅' : '⬜'} 🗣️ 对话跟练</div>
+        <div class="text-sm" style="padding:3px 0">${progress.listening ? '✅' : '⬜'} 👂 听力训练</div>
       </div>
     </div>
   `;
