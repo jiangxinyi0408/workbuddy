@@ -1044,6 +1044,16 @@ body {
   font-size: 12px;
 }
 .data-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.data-actions button { flex: 1; min-width: 120px; }
+.backup-status {
+  background: var(--primary-bg);
+  color: var(--primary-dark);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--primary);
+}
 
 /* ============================================================
    关于

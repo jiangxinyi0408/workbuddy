@@ -10,6 +10,7 @@ import { initFinance, renderFinance, dashboardFinance } from './modules/finance.
 import { initEnglish, renderEnglish, dashboardEnglish } from './modules/english.js';
 import { initPingpong, renderPingpong, dashboardPingpong } from './modules/pingpong.js';
 import { initNews, renderNews, dashboardNews } from './news.js';
+import { autoRestoreIfNeeded, backupToLocalStorage, formatBackupTime } from './backup.js';
 
 // 页面定义
 const PAGES = {
@@ -227,11 +228,18 @@ window.__showSettings = async function() {
       </div>
 
       <div class="form-group">
-        <label>💾 数据管理</label>
+        <label>💾 数据备份与恢复</label>
+        <div class="backup-status" id="backup-status">⏳ 读取中...</div>
         <div class="data-actions">
-          <button class="btn-outline" onclick="window.__exportData()">导出全部数据</button>
-          <button class="btn-danger-outline" onclick="window.__clearData()">清空所有数据</button>
+          <button class="btn-outline" onclick="window.__manualBackup()">📥 立即备份</button>
+          <button class="btn-outline" onclick="window.__exportData()">📤 导出文件</button>
         </div>
+        <div class="data-actions mt-8">
+          <button class="btn-outline" onclick="window.__importData()">📂 导入文件</button>
+          <button class="btn-danger-outline" onclick="window.__clearData()">🗑 清空数据</button>
+        </div>
+        <input type="file" id="import-file-input" accept=".json" style="display:none">
+        <div class="form-hint">自动备份每5分钟执行一次，切换App回来时也会备份</div>
       </div>
 
       <button class="btn-primary btn-full" onclick="window.__saveSettings()">保存设置</button>
@@ -240,6 +248,13 @@ window.__showSettings = async function() {
 
   const sheet = openBottomSheet('应用设置', html);
   window.__currentSheet = sheet;
+
+  // 更新备份状态显示
+  const updateBackupStatus = () => {
+    const el = document.getElementById('backup-status');
+    if (el) el.textContent = '✅ ' + formatBackupTime();
+  };
+  updateBackupStatus();
 };
 
 window.__saveSettings = async function() {
@@ -266,19 +281,40 @@ window.__saveSettings = async function() {
 };
 
 window.__exportData = async function() {
-  const stores = ['tasks', 'workLogs', 'pingpongSessions', 'englishProgress', 'weights', 'meals', 'loans', 'incomes', 'repayments', 'settings'];
-  const data = {};
-  for (const s of stores) {
-    data[s] = await getAll(s);
+  const { exportBackupFile } = await import('./backup.js');
+  await exportBackupFile();
+  toast('备份文件已下载到手机');
+};
+
+window.__manualBackup = async function() {
+  const { backupToLocalStorage } = await import('./backup.js');
+  const result = await backupToLocalStorage();
+  if (result.success) {
+    toast(`已备份 ${result.count} 条记录`);
+    const el = document.getElementById('backup-status');
+    if (el) el.textContent = '✅ ' + formatBackupTime();
+  } else {
+    toast('备份失败：' + (result.error || '存储空间不足'));
   }
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `workbuddy-backup-${today()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('数据已导出');
+};
+
+window.__importData = function() {
+  const input = document.getElementById('import-file-input');
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!confirm('导入备份将覆盖当前数据，确定继续吗？')) return;
+    try {
+      const { importBackupFile } = await import('./backup.js');
+      const result = await importBackupFile(file);
+      toast(`已恢复 ${result.restored} 条记录`);
+      if (window.__currentSheet) window.__currentSheet.close();
+      location.reload();
+    } catch (err) {
+      toast('导入失败：' + err.message);
+    }
+  };
+  input.click();
 };
 
 window.__clearData = async function() {
@@ -289,6 +325,9 @@ window.__clearData = async function() {
     const { clear } = await import('./db.js');
     await clear(s);
   }
+  // 同步清空 localStorage 备份
+  localStorage.removeItem('workbuddy_backup');
+  localStorage.removeItem('workbuddy_backup_time');
   toast('数据已清空');
   location.reload();
 };
@@ -340,6 +379,16 @@ async function init() {
   // 暴露导航函数
   window.__navigate = navigate;
 
+  // 🛡️ 启动时自动检测：如果 IndexedDB 被清空但 localStorage 有备份 → 自动恢复
+  try {
+    const restoreResult = await autoRestoreIfNeeded();
+    if (restoreResult.restored) {
+      toast(`检测到数据丢失，已自动恢复 ${restoreResult.count} 条记录`);
+    }
+  } catch (e) {
+    console.warn('自动恢复检测失败:', e);
+  }
+
   // 初始化各模块
   await Promise.all([
     initWork(),
@@ -371,6 +420,26 @@ async function init() {
       console.log('SW注册失败（不影响使用）:', e);
     }
   }
+
+  // 🛡️ 启动时立即备份一次（确保 localStorage 有最新副本）
+  backupToLocalStorage().catch(() => {});
+
+  // 🛡️ 每 5 分钟自动备份一次（防 iOS Safari 随时清空 IndexedDB）
+  setInterval(() => {
+    backupToLocalStorage().catch(() => {});
+  }, 5 * 60 * 1000);
+
+  // 🛡️ 页面从后台切回前台时立即备份（用户切回 App 时数据最新）
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      backupToLocalStorage().catch(() => {});
+    }
+  });
+
+  // 🛡️ 页面关闭前紧急备份
+  window.addEventListener('pagehide', () => {
+    backupToLocalStorage().catch(() => {});
+  });
 
   // 移动端默认收起侧边栏
   if (isMobile()) {
