@@ -971,6 +971,21 @@ body {
   border-radius: 3px;
   font-size: 10px;
 }
+.news-hot-badge {
+  background: #fff1f0;
+  color: #cf1322;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.news-refresh-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px;
+}
+.btn-sm { font-size: 12px; padding: 4px 10px; }
 .news-title { font-size: 15px; font-weight: 600; line-height: 1.4; }
 .news-summary { font-size: 13px; color: var(--gray-500); margin-top: 6px; line-height: 1.5; }
 .news-time { font-size: 11px; color: var(--gray-400); margin-top: 6px; }
