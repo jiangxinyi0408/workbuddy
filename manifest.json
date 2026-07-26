@@ -10,9 +10,15 @@
   "lang": "zh-CN",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%239d8ec4'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white'%3E%F0%9F%92%BC%3C/text%3E%3C/svg%3E",
+      "src": "images/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
