@@ -342,15 +342,15 @@ function showAddLoanDialog(container) {
       </div>
       <div class="form-group">
         <label>贷款本金 (元)</label>
-        <input type="number" id="loan-principal" placeholder="如：500000">
+        <input type="number" step="0.01" id="loan-principal" placeholder="如：500000.00">
       </div>
       <div class="form-group">
         <label>当前剩余欠款 (元)</label>
-        <input type="number" id="loan-balance" placeholder="留空则等于本金">
+        <input type="number" step="0.01" id="loan-balance" placeholder="留空则等于本金">
       </div>
       <div class="form-group">
         <label>每月固定还款 (元)</label>
-        <input type="number" id="loan-monthly" placeholder="如：5000">
+        <input type="number" step="0.01" id="loan-monthly" placeholder="如：5000.00">
       </div>
       <div class="form-group">
         <label>年利率 (%)</label>
@@ -409,7 +409,7 @@ function showAddIncomeDialog(container) {
       </div>
       <div class="form-group">
         <label>金额 (元)</label>
-        <input type="number" id="income-amount" placeholder="如：8000">
+        <input type="number" step="0.01" id="income-amount" placeholder="如：8000.00">
       </div>
       <div class="form-group">
         <label>备注</label>
@@ -451,7 +451,7 @@ function showRepayDialog(container, loanId) {
       </div>
       <div class="form-group">
         <label>还款金额 (元)</label>
-        <input type="number" id="repay-amount" placeholder="如：5000">
+        <input type="number" step="0.01" id="repay-amount" placeholder="如：5000.00">
       </div>
       <button class="btn-primary btn-full" onclick="window.__saveRepay('${loanId}')">确认还款</button>
     </div>
@@ -472,8 +472,11 @@ function showRepayDialog(container, loanId) {
 }
 
 function formatNum(n) {
-  if (n == null) return '0';
-  return Math.round(n).toLocaleString('zh-CN');
+  if (n == null || isNaN(n)) n = 0;
+  return Number(n).toLocaleString('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 // ============================================================
