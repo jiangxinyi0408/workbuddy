@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T04:55:54.480Z",
+  "updatedAt": "2026-07-27T04:58:09.325Z",
   "data": {
     "tasks": [],
     "workLogs": [],
@@ -17,14 +17,8 @@
         "value": "2026-07-27"
       },
       {
-        "key": "geminiApiKey",
-        "value": ""
-      },
-      {
         "key": "healthProfile",
         "value": {
-          "height": "",
-          "targetWeight": "",
           "healthIndicators": [
             "低密度脂蛋白过高",
             "胆固醇过高"
@@ -38,16 +32,8 @@
         }
       },
       {
-        "key": "height",
-        "value": ""
-      },
-      {
         "key": "summaryHour",
         "value": 21
-      },
-      {
-        "key": "targetWeight",
-        "value": ""
       }
     ]
   }
