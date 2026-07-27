@@ -4,7 +4,7 @@
 // 时段支持多选：上午、下午、晚上、全天
 // ============================================================
 
-import { put, getAll, del } from '../db.js';
+import { put, bulkPut, getAll, del } from '../db.js';
 import { genId, today, fmtDate, weekStart, weekRange, weekdayName, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
 
 let initialized = false;
@@ -260,11 +260,13 @@ async function renderScheduleTab(container) {
       `).join('')}
     </div>
 
-    <button class="fab" onclick="window.__ppAdd()">+</button>
+    <button class="fab" onclick="window.__ppAdd()" style="right:72px">+</button>
+    <button class="fab fab-secondary" onclick="window.__ppBatchAdd()">≡</button>
   `;
 
   window.__ppAdd = () => showAddSessionDialog(today());
   window.__ppQuickAdd = (date) => showAddSessionDialog(date);
+  window.__ppBatchAdd = () => showBatchAddSessionDialog();
 
   window.__delSession = async (id) => {
     if (await confirmDialog('删除这条活动记录？')) {
@@ -566,11 +568,13 @@ async function renderFreeTab(container) {
       `).join('')}
     </div>
 
-    <button class="fab" style="background:#52c41a" onclick="window.__addFreeActivity('${today()}')">+</button>
+    <button class="fab" style="background:#52c41a;right:72px" onclick="window.__addFreeActivity('${today()}')">+</button>
+    <button class="fab fab-secondary" style="background:#52c41a" onclick="window.__ppBatchFree()">≡</button>
   `;
 
   window.__addFreeActivity = (date) => showAddFreeActivityDialog(date);
   window.__editFreeActivity = (id) => showEditFreeActivityDialog(id);
+  window.__ppBatchFree = () => showBatchAddFreeActivityDialog();
 
   window.__delFreeActivity = async (id) => {
     if (await confirmDialog('删除这条自由活动？')) {
@@ -773,6 +777,268 @@ async function showEditSessionDialog(id) {
       sheet.close();
       renderPingpong(document.getElementById('main-content'));
     }
+  };
+}
+
+// ============================================================
+// 批量添加打球活动（按星期几 + 连续周数）
+// ============================================================
+
+function showBatchAddSessionDialog() {
+  const weekDays = [
+    { value: 1, label: '周一' },
+    { value: 2, label: '周二' },
+    { value: 3, label: '周三' },
+    { value: 4, label: '周四' },
+    { value: 5, label: '周五' },
+    { value: 6, label: '周六' },
+    { value: 0, label: '周日' },
+  ];
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>活动名称</label>
+        <input type="text" id="batch-pp-name" placeholder="如：乒乓球训练" value="乒乓球活动">
+      </div>
+      <div class="form-group">
+        <label>每周哪天（可多选）</label>
+        <div class="pp-slot-picker" id="batch-weekday-picker">
+          ${weekDays.map(d => `
+            <button type="button" class="pp-slot-chip" data-day="${d.value}">${d.label}</button>
+          `).join('')}
+          <input type="hidden" id="batch-weekdays" value="">
+        </div>
+        <div class="form-hint" style="margin-top:4px">点击选择星期几，可多选</div>
+      </div>
+      <div class="form-group">
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('batch-pp', ['下午', '晚上'])}
+      </div>
+      <div class="form-group">
+        <label>开始时间</label>
+        <input type="time" id="batch-pp-start" value="19:00">
+      </div>
+      <div class="form-group">
+        <label>活动时长（小时）</label>
+        <input type="number" id="batch-pp-duration" step="0.5" min="0.5" value="2">
+      </div>
+      <div class="form-group">
+        <label>连续周数</label>
+        <input type="number" id="batch-pp-weeks" min="1" max="52" value="4">
+        <div class="form-hint">从本周开始，连续添加多少周</div>
+      </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="batch-pp-note" placeholder="如：和同事一起">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__saveBatchSession()">批量添加</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('批量添加活动', html);
+
+  // 星期几多选
+  setTimeout(() => {
+    const dayChips = document.querySelectorAll('#batch-weekday-picker .pp-slot-chip');
+    const dayHidden = document.getElementById('batch-weekdays');
+    dayChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('pp-slot-chip-active');
+        const selected = [];
+        dayChips.forEach(c => {
+          if (c.classList.contains('pp-slot-chip-active')) selected.push(c.dataset.day);
+        });
+        dayHidden.value = selected.join(',');
+      });
+    });
+
+    // 时段多选
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('batch-pp');
+    document.body.appendChild(script);
+  }, 100);
+
+  window.__saveBatchSession = async () => {
+    const name = document.getElementById('batch-pp-name').value.trim() || '乒乓球活动';
+    const daysStr = document.getElementById('batch-weekdays').value;
+    if (!daysStr) { toast('请选择每周哪天'); return; }
+    const weekdays = daysStr.split(',').map(Number);
+
+    const slotsStr = document.getElementById('batch-pp-slots').value;
+    const timeSlots = slotsStr ? slotsStr.split(',').filter(Boolean) : ['晚上'];
+    if (timeSlots.length === 0) { toast('请选择时段'); return; }
+
+    const startTime = document.getElementById('batch-pp-start').value;
+    const duration = parseFloat(document.getElementById('batch-pp-duration').value);
+    if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
+    const weeks = parseInt(document.getElementById('batch-pp-weeks').value) || 1;
+    const note = document.getElementById('batch-pp-note').value.trim();
+
+    // 计算日期
+    const sessions = [];
+    const todayDate = new Date();
+    const currentWeekStart = weekStart(todayDate);
+
+    for (let w = 0; w < weeks; w++) {
+      for (const dayOfWeek of weekdays) {
+        // 从本周开始计算
+        const d = new Date(currentWeekStart);
+        d.setDate(d.getDate() + w * 7 + dayOfWeek);
+        // 跳过过去的日期（本周已过的天）
+        if (w === 0 && d < new Date(todayDate.toDateString())) continue;
+
+        sessions.push({
+          id: genId(),
+          date: fmtDate(d),
+          name,
+          timeSlots,
+          startTime,
+          duration,
+          note,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    if (sessions.length === 0) {
+      toast('没有可添加的日期（本周所选日期已过）');
+      return;
+    }
+
+    await bulkPut('pingpongSessions', sessions);
+    toast(`已添加 ${sessions.length} 条活动`);
+    sheet.close();
+    renderPingpong(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 批量添加自由活动（按星期几 + 连续周数）
+// ============================================================
+
+function showBatchAddFreeActivityDialog() {
+  const weekDays = [
+    { value: 1, label: '周一' },
+    { value: 2, label: '周二' },
+    { value: 3, label: '周三' },
+    { value: 4, label: '周四' },
+    { value: 5, label: '周五' },
+    { value: 6, label: '周六' },
+    { value: 0, label: '周日' },
+  ];
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>活动名称</label>
+        <input type="text" id="batch-fa-name" placeholder="如：散步、游泳、健身">
+      </div>
+      <div class="form-group">
+        <label>每周哪天（可多选）</label>
+        <div class="pp-slot-picker" id="batch-fa-weekday-picker">
+          ${weekDays.map(d => `
+            <button type="button" class="pp-slot-chip" data-day="${d.value}">${d.label}</button>
+          `).join('')}
+          <input type="hidden" id="batch-fa-weekdays" value="">
+        </div>
+        <div class="form-hint" style="margin-top:4px">点击选择星期几，可多选</div>
+      </div>
+      <div class="form-group">
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('batch-fa', ['下午'])}
+      </div>
+      <div class="form-group">
+        <label>开始时间</label>
+        <input type="time" id="batch-fa-start" value="">
+      </div>
+      <div class="form-group">
+        <label>活动时长（小时）</label>
+        <input type="number" id="batch-fa-duration" step="0.5" min="0.5" value="1">
+      </div>
+      <div class="form-group">
+        <label>连续周数</label>
+        <input type="number" id="batch-fa-weeks" min="1" max="52" value="4">
+        <div class="form-hint">从本周开始，连续添加多少周</div>
+      </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="batch-fa-note" placeholder="如：和朋友一起">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__saveBatchFreeActivity()">批量添加</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('批量添加自由活动', html);
+
+  setTimeout(() => {
+    const dayChips = document.querySelectorAll('#batch-fa-weekday-picker .pp-slot-chip');
+    const dayHidden = document.getElementById('batch-fa-weekdays');
+    dayChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('pp-slot-chip-active');
+        const selected = [];
+        dayChips.forEach(c => {
+          if (c.classList.contains('pp-slot-chip-active')) selected.push(c.dataset.day);
+        });
+        dayHidden.value = selected.join(',');
+      });
+    });
+
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('batch-fa');
+    document.body.appendChild(script);
+  }, 100);
+
+  window.__saveBatchFreeActivity = async () => {
+    const name = document.getElementById('batch-fa-name').value.trim();
+    if (!name) { toast('请填写活动名称'); return; }
+    const daysStr = document.getElementById('batch-fa-weekdays').value;
+    if (!daysStr) { toast('请选择每周哪天'); return; }
+    const weekdays = daysStr.split(',').map(Number);
+
+    const slotsStr = document.getElementById('batch-fa-slots').value;
+    const timeSlots = slotsStr ? slotsStr.split(',').filter(Boolean) : ['下午'];
+    if (timeSlots.length === 0) { toast('请选择时段'); return; }
+
+    const startTime = document.getElementById('batch-fa-start').value;
+    const duration = parseFloat(document.getElementById('batch-fa-duration').value);
+    if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
+    const weeks = parseInt(document.getElementById('batch-fa-weeks').value) || 1;
+    const note = document.getElementById('batch-fa-note').value.trim();
+
+    const activities = [];
+    const todayDate = new Date();
+    const currentWeekStart = weekStart(todayDate);
+
+    for (let w = 0; w < weeks; w++) {
+      for (const dayOfWeek of weekdays) {
+        const d = new Date(currentWeekStart);
+        d.setDate(d.getDate() + w * 7 + dayOfWeek);
+        if (w === 0 && d < new Date(todayDate.toDateString())) continue;
+
+        activities.push({
+          id: genId(),
+          date: fmtDate(d),
+          name,
+          timeSlots,
+          startTime,
+          duration,
+          note,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    if (activities.length === 0) {
+      toast('没有可添加的日期（本周所选日期已过）');
+      return;
+    }
+
+    await bulkPut('freeActivities', activities);
+    toast(`已添加 ${activities.length} 条活动`);
+    sheet.close();
+    renderPingpong(document.getElementById('main-content'));
   };
 }
 
