@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T18:05:11.027Z",
+  "updatedAt": "2026-07-27T18:05:21.520Z",
   "data": {
     "tasks": [
       {
@@ -372,19 +372,6 @@
       {
         "id": "ms3jek4i63o9tj",
         "date": "2026-08-23",
-        "name": "嘉定",
-        "timeSlots": [
-          "下午",
-          "晚上"
-        ],
-        "startTime": "14:00",
-        "duration": 6,
-        "note": "",
-        "createdAt": "2026-07-27T18:05:06.018Z"
-      },
-      {
-        "id": "ms3jek4ims6v5h",
-        "date": "2026-08-02",
         "name": "嘉定",
         "timeSlots": [
           "下午",
