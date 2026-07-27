@@ -18,13 +18,13 @@ export async function initWeight() {
 // 体重记录
 // ============================================================
 
-async function addWeight(weight, time, note) {
+async function addWeight(data) {
   const record = {
     id: genId(),
-    date: today(),
-    time: time, // 'morning' | 'evening'
-    weight: parseFloat(weight),
-    note: note || '',
+    date: data.date || today(),
+    time: data.time, // 'morning' | 'evening'
+    weight: parseFloat(data.weight),
+    note: data.note || '',
     createdAt: new Date().toISOString(),
   };
   await put('weights', record);
@@ -140,12 +140,15 @@ async function renderWeightTab(container) {
       ${records.length > 0 ? `
       <ul class="weight-record-list">
         ${records.slice(-10).reverse().map(r => `
-          <li class="weight-record-item">
+          <li class="weight-record-item" onclick="window.__editWeight('${r.id}')" style="cursor:pointer">
             <div>
               <div class="text-sm font-bold">${r.weight} kg</div>
-              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '🌅早上' : '🌙晚上'}</div>
+              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '🌅早上' : '🌙晚上'}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div>
             </div>
-            <button class="task-delete" onclick="window.__delWeight('${r.id}')">✕</button>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="task-edit" onclick="event.stopPropagation();window.__editWeight('${r.id}')">✎</button>
+              <button class="task-delete" onclick="event.stopPropagation();window.__delWeight('${r.id}')">✕</button>
+            </div>
           </li>
         `).join('')}
       </ul>` : '<div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-text">暂无体重记录</div></div>'}
@@ -158,6 +161,7 @@ async function renderWeightTab(container) {
       renderWeightTab(container);
     }
   };
+  window.__editWeight = (id) => showEditWeightDialog(container, id);
 
   // 绘制图表
   if (records.length > 0) {
@@ -232,6 +236,10 @@ function showAddWeightDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="weight-date" value="${today()}">
+      </div>
+      <div class="form-group">
         <label>体重 (kg)</label>
         <input type="number" id="weight-value" step="0.1" placeholder="如：65.5" autofocus>
       </div>
@@ -256,12 +264,74 @@ function showAddWeightDialog(container) {
   window.__saveWeight = async () => {
     const weight = document.getElementById('weight-value').value;
     if (!weight) { toast('请输入体重'); return; }
+    const date = document.getElementById('weight-date').value || today();
     const time = document.getElementById('weight-time').value;
     const note = document.getElementById('weight-note').value;
-    await addWeight(weight, time, note);
+    await addWeight({ weight, date, time, note });
     toast('体重已记录');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 编辑体重对话框
+// ============================================================
+
+async function showEditWeightDialog(container, id) {
+  const all = await getAll('weights');
+  const record = all.find(r => r.id === id);
+  if (!record) { toast('记录不存在'); return; }
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="weight-date" value="${record.date}">
+      </div>
+      <div class="form-group">
+        <label>体重 (kg)</label>
+        <input type="number" id="weight-value" step="0.1" value="${record.weight}">
+      </div>
+      <div class="form-group">
+        <label>称重时间</label>
+        <select id="weight-time">
+          <option value="morning" ${record.time==='morning'?'selected':''}>🌅 早上</option>
+          <option value="evening" ${record.time==='evening'?'selected':''}>🌙 晚上</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="weight-note" value="${escapeHtml(record.note || '')}">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__updateWeight()">保存修改</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delWeightFromEdit('${id}')">删除此记录</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('编辑体重', html);
+
+  window.__updateWeight = async () => {
+    const weight = document.getElementById('weight-value').value;
+    if (!weight) { toast('请输入体重'); return; }
+    record.date = document.getElementById('weight-date').value || today();
+    record.time = document.getElementById('weight-time').value;
+    record.weight = parseFloat(weight);
+    record.note = document.getElementById('weight-note').value;
+    record.updatedAt = new Date().toISOString();
+    await put('weights', record);
+    toast('已修改');
+    sheet.close();
+    renderWeight(document.getElementById('main-content'));
+  };
+
+  window.__delWeightFromEdit = async (delId) => {
+    if (await confirmDialog('删除这条记录？')) {
+      await del('weights', delId);
+      toast('已删除');
+      sheet.close();
+      renderWeight(document.getElementById('main-content'));
+    }
   };
 }
 
@@ -292,17 +362,20 @@ async function renderDietTab(container) {
 
     ${todayMeals.length > 0 ? todayMeals.map(m => `
       <div class="meal-card">
-        <div class="meal-header">
+        <div class="meal-header" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
           <span class="meal-type-badge">${m.mealType}</span>
           <span class="meal-calories">${m.totalCalories} 卡</span>
         </div>
-        <div class="meal-foods">
+        <div class="meal-foods" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
           ${(m.foods || []).map(f => `<span class="meal-food-tag">${escapeHtml(f.name)} ${f.calories}卡</span>`).join('')}
         </div>
-        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="食物">` : ''}
+        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="食物" onclick="window.__editMeal('${m.id}')">` : ''}
         <div class="flex-between mt-8">
-          <span class="text-xs text-gray">${m.source === 'ai' ? '🤖 AI识别' : m.source === 'photo' ? '📷 照片记录' : '✍️ 手动录入'}</span>
-          <button class="task-delete" onclick="window.__delMeal('${m.id}')">✕</button>
+          <span class="text-xs text-gray">${m.source === 'ai' ? '🤖 AI识别' : m.source === 'photo' ? '📷 照片记录' : '✍️ 手动录入'} · ${fmtDate(m.date)}</span>
+          <div style="display:flex;gap:4px">
+            <button class="task-edit" onclick="window.__editMeal('${m.id}')">✎</button>
+            <button class="task-delete" onclick="window.__delMeal('${m.id}')">✕</button>
+          </div>
         </div>
       </div>
     `).join('') : '<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">今天还没有饮食记录</div></div>'}
@@ -314,6 +387,7 @@ async function renderDietTab(container) {
       renderDietTab(container);
     }
   };
+  window.__editMeal = (id) => showEditMealDialog(container, id);
 }
 
 // ============================================================
@@ -492,6 +566,103 @@ function showAddMealDialog(container) {
     toast('照片已保存');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 编辑饮食对话框
+// ============================================================
+
+async function showEditMealDialog(container, id) {
+  const all = await getAll('meals');
+  const meal = all.find(m => m.id === id);
+  if (!meal) { toast('记录不存在'); return; }
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="meal-date" value="${meal.date}">
+      </div>
+      <div class="form-group">
+        <label>用餐类型</label>
+        <select id="meal-type">
+          <option value="早餐" ${meal.mealType==='早餐'?'selected':''}>🌅 早餐</option>
+          <option value="午餐" ${meal.mealType==='午餐'?'selected':''}>☀️ 午餐</option>
+          <option value="晚餐" ${meal.mealType==='晚餐'?'selected':''}>🌙 晚餐</option>
+          <option value="加餐" ${meal.mealType==='加餐'?'selected':''}>🍪 加餐</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>食物列表</label>
+        <div id="edit-foods-list"></div>
+        <button class="btn-outline" onclick="window.__addEditFoodRow()" style="margin-top:8px">+ 添加食物</button>
+      </div>
+      <div class="form-group">
+        <label>总卡路里</label>
+        <input type="number" id="meal-calories" value="${meal.totalCalories || 0}">
+      </div>
+      ${meal.imageBase64 ? `
+      <div class="form-group">
+        <label>已有照片</label>
+        <img src="${meal.imageBase64}" style="max-height:120px;border-radius:8px">
+      </div>
+      ` : ''}
+      <button class="btn-primary btn-full" onclick="window.__updateMeal()">保存修改</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delMealFromEdit('${id}')">删除此记录</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('编辑饮食', html);
+
+  // 渲染已有食物
+  const foodsList = document.getElementById('edit-foods-list');
+  const renderFoodRow = (name = '', calories = '') => {
+    const row = document.createElement('div');
+    row.className = 'flex gap-8';
+    row.style.marginBottom = '8px';
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(name)}" placeholder="食物名" style="flex:1;padding:8px;border:1px solid var(--gray-300);border-radius:6px;font-size:14px" data-edit-name>
+      <input type="number" value="${calories}" placeholder="卡路里" style="width:80px;padding:8px;border:1px solid var(--gray-300);border-radius:6px;font-size:14px" data-edit-cal>
+    `;
+    foodsList.appendChild(row);
+  };
+
+  (meal.foods || []).forEach(f => renderFoodRow(f.name, f.calories));
+  if ((meal.foods || []).length === 0) renderFoodRow();
+
+  window.__addEditFoodRow = () => renderFoodRow();
+
+  window.__updateMeal = async () => {
+    const date = document.getElementById('meal-date').value || today();
+    const mealType = document.getElementById('meal-type').value;
+    const totalCalories = parseInt(document.getElementById('meal-calories').value) || 0;
+
+    const foods = [];
+    document.querySelectorAll('#edit-foods-list [data-edit-name]').forEach(input => {
+      const name = input.value.trim();
+      const cal = parseInt(input.nextElementSibling.value) || 0;
+      if (name) foods.push({ name, calories: cal, grams: 0 });
+    });
+
+    meal.date = date;
+    meal.mealType = mealType;
+    meal.foods = foods;
+    meal.totalCalories = foods.length > 0 ? foods.reduce((sum, f) => sum + (f.calories || 0), 0) : totalCalories;
+    meal.updatedAt = new Date().toISOString();
+    await put('meals', meal);
+    toast('已修改');
+    sheet.close();
+    renderWeight(document.getElementById('main-content'));
+  };
+
+  window.__delMealFromEdit = async (delId) => {
+    if (await confirmDialog('删除这条饮食记录？')) {
+      await del('meals', delId);
+      toast('已删除');
+      sheet.close();
+      renderWeight(document.getElementById('main-content'));
+    }
   };
 }
 
