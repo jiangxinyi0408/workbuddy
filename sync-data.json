@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:00:53.627Z",
+  "updatedAt": "2026-07-27T17:01:25.382Z",
   "data": {
     "tasks": [
       {
@@ -290,7 +290,16 @@
       }
     ],
     "englishProgress": [],
-    "weights": [],
+    "weights": [
+      {
+        "id": "ms3h4k8euirxpx",
+        "date": "2026-07-27",
+        "time": "evening",
+        "weight": 64.1,
+        "note": "吃完满晶自助后骑单车45分钟",
+        "createdAt": "2026-07-27T17:01:20.366Z"
+      }
+    ],
     "meals": [],
     "loans": [],
     "incomes": [
