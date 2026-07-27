@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:38:42.092Z",
+  "updatedAt": "2026-07-27T17:38:50.132Z",
   "data": {
     "tasks": [
       {
@@ -334,6 +334,21 @@
         "interestRate": 3.84,
         "note": "",
         "createdAt": "2026-07-27T17:31:50.276Z"
+      },
+      {
+        "id": "ms3igoarm15q57",
+        "bank": "宁波银行",
+        "principal": 100000,
+        "currentBalance": 86263.62,
+        "monthlyPayment": 0,
+        "paymentType": "variable",
+        "remainingPeriods": 10,
+        "estimatedMonthlyPayment": 8700,
+        "startDate": "2026-07-28",
+        "endDate": "2027-05-14",
+        "interestRate": 2.99,
+        "note": "",
+        "createdAt": "2026-07-27T17:38:45.123Z"
       }
     ],
     "incomes": [
