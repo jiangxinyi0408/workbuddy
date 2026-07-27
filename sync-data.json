@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T18:11:02.990Z",
+  "updatedAt": "2026-07-27T18:11:22.019Z",
   "data": {
     "tasks": [
       {
@@ -68,19 +68,6 @@
         "createdAt": "2026-07-27T01:56:47.484Z",
         "completedAt": null,
         "carriedOverTo": "ms3ez4ezukoxls"
-      },
-      {
-        "id": "ms2spb5aocuni7",
-        "title": "环责险电子保单及发票邮件",
-        "type": "daily",
-        "dueDate": "2026-07-27",
-        "priority": "medium",
-        "status": "pending",
-        "category": "天马",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T05:37:37.966Z",
-        "completedAt": null,
-        "carriedOverTo": "ms3ez4f1wtrs3p"
       },
       {
         "id": "ms2spl0ebwhlei",
