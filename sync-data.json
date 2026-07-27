@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T04:58:18.843Z",
+  "updatedAt": "2026-07-27T04:58:34.888Z",
   "data": {
     "tasks": [],
     "workLogs": [],
@@ -23,8 +23,6 @@
       {
         "key": "healthProfile",
         "value": {
-          "height": "",
-          "targetWeight": "",
           "healthIndicators": [
             "低密度脂蛋白过高",
             "胆固醇过高"
