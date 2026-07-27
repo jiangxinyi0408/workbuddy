@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T05:37:42.976Z",
+  "updatedAt": "2026-07-27T05:37:57.812Z",
   "data": {
     "tasks": [
       {
@@ -74,6 +74,18 @@
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:37.966Z",
         "completedAt": null
+      },
+      {
+        "id": "ms2spl0ebwhlei",
+        "title": "货运险出单",
+        "type": "daily",
+        "dueDate": "2026-07-27",
+        "priority": "medium",
+        "status": "done",
+        "category": "商汤",
+        "estimateHours": null,
+        "createdAt": "2026-07-27T05:37:50.750Z",
+        "completedAt": "2026-07-27T05:37:52.803Z"
       }
     ],
     "workLogs": [],
