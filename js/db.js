@@ -52,7 +52,11 @@ export async function put(storeName, data) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(storeName, 'readwrite');
     tx.objectStore(storeName).put(data);
-    tx.oncomplete = () => resolve(data);
+    tx.oncomplete = () => {
+      resolve(data);
+      // 触发云同步（防抖）
+      try { import('./sync.js').then(m => m.scheduleAutoSync()).catch(() => {}); } catch (e) {}
+    };
     tx.onerror = () => reject(tx.error);
   });
 }
@@ -64,7 +68,11 @@ export async function bulkPut(storeName, dataList) {
     const tx = db.transaction(storeName, 'readwrite');
     const store = tx.objectStore(storeName);
     dataList.forEach(d => store.put(d));
-    tx.oncomplete = () => resolve(dataList);
+    tx.oncomplete = () => {
+      resolve(dataList);
+      // 触发云同步（防抖）
+      try { import('./sync.js').then(m => m.scheduleAutoSync()).catch(() => {}); } catch (e) {}
+    };
     tx.onerror = () => reject(tx.error);
   });
 }
@@ -135,7 +143,10 @@ export async function del(storeName, id) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(storeName, 'readwrite');
     tx.objectStore(storeName).delete(id);
-    tx.oncomplete = () => resolve(true);
+    tx.oncomplete = () => {
+      resolve(true);
+      try { import('./sync.js').then(m => m.scheduleAutoSync()).catch(() => {}); } catch (e) {}
+    };
     tx.onerror = () => reject(tx.error);
   });
 }

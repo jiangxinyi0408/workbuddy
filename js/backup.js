@@ -36,6 +36,11 @@ export async function backupToLocalStorage() {
     const json = JSON.stringify(payload);
     localStorage.setItem(BACKUP_KEY, json);
     localStorage.setItem(BACKUP_TIME_KEY, payload.createdAt);
+    // 触发云同步（动态import避免循环依赖）
+    try {
+      const { scheduleAutoSync } = await import('./sync.js');
+      scheduleAutoSync();
+    } catch (e) {}
     return { success: true, count: totalCount, size: json.length };
   } catch (e) {
     // localStorage 满了或不可用，静默失败

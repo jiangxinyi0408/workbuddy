@@ -13,6 +13,7 @@ import { initNews, renderNews, dashboardNews } from './news.js';
 import { initAI, renderAI, dashboardAI } from './modules/ai.js';
 import { autoRestoreIfNeeded, backupToLocalStorage, formatBackupTime } from './backup.js';
 import { hasPassword, isAuthed, verifyPassword, getLockRemaining, getFailCount, setPassword, changePassword, removePassword, clearAuth } from './modules/auth.js';
+import { isSyncEnabled, scheduleAutoSync, autoSyncOnStart, getSyncStatus, setSyncToken, setSyncEnabled, pushToCloud, pullFromCloud, verifyToken, formatLastSync } from './sync.js';
 
 // 页面定义
 const PAGES = {
@@ -375,6 +376,15 @@ window.__showSettings = async function() {
       </div>
 
       <div class="form-group">
+        <label>☁️ 云同步（多设备同步）</label>
+        <div class="sync-status" id="sync-status">⏳ 读取中...</div>
+        <div class="data-actions" id="sync-actions">
+          <button class="btn-outline" onclick="window.__setupSync()">⚙️ 设置同步</button>
+        </div>
+        <div class="form-hint">通过 GitHub Gist 在 iPhone/iPad 间自动同步数据</div>
+      </div>
+
+      <div class="form-group">
         <label>🔒 资产管理密码锁</label>
         <div class="lock-setting-status" id="lock-status">⏳ 读取中...</div>
         <div class="data-actions">
@@ -410,6 +420,107 @@ window.__showSettings = async function() {
     }
   };
   updateLockStatus();
+
+  // 更新云同步状态显示
+  const updateSyncStatus = () => {
+    const statusEl = document.getElementById('sync-status');
+    const actionsEl = document.getElementById('sync-actions');
+    if (!statusEl || !actionsEl) return;
+    const status = getSyncStatus();
+    if (status.enabled) {
+      statusEl.textContent = '✅ 已启用 · ' + status.lastSync;
+      actionsEl.innerHTML = `
+        <button class="btn-outline" onclick="window.__syncPush()">⬆️ 立即上传</button>
+        <button class="btn-outline" onclick="window.__syncPull()">⬇️ 立即拉取</button>
+        <button class="btn-danger-outline" onclick="window.__disableSync()">关闭同步</button>
+      `;
+    } else if (status.hasToken) {
+      statusEl.textContent = '⚪ Token已设置，未启用同步';
+      actionsEl.innerHTML = `<button class="btn-primary" onclick="window.__enableSync()">启用同步</button>`;
+    } else {
+      statusEl.textContent = '⚪ 未设置';
+      actionsEl.innerHTML = `<button class="btn-outline" onclick="window.__setupSync()">⚙️ 设置同步</button>`;
+    }
+  };
+  updateSyncStatus();
+};
+
+// ============================================================
+// ☁️ 云同步管理函数
+// ============================================================
+
+window.__setupSync = function() {
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>GitHub Token</label>
+        <input type="password" id="sync-token" class="lock-input" placeholder="ghp_xxxxxxxx" autocomplete="off" value="${getSyncStatus().hasToken ? '(已设置，输入新Token可替换)' : ''}">
+        <div class="form-hint">需要一个有 gist 权限的 Token<br>到 github.com → Settings → Developer settings → Personal access tokens → Generate new token → 勾选 gist</div>
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__verifyAndSaveToken()">验证并保存</button>
+    </div>
+  `;
+  const sheet = openBottomSheet('设置云同步', html);
+  window.__currentSheet = sheet;
+
+  window.__verifyAndSaveToken = async () => {
+    const token = document.getElementById('sync-token').value.trim();
+    if (!token || token === '(已设置，输入新Token可替换)') { toast('请输入Token'); return; }
+    toast('验证中...');
+    const result = await verifyToken(token);
+    if (result.success) {
+      setSyncToken(token);
+      setSyncEnabled(true);
+      toast(`✅ Token验证成功，欢迎 ${result.username}`);
+      sheet.close();
+      // 立即推送一次
+      const pushResult = await pushToCloud();
+      if (pushResult.success) {
+        toast(`☁️ 已上传 ${pushResult.count} 条记录`);
+      }
+      window.__showSettings();
+    } else {
+      toast('❌ ' + result.error);
+    }
+  };
+};
+
+window.__enableSync = function() {
+  setSyncEnabled(true);
+  toast('云同步已启用');
+  pushToCloud().then(r => {
+    if (r.success) toast(`☁️ 已上传 ${r.count} 条记录`);
+  });
+  window.__showSettings();
+};
+
+window.__disableSync = function() {
+  if (!confirm('确定关闭云同步？关闭后多设备不再自动同步')) return;
+  setSyncEnabled(false);
+  toast('云同步已关闭');
+  window.__showSettings();
+};
+
+window.__syncPush = async function() {
+  toast('上传中...');
+  const result = await pushToCloud();
+  if (result.success) {
+    toast(`☁️ 已上传 ${result.count} 条记录`);
+    window.__showSettings();
+  } else {
+    toast('❌ ' + result.error);
+  }
+};
+
+window.__syncPull = async function() {
+  toast('拉取中...');
+  const result = await pullFromCloud();
+  if (result.success) {
+    toast(`☁️ 已拉取 ${result.count} 条记录`);
+    location.reload();
+  } else {
+    toast('❌ ' + result.error);
+  }
 };
 
 // ============================================================
@@ -642,6 +753,18 @@ async function init() {
     console.warn('自动恢复检测失败:', e);
   }
 
+  // ☁️ 云同步：启动时自动从 Gist 拉取最新数据
+  if (isSyncEnabled()) {
+    try {
+      const syncResult = await autoSyncOnStart();
+      if (syncResult.synced) {
+        toast(`☁️ 已从云端同步 ${syncResult.count} 条记录`);
+      }
+    } catch (e) {
+      console.warn('云同步失败:', e);
+    }
+  }
+
   // 初始化各模块
   await Promise.all([
     initWork(),
@@ -681,18 +804,27 @@ async function init() {
   // 🛡️ 每 5 分钟自动备份一次（防 iOS Safari 随时清空 IndexedDB）
   setInterval(() => {
     backupToLocalStorage().catch(() => {});
+    // ☁️ 同时触发云同步（如果启用）
+    scheduleAutoSync();
   }, 5 * 60 * 1000);
 
   // 🛡️ 页面从后台切回前台时立即备份（用户切回 App 时数据最新）
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       backupToLocalStorage().catch(() => {});
+      // ☁️ 切回前台时也拉取云端最新（另一台设备可能有更新）
+      if (isSyncEnabled()) {
+        autoSyncOnStart().catch(() => {});
+      }
     }
   });
 
-  // 🛡️ 页面关闭前紧急备份
+  // 🛡️ 页面关闭前紧急备份 + 云同步
   window.addEventListener('pagehide', () => {
     backupToLocalStorage().catch(() => {});
+    if (isSyncEnabled()) {
+      pushToCloud().catch(() => {});
+    }
   });
 
   // 移动端默认收起侧边栏
