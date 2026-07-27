@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:44:37.900Z",
+  "updatedAt": "2026-07-27T17:45:04.348Z",
   "data": {
     "tasks": [
       {
@@ -326,7 +326,7 @@
         "principal": 150000,
         "currentBalance": 138148.37,
         "monthlyPayment": 0,
-        "paymentType": "variable",
+        "paymentType": "fixed",
         "remainingPeriods": 33,
         "estimatedMonthlyPayment": 4417.93,
         "startDate": "2026-07-28",
@@ -334,7 +334,7 @@
         "interestRate": 2.1,
         "note": "",
         "createdAt": "2026-07-27T17:31:50.276Z",
-        "updatedAt": "2026-07-27T17:41:37.555Z"
+        "updatedAt": "2026-07-27T17:44:59.338Z"
       },
       {
         "id": "ms3igoarm15q57",
