@@ -1065,8 +1065,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
-  padding: 2px 0;
+  gap: 2px;
+  padding: 4px 2px;
+}
+
+.pp-ov-merged {
+  vertical-align: middle !important;
 }
 
 /* 旧 pingpong 样式保留兼容 */

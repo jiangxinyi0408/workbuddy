@@ -252,7 +252,7 @@ async function renderScheduleTab(container) {
 }
 
 // ============================================================
-// Tab: 活动总览（时间网格）
+// Tab: 活动总览（时间网格 - 合并单元格版）
 // ============================================================
 
 async function renderOverviewTab(container) {
@@ -262,14 +262,21 @@ async function renderOverviewTab(container) {
   const ws = weekStart(new Date());
   const timeSlots = ['上午', '下午', '晚上'];
   const slotRanges = { '上午': '6:00-12:00', '下午': '12:00-18:00', '晚上': '18:00-24:00' };
-  const slotColors = {
-    '上午': { bg: '#fff7e6', border: '#faad14', text: '#d48806' },
-    '下午': { bg: '#e6f7ff', border: '#1890ff', text: '#096dd9' },
-    '晚上': { bg: '#f9f0ff', border: '#722ed1', text: '#531dab' },
+
+  // 颜色按活动来源区分
+  const sourceColors = {
+    pp:   { bg: '#e6f7ff', border: '#1890ff', text: '#096dd9' },
+    free: { bg: '#f6ffed', border: '#52c41a', text: '#389e0d' },
   };
 
-  const grid = [];
   const dayLabels = [];
+
+  // 为每天构建活动列表，每个活动标记覆盖的时段索引范围
+  // cellMap[dayIndex][slotIndex] = { activity, isStart, rowspan, isFree }
+  const cellMap = [];
+  for (let i = 0; i < 7; i++) cellMap.push([null, null, null]);
+
+  const allActivities = [];
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(ws);
@@ -278,44 +285,106 @@ async function renderOverviewTab(container) {
     const isToday = dateStr === today();
     dayLabels.push({ date: dateStr, dayName: weekdayName(d), dateShort: dateStr.slice(5), isToday });
 
-    const row = [];
-    for (const slot of timeSlots) {
-      // 用 timeSlots 数组匹配（兼容旧 timeSlot）
-      const ppInSlot = sessions.filter(s => s.date === dateStr && getTimeSlots(s).includes(slot))
-        .map(s => ({ ...s, source: 'pp' }));
-      const freeInSlot = freeActivities.filter(a => a.date === dateStr && getTimeSlots(a).includes(slot))
-        .map(a => ({ ...a, source: 'free' }));
-      const allInSlot = [...ppInSlot, ...freeInSlot];
-      row.push({
-        slot,
-        activities: allInSlot,
-        isFree: allInSlot.length === 0,
-        ppCount: ppInSlot.length,
-        freeCount: freeInSlot.length,
-      });
+    // 收集当天所有活动
+    const dayPp = sessions.filter(s => s.date === dateStr).map(s => ({ ...s, source: 'pp' }));
+    const dayFree = freeActivities.filter(a => a.date === dateStr).map(a => ({ ...a, source: 'free' }));
+    const dayAll = [...dayPp, ...dayFree];
+
+    for (const act of dayAll) {
+      const slots = getTimeSlots(act);
+      // 将时段名转为索引
+      const slotIndices = slots.map(s => timeSlots.indexOf(s)).filter(idx => idx >= 0).sort((a, b) => a - b);
+      if (slotIndices.length === 0) continue;
+
+      const startIdx = slotIndices[0];
+      const endIdx = slotIndices[slotIndices.length - 1];
+      const rowspan = endIdx - startIdx + 1;
+
+      allActivities.push({ ...act, dayIndex: i, startIdx, endIdx, rowspan });
+
+      // 标记 cellMap
+      for (let si = startIdx; si <= endIdx; si++) {
+        if (si === startIdx) {
+          cellMap[i][si] = { activity: act, isStart: true, rowspan, isFree: false };
+        } else {
+          cellMap[i][si] = { activity: act, isStart: false, rowspan: 0, isFree: false };
+        }
+      }
     }
-    grid.push(row);
   }
 
+  // 统计
   const totalCells = 7 * 3;
-  const busyCells = grid.flat().filter(c => !c.isFree).length;
+  const occupiedSlots = new Set();
+  allActivities.forEach(a => {
+    for (let si = a.startIdx; si <= a.endIdx; si++) {
+      occupiedSlots.add(`${a.dayIndex}-${si}`);
+    }
+  });
+  const busyCells = occupiedSlots.size;
   const freeCells = totalCells - busyCells;
+
+  // 构建表格行
+  const rowsHtml = timeSlots.map((slot, si) => {
+    const tds = [];
+    for (let di = 0; di < 7; di++) {
+      const cell = cellMap[di][si];
+
+      if (!cell) {
+        // 空闲格
+        tds.push(`<td class="pp-ov-td pp-ov-free"><span class="pp-ov-free-text">空闲</span></td>`);
+        continue;
+      }
+
+      if (!cell.isStart) {
+        // 被合并的格子，不渲染 <td>
+        continue;
+      }
+
+      const a = cell.activity;
+      const colors = sourceColors[a.source] || sourceColors.pp;
+      const slotCount = cell.rowspan;
+      const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[a.startIdx]}+${timeSlots[a.endIdx]}` : timeSlots[a.startIdx]);
+
+      tds.push(`
+        <td class="pp-ov-td pp-ov-merged" rowspan="${cell.rowspan}" style="background:${colors.bg};border:1px solid ${colors.border};vertical-align:middle">
+          <div class="pp-ov-activity">
+            <span style="font-size:13px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
+            <span style="font-size:12px;font-weight:600;color:${colors.text}">${escapeHtml(a.name.length > 8 ? a.name.slice(0, 8) + '…' : a.name)}</span>
+            <span style="font-size:10px;color:${colors.text};opacity:0.7">${slotsLabel}</span>
+            ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
+            <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
+          </div>
+        </td>
+      `);
+    }
+
+    return `
+      <tr>
+        <td class="pp-ov-td pp-ov-slot-label">
+          <div style="font-weight:600">${slot}</div>
+          <div style="font-size:10px;color:var(--gray-400)">${slotRanges[slot]}</div>
+        </td>
+        ${tds.join('')}
+      </tr>
+    `;
+  }).join('');
 
   container.innerHTML = `
     <div class="pp-overview">
       <div class="card" style="background:linear-gradient(135deg, #1890ff, #722ed1);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
+            <div style="font-size:24px;font-weight:700">${allActivities.length}</div>
+            <div style="font-size:11px;opacity:0.85">活动总数</div>
+          </div>
+          <div>
             <div style="font-size:24px;font-weight:700">${busyCells}</div>
-            <div style="font-size:11px;opacity:0.85">已占用时段</div>
+            <div style="font-size:11px;opacity:0.85">已占时段</div>
           </div>
           <div>
             <div style="font-size:24px;font-weight:700">${freeCells}</div>
             <div style="font-size:11px;opacity:0.85">空闲时段</div>
-          </div>
-          <div>
-            <div style="font-size:24px;font-weight:700">${Math.round((busyCells / totalCells) * 100)}%</div>
-            <div style="font-size:11px;opacity:0.85">时间利用率</div>
           </div>
         </div>
       </div>
@@ -338,42 +407,13 @@ async function renderOverviewTab(container) {
             </tr>
           </thead>
           <tbody>
-            ${timeSlots.map((slot, si) => `
-              <tr>
-                <td class="pp-ov-td pp-ov-slot-label">
-                  <div style="font-weight:600">${slot}</div>
-                  <div style="font-size:10px;color:var(--gray-400)">${slotRanges[slot]}</div>
-                </td>
-                ${grid.map((row, di) => {
-                  const cell = row[si];
-                  if (cell.isFree) {
-                    return `
-                      <td class="pp-ov-td pp-ov-free">
-                        <span class="pp-ov-free-text">空闲</span>
-                      </td>
-                    `;
-                  }
-                  return `
-                    <td class="pp-ov-td" style="background:${slotColors[slot].bg};border:1px solid ${slotColors[slot].border}">
-                      ${cell.activities.map(a => `
-                        <div class="pp-ov-activity">
-                          <span style="font-size:11px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
-                          <span style="font-size:11px;font-weight:500;color:${slotColors[slot].text}">${escapeHtml(a.name.length > 6 ? a.name.slice(0, 6) + '…' : a.name)}</span>
-                          ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
-                          <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
-                        </div>
-                      `).join('')}
-                    </td>
-                  `;
-                }).join('')}
-              </tr>
-            `).join('')}
+            ${rowsHtml}
           </tbody>
         </table>
       </div>
 
       <div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">
-        💡 打球时间 + 自由活动合并展示 · 一目了然查看整周安排
+        💡 多时段活动自动合并显示 · 一目了然查看整周安排
       </div>
     </div>
   `;
