@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T16:56:56.626Z",
+  "updatedAt": "2026-07-27T16:57:44.606Z",
   "data": {
     "tasks": [
       {
@@ -273,6 +273,20 @@
         "duration": 2,
         "note": "",
         "createdAt": "2026-07-27T16:56:13.653Z"
+      },
+      {
+        "id": "ms3gztvvpx2u8c",
+        "date": "2026-08-08",
+        "name": "上海嘉年华决赛",
+        "timeSlots": [
+          "上午",
+          "下午",
+          "晚上"
+        ],
+        "startTime": "09:00",
+        "duration": 12,
+        "note": "",
+        "createdAt": "2026-07-27T16:57:39.595Z"
       }
     ],
     "englishProgress": [],
