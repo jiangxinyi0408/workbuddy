@@ -7,7 +7,7 @@ import { put, getAll, del } from '../db.js';
 import { genId, today, fmtDate, weekStart, weekRange, weekdayName, toast, openBottomSheet, confirmDialog, escapeHtml } from '../utils.js';
 
 let initialized = false;
-let currentTab = 'schedule'; // 'schedule' | 'overview' | 'free'
+let currentTab = 'overview'; // 'overview' | 'schedule' | 'free'
 
 export async function initPingpong() {
   if (initialized) return;
@@ -77,8 +77,8 @@ async function getWeekFreeActivities() {
 export async function renderPingpong(container) {
   // 三标签导航
   const tabs = [
-    { key: 'schedule', label: '🏓 打球时间' },
     { key: 'overview', label: '📊 活动总览' },
+    { key: 'schedule', label: '🏓 打球时间' },
     { key: 'free', label: '🎯 自由活动' },
   ];
 
