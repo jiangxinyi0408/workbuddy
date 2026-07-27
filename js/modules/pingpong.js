@@ -10,6 +10,8 @@ import { genId, today, fmtDate, weekStart, weekRange, weekdayName, toast, openBo
 let initialized = false;
 let currentTab = 'overview'; // 'overview' | 'schedule' | 'free'
 let overviewWeekOffset = 0; // 总览周偏移：0=本周，-1=上周，1=下周
+let scheduleWeekOffset = 0; // 打球时间周偏移
+let freeWeekOffset = 0; // 自由活动周偏移
 
 export async function initPingpong() {
   if (initialized) return;
@@ -164,9 +166,14 @@ async function renderCurrentTab() {
 // ============================================================
 
 async function renderScheduleTab(container) {
-  const sessions = await getWeekSessions();
+  const sessions = await getSessionsByWeek(scheduleWeekOffset);
 
-  const ws = weekStart(new Date());
+  const refDate = new Date();
+  refDate.setDate(refDate.getDate() + scheduleWeekOffset * 7);
+  const ws = weekStart(refDate);
+  const [curWStart, curWEnd] = weekRange(refDate);
+  const weekLabel = scheduleWeekOffset === 0 ? '本周' : (scheduleWeekOffset < 0 ? `${Math.abs(scheduleWeekOffset)}周前` : `${scheduleWeekOffset}周后`);
+
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(ws);
@@ -193,6 +200,14 @@ async function renderScheduleTab(container) {
 
   container.innerHTML = `
     <div class="pp-weekly-view">
+      <!-- 周切换器 -->
+      <div class="pp-week-switcher">
+        <button class="pp-week-btn" onclick="window.__ppScheduleWeek(${scheduleWeekOffset - 1})">‹ 上周</button>
+        <span class="pp-week-label">${weekLabel} (${curWStart.slice(5)} ~ ${curWEnd.slice(5)})</span>
+        <button class="pp-week-btn" onclick="window.__ppScheduleWeek(${scheduleWeekOffset + 1})">下周 ›</button>
+      </div>
+      ${scheduleWeekOffset !== 0 ? `<div style="text-align:center;margin-bottom:8px"><button class="pp-week-today" onclick="window.__ppScheduleWeek(0)">回到本周</button></div>` : ''}
+
       <div class="card" style="background:linear-gradient(135deg, var(--primary), #a48cc4);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
@@ -276,6 +291,7 @@ async function renderScheduleTab(container) {
   };
 
   window.__editSession = (id) => showEditSessionDialog(id);
+  window.__ppScheduleWeek = (offset) => { scheduleWeekOffset = offset; renderPingpong(document.getElementById('main-content')); };
 }
 
 // ============================================================
@@ -473,9 +489,14 @@ async function renderOverviewTab(container) {
 // ============================================================
 
 async function renderFreeTab(container) {
-  const activities = await getWeekFreeActivities();
+  const activities = await getFreeActivitiesByWeek(freeWeekOffset);
 
-  const ws = weekStart(new Date());
+  const refDate = new Date();
+  refDate.setDate(refDate.getDate() + freeWeekOffset * 7);
+  const ws = weekStart(refDate);
+  const [curWStart, curWEnd] = weekRange(refDate);
+  const weekLabel = freeWeekOffset === 0 ? '本周' : (freeWeekOffset < 0 ? `${Math.abs(freeWeekOffset)}周前` : `${freeWeekOffset}周后`);
+
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(ws);
@@ -501,6 +522,14 @@ async function renderFreeTab(container) {
 
   container.innerHTML = `
     <div class="pp-weekly-view">
+      <!-- 周切换器 -->
+      <div class="pp-week-switcher">
+        <button class="pp-week-btn" onclick="window.__ppFreeWeek(${freeWeekOffset - 1})">‹ 上周</button>
+        <span class="pp-week-label">${weekLabel} (${curWStart.slice(5)} ~ ${curWEnd.slice(5)})</span>
+        <button class="pp-week-btn" onclick="window.__ppFreeWeek(${freeWeekOffset + 1})">下周 ›</button>
+      </div>
+      ${freeWeekOffset !== 0 ? `<div style="text-align:center;margin-bottom:8px"><button class="pp-week-today" onclick="window.__ppFreeWeek(0)">回到本周</button></div>` : ''}
+
       <div class="card" style="background:linear-gradient(135deg, #52c41a, #1890ff);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
@@ -574,6 +603,7 @@ async function renderFreeTab(container) {
 
   window.__addFreeActivity = (date) => showAddFreeActivityDialog(date);
   window.__editFreeActivity = (id) => showEditFreeActivityDialog(id);
+  window.__ppFreeWeek = (offset) => { freeWeekOffset = offset; renderPingpong(document.getElementById('main-content')); };
   window.__ppBatchFree = () => showBatchAddFreeActivityDialog();
 
   window.__delFreeActivity = async (id) => {
@@ -882,9 +912,10 @@ function showBatchAddSessionDialog() {
 
     for (let w = 0; w < weeks; w++) {
       for (const dayOfWeek of weekdays) {
-        // 从本周开始计算
+        // dayOfWeek: 0=周日,1=周一...6=周六 → 转为从周一开始的偏移: 周一=0, 周日=6
+        const offset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         const d = new Date(currentWeekStart);
-        d.setDate(d.getDate() + w * 7 + dayOfWeek);
+        d.setDate(d.getDate() + w * 7 + offset);
         // 跳过过去的日期（本周已过的天）
         if (w === 0 && d < new Date(todayDate.toDateString())) continue;
 
@@ -1013,8 +1044,9 @@ function showBatchAddFreeActivityDialog() {
 
     for (let w = 0; w < weeks; w++) {
       for (const dayOfWeek of weekdays) {
+        const offset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         const d = new Date(currentWeekStart);
-        d.setDate(d.getDate() + w * 7 + dayOfWeek);
+        d.setDate(d.getDate() + w * 7 + offset);
         if (w === 0 && d < new Date(todayDate.toDateString())) continue;
 
         activities.push({
