@@ -792,7 +792,29 @@ async function init() {
   // 注册 Service Worker
   if ('serviceWorker' in navigator) {
     try {
-      await navigator.serviceWorker.register('sw.js');
+      const reg = await navigator.serviceWorker.register('sw.js');
+      // 监听 SW 更新，自动刷新页面
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          console.log('Service Worker 已更新，刷新页面...');
+          window.location.reload();
+        }
+      });
+      // 检测到新 SW 等待中时，立即激活
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // 新 SW 已安装，通知它跳过等待
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        }
+      });
     } catch (e) {
       console.log('SW注册失败（不影响使用）:', e);
     }

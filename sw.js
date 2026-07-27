@@ -1,8 +1,9 @@
 // ============================================================
 // sw.js - Service Worker（离线缓存）
+// 策略：网络优先，离线回退缓存
 // ============================================================
 
-const CACHE_NAME = 'workbuddy-v16';
+const CACHE_NAME = 'workbuddy-v17';
 const CACHE_URLS = [
   './',
   './index.html',
@@ -10,6 +11,8 @@ const CACHE_URLS = [
   './js/app.js',
   './js/db.js',
   './js/utils.js',
+  './js/sync.js',
+  './js/backup.js',
   './js/ai.js',
   './js/news.js',
   './js/modules/work.js',
@@ -17,6 +20,7 @@ const CACHE_URLS = [
   './js/modules/finance.js',
   './js/modules/english.js',
   './js/modules/pingpong.js',
+  './js/modules/auth.js',
   './manifest.json',
 ];
 
@@ -32,39 +36,53 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
 
-// 激活：清理旧缓存
+// 接收消息：跳过等待
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// 激活：清理旧缓存，立即接管
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
+  // 通知所有客户端刷新
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({ type: 'SW_UPDATED' });
+    });
+  });
 });
 
-// 请求拦截：缓存优先，网络后备
+// 请求拦截：网络优先，离线回退
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // 只处理同源请求和 CDN
-  if (url.origin === location.origin || url.hostname.includes('cdn')) {
+  // 只处理同源 GET 请求
+  if (url.origin === location.origin && e.request.method === 'GET') {
     e.respondWith(
-      caches.match(e.request).then((cached) => {
-        if (cached) return cached;
-        return fetch(e.request).then((response) => {
-          // 缓存新资源
-          if (response && response.status === 200 && e.request.method === 'GET') {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-          }
-          return response;
-        }).catch(() => {
-          // 离线后备
+      fetch(e.request).then((response) => {
+        // 网络成功：缓存一份，返回响应
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        }
+        return response;
+      }).catch(() => {
+        // 网络失败：回退缓存
+        return caches.match(e.request).then((cached) => {
+          if (cached) return cached;
+          // 最终回退
           if (e.request.destination === 'document') {
             return caches.match('./index.html');
           }
+          return new Response('', { status: 504, statusText: 'Offline' });
         });
       })
     );
