@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:08:31.434Z",
+  "updatedAt": "2026-07-27T17:08:48.983Z",
   "data": {
     "tasks": [
       {
@@ -301,7 +301,21 @@
       }
     ],
     "meals": [],
-    "loans": [],
+    "loans": [
+      {
+        "id": "ms3he2ite16njg",
+        "bank": "招商银行",
+        "loanName": "",
+        "principal": 26441.49,
+        "currentBalance": 26441.49,
+        "monthlyPayment": 13000,
+        "startDate": "2026-07-28",
+        "endDate": "2026-07-28",
+        "interestRate": 0,
+        "type": "信用贷",
+        "createdAt": "2026-07-27T17:08:43.973Z"
+      }
+    ],
     "incomes": [
       {
         "id": "ms1tmyqpkalkbn",
