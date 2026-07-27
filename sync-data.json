@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T06:44:48.480Z",
+  "updatedAt": "2026-07-27T06:44:57.004Z",
   "data": {
     "tasks": [
       {
@@ -21,11 +21,11 @@
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "high",
-        "status": "pending",
+        "status": "done",
         "category": "天马",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:53:55.167Z",
-        "completedAt": null,
+        "completedAt": "2026-07-27T06:44:49.282Z",
         "image": null,
         "updatedAt": "2026-07-27T05:58:48.733Z"
       },
