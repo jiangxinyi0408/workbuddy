@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T05:57:18.417Z",
+  "updatedAt": "2026-07-27T05:57:55.896Z",
   "data": {
     "tasks": [
       {
@@ -21,11 +21,11 @@
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "high",
-        "status": "done",
+        "status": "pending",
         "category": "天马",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:53:55.167Z",
-        "completedAt": "2026-07-27T05:36:41.346Z"
+        "completedAt": null
       },
       {
         "id": "ms2kqhiyl59bs6",
@@ -81,11 +81,11 @@
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "medium",
-        "status": "done",
+        "status": "pending",
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:50.750Z",
-        "completedAt": "2026-07-27T05:37:52.803Z"
+        "completedAt": null
       },
       {
         "id": "ms2sq922l7zr0z",
@@ -94,11 +94,12 @@
         "dueDate": "2026-07-28",
         "priority": "low",
         "status": "pending",
-        "category": "",
+        "category": "商汤",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T05:38:21.914Z",
-        "completedAt": null
+        "completedAt": null,
+        "updatedAt": "2026-07-27T05:57:49.023Z"
       }
     ],
     "workLogs": [],
