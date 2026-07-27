@@ -305,9 +305,9 @@ async function renderOverviewTab(container) {
       // 标记 cellMap
       for (let si = startIdx; si <= endIdx; si++) {
         if (si === startIdx) {
-          cellMap[i][si] = { activity: act, isStart: true, rowspan, isFree: false };
+          cellMap[i][si] = { activity: act, isStart: true, rowspan, startIdx, endIdx, isFree: false };
         } else {
-          cellMap[i][si] = { activity: act, isStart: false, rowspan: 0, isFree: false };
+          cellMap[i][si] = { activity: act, isStart: false, rowspan: 0, startIdx, endIdx, isFree: false };
         }
       }
     }
@@ -344,7 +344,9 @@ async function renderOverviewTab(container) {
       const a = cell.activity;
       const colors = sourceColors[a.source] || sourceColors.pp;
       const slotCount = cell.rowspan;
-      const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[a.startIdx]}+${timeSlots[a.endIdx]}` : timeSlots[a.startIdx]);
+      const startIdx = cell.startIdx;
+      const endIdx = cell.endIdx;
+      const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[startIdx]}+${timeSlots[endIdx]}` : timeSlots[startIdx]);
 
       tds.push(`
         <td class="pp-ov-td pp-ov-merged" rowspan="${cell.rowspan}" style="background:${colors.bg};border:1px solid ${colors.border};vertical-align:middle">
