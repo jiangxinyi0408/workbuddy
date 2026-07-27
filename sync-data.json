@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T11:27:01.373Z",
+  "updatedAt": "2026-07-27T16:01:20.497Z",
   "data": {
     "tasks": [
       {
@@ -13,7 +13,8 @@
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-26T15:25:31.959Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4ett6npzc"
       },
       {
         "id": "ms2kpm1rcf60v3",
@@ -39,7 +40,8 @@
         "category": "常纺",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:54:35.962Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4evriock6"
       },
       {
         "id": "ms2krg03culbuy",
@@ -51,7 +53,8 @@
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:55:20.643Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4evz2zcdb"
       },
       {
         "id": "ms2ktb0c9u9wha",
@@ -63,7 +66,8 @@
         "category": "太享保",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:56:47.484Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4ezukoxls"
       },
       {
         "id": "ms2spb5aocuni7",
@@ -75,7 +79,8 @@
         "category": "天马",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:37.966Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4f1wtrs3p"
       },
       {
         "id": "ms2spl0ebwhlei",
@@ -116,6 +121,97 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T06:39:30.494Z",
+        "completedAt": null,
+        "carriedOverTo": "ms3ez4f4jxq46k"
+      },
+      {
+        "id": "ms3ez4ett6npzc",
+        "title": "整理对账单",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.349Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ez4evriock6",
+        "title": "供应商系统注册",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "常纺",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.351Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ez4evz2zcdb",
+        "title": "弹福无主被的理赔问题沟通（需要太科加速提供理赔平台）",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.351Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ez4ezukoxls",
+        "title": "处理投诉咨询",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "太享保",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.355Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ez4f1wtrs3p",
+        "title": "环责险电子保单及发票邮件",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "天马",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.357Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ez4f4jxq46k",
+        "title": "q1总结材料（发邮件让太科准备）",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "high",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-27",
+        "createdAt": "2026-07-27T16:01:07.360Z",
         "completedAt": null
       }
     ],
@@ -659,7 +755,7 @@
               "pubDate": "2026-07-26T19:30:14.000Z"
             }
           ],
-          "timestamp": 1785151210278
+          "timestamp": 1785168073031
         }
       },
       {
