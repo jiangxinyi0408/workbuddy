@@ -398,6 +398,12 @@ window.__showSettings = async function() {
         <div class="form-hint">保护资产管理模块，错误5次锁1分钟，10次锁5分钟</div>
       </div>
 
+      <div class="form-group">
+        <label>🔄 检查更新</label>
+        <div class="form-hint" style="margin-bottom:8px">更新版本后点击刷新即可加载最新代码</div>
+        <button class="btn-primary btn-full" onclick="window.__refreshApp()">🔄 立即刷新</button>
+      </div>
+
       <button class="btn-primary btn-full" onclick="window.__saveSettings()">保存设置</button>
     </div>
   `;
@@ -742,6 +748,25 @@ async function checkScheduledSummary() {
 async function init() {
   // 暴露导航函数
   window.__navigate = navigate;
+
+  // 刷新功能：清除 SW 缓存 + 重新加载页面
+  window.__refreshApp = async function() {
+    const btn = document.querySelector('.header-refresh');
+    if (btn) {
+      btn.classList.add('spinning');
+      // 给一点动画时间
+      await new Promise(r => setTimeout(r, 300));
+    }
+    // 先备份当前数据，防止丢失
+    try { await import('./backup.js').then(m => m.backupToLocalStorage()); } catch(e) {}
+    // 尝试清除 Service Worker 缓存后刷新
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    } catch(e) {}
+    // 强制重新加载（不走缓存）
+    window.location.reload();
+  };
 
   // 🛡️ 启动时自动检测：如果 IndexedDB 被清空但 localStorage 有备份 → 自动恢复
   try {

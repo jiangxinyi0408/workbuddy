@@ -264,6 +264,24 @@ body {
   transition: background 0.2s;
 }
 .header-menu:hover { background: rgba(255,255,255,0.25); }
+
+.header-refresh {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.3s;
+  flex-shrink: 0;
+}
+.header-refresh:hover { background: rgba(255,255,255,0.25); }
+.header-refresh:active { transform: rotate(180deg); }
+.header-refresh.spinning svg { animation: spin 0.8s linear; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @media (min-width: 769px) {
   .header-menu { display: none; }
 }
