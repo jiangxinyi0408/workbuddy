@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T05:58:16.086Z",
+  "updatedAt": "2026-07-27T05:58:42.267Z",
   "data": {
     "tasks": [
       {
@@ -67,7 +67,7 @@
       },
       {
         "id": "ms2spl0ebwhlei",
-        "title": "货运险出单",
+        "title": "货运险出单及电子保单发票发送邮件",
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "medium",
@@ -75,7 +75,9 @@
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:50.750Z",
-        "completedAt": null
+        "completedAt": null,
+        "image": null,
+        "updatedAt": "2026-07-27T05:58:37.250Z"
       },
       {
         "id": "ms2sq922l7zr0z",
