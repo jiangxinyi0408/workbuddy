@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:54:35.429Z",
+  "updatedAt": "2026-07-27T17:55:27.729Z",
   "data": {
     "tasks": [
       {
@@ -252,7 +252,8 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:52:05.444Z",
-        "completedAt": null
+        "completedAt": null,
+        "updatedAt": "2026-07-27T17:55:22.720Z"
       },
       {
         "id": "ms3iyxxrp3gfns",
