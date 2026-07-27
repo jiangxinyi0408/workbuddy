@@ -321,10 +321,16 @@ async function renderOverviewTab(container) {
 
   const dayLabels = [];
 
-  // 为每天构建活动列表，每个活动标记覆盖的时段索引范围
-  // cellMap[dayIndex][slotIndex] = { activity, isStart, rowspan, isFree }
+  // 为每天构建活动列表
+  // cellMap[dayIndex][slotIndex] = array of { activity, isStart, rowspan, startIdx, endIdx }
+  // 同一格可以有多个活动（不同活动同时段），各自独立显示
+  // 只有同一活动跨多个时段时才 rowspan 合并
   const cellMap = [];
   for (let i = 0; i < 7; i++) cellMap.push([null, null, null]);
+  // 初始化为空数组
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < 3; j++) cellMap[i][j] = [];
+  }
 
   const allActivities = [];
 
@@ -332,8 +338,7 @@ async function renderOverviewTab(container) {
     const d = new Date(ws);
     d.setDate(d.getDate() + i);
     const dateStr = fmtDate(d);
-    const isToday = dateStr === today();
-    dayLabels.push({ date: dateStr, dayName: weekdayName(d), dateShort: dateStr.slice(5), isToday });
+    dayLabels.push({ date: dateStr, dayName: weekdayName(d), dateShort: dateStr.slice(5), isToday: dateStr === today() });
 
     // 收集当天所有活动
     const dayPp = sessions.filter(s => s.date === dateStr).map(s => ({ ...s, source: 'pp' }));
@@ -342,7 +347,6 @@ async function renderOverviewTab(container) {
 
     for (const act of dayAll) {
       const slots = getTimeSlots(act);
-      // 将时段名转为索引
       const slotIndices = slots.map(s => timeSlots.indexOf(s)).filter(idx => idx >= 0).sort((a, b) => a - b);
       if (slotIndices.length === 0) continue;
 
@@ -352,12 +356,12 @@ async function renderOverviewTab(container) {
 
       allActivities.push({ ...act, dayIndex: i, startIdx, endIdx, rowspan });
 
-      // 标记 cellMap
+      // 标记 cellMap：同一活动在起始格标记 isStart + rowspan，其他格标记被合并
       for (let si = startIdx; si <= endIdx; si++) {
         if (si === startIdx) {
-          cellMap[i][si] = { activity: act, isStart: true, rowspan, startIdx, endIdx, isFree: false };
+          cellMap[i][si].push({ activity: act, isStart: true, rowspan, startIdx, endIdx });
         } else {
-          cellMap[i][si] = { activity: act, isStart: false, rowspan: 0, startIdx, endIdx, isFree: false };
+          cellMap[i][si].push({ activity: act, isStart: false, rowspan: 0, startIdx, endIdx });
         }
       }
     }
@@ -378,37 +382,59 @@ async function renderOverviewTab(container) {
   const rowsHtml = timeSlots.map((slot, si) => {
     const tds = [];
     for (let di = 0; di < 7; di++) {
-      const cell = cellMap[di][si];
+      const cellActivities = cellMap[di][si];
 
-      if (!cell) {
+      if (cellActivities.length === 0) {
         // 空闲格
         tds.push(`<td class="pp-ov-td pp-ov-free"><span class="pp-ov-free-text">空闲</span></td>`);
         continue;
       }
 
-      if (!cell.isStart) {
-        // 被合并的格子，不渲染 <td>
+      // 找到以本格为起始的活动（可能有多个不同活动同时段）
+      const startActivities = cellActivities.filter(c => c.isStart);
+      // 被其他活动合并的格子（非起始），不渲染
+      const hasMergedFromAbove = cellActivities.some(c => !c.isStart);
+
+      if (hasMergedFromAbove && startActivities.length === 0) {
+        // 整格被上方活动合并，不渲染 <td>
         continue;
       }
 
-      const a = cell.activity;
-      const colors = sourceColors[a.source] || sourceColors.pp;
-      const slotCount = cell.rowspan;
-      const startIdx = cell.startIdx;
-      const endIdx = cell.endIdx;
-      const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[startIdx]}+${timeSlots[endIdx]}` : timeSlots[startIdx]);
+      // 如果有从上方合并过来的活动，且本格也有新活动起始，需要分开渲染
+      // 被合并的活动不渲染 td，只有起始活动渲染
+      if (startActivities.length === 0) {
+        continue;
+      }
 
-      tds.push(`
-        <td class="pp-ov-td pp-ov-merged" rowspan="${cell.rowspan}" style="background:${colors.bg};border:1px solid ${colors.border};vertical-align:middle">
-          <div class="pp-ov-activity">
-            <span style="font-size:13px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
-            <span style="font-size:12px;font-weight:600;color:${colors.text}">${escapeHtml(a.name.length > 8 ? a.name.slice(0, 8) + '…' : a.name)}</span>
-            <span style="font-size:10px;color:${colors.text};opacity:0.7">${slotsLabel}</span>
-            ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
-            <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
-          </div>
-        </td>
-      `);
+      // 渲染所有以本格为起始的活动
+      // 如果只有一个起始活动 → 正常 rowspan
+      // 如果有多个起始活动（不同活动同一时段）→ 各自独立，不用 rowspan
+      const hasMultiple = startActivities.length > 1;
+      const tdsForCell = startActivities.map(cell => {
+        const a = cell.activity;
+        const colors = sourceColors[a.source] || sourceColors.pp;
+        const slotCount = cell.rowspan;
+        const startIdx = cell.startIdx;
+        const endIdx = cell.endIdx;
+        const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[startIdx]}+${timeSlots[endIdx]}` : timeSlots[startIdx]);
+
+        // 多个活动同时段时不用 rowspan（避免布局错乱）
+        const useRowspan = hasMultiple ? 1 : cell.rowspan;
+
+        return `
+          <td class="pp-ov-td pp-ov-merged" rowspan="${useRowspan}" style="background:${colors.bg};border:1px solid ${colors.border};vertical-align:middle">
+            <div class="pp-ov-activity">
+              <span style="font-size:13px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
+              <span style="font-size:12px;font-weight:600;color:${colors.text}">${escapeHtml(a.name.length > 8 ? a.name.slice(0, 8) + '…' : a.name)}</span>
+              <span style="font-size:10px;color:${colors.text};opacity:0.7">${slotsLabel}</span>
+              ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
+              <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
+            </div>
+          </td>
+        `;
+      }).join('');
+
+      tds.push(tdsForCell);
     }
 
     return `
