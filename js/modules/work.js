@@ -121,8 +121,13 @@ async function logWork(data) {
 // ============================================================
 
 let currentFilter = 'today';
+let currentCategory = ''; // '' = 全部分类
 
 export async function renderWork(container) {
+  // 先获取所有任务，提取分类列表
+  const allTasks = await getAll('tasks');
+  const categories = [...new Set(allTasks.map(t => t.category).filter(c => c && c.trim()))].sort();
+
   container.innerHTML = `
     <div class="filter-tabs">
       <button class="filter-tab ${currentFilter==='today'?'active':''}" onclick="window.__workFilter('today')">今天</button>
@@ -131,12 +136,21 @@ export async function renderWork(container) {
       <button class="filter-tab ${currentFilter==='all'?'active':''}" onclick="window.__workFilter('all')">全部</button>
       <button class="filter-tab ${currentFilter==='done'?'active':''}" onclick="window.__workFilter('done')">已完成</button>
     </div>
+    ${categories.length > 0 ? `
+    <div class="filter-tabs" style="top:calc(var(--header-h) + 41px)">
+      <button class="filter-tab ${currentCategory===''?'active':''}" onclick="window.__workCategory('')">📋 全部</button>
+      ${categories.map(cat => `
+        <button class="filter-tab ${currentCategory===cat?'active':''}" onclick="window.__workCategory('${escapeHtml(cat)}')">${escapeHtml(cat)}</button>
+      `).join('')}
+    </div>
+    ` : ''}
     <div id="task-list-container"></div>
     <button class="fab" onclick="window.__addTask()" style="right:72px">+</button>
     <button class="fab fab-secondary" onclick="window.__batchAddTask()">≡</button>
   `;
 
   window.__workFilter = (f) => { currentFilter = f; renderWork(container); };
+  window.__workCategory = (c) => { currentCategory = c; renderWork(container); };
   window.__addTask = () => showAddTaskDialog(container);
   window.__batchAddTask = () => showBatchAddTaskDialog(container);
   window.__toggleTask = async (id) => { await toggleTask(id); renderWork(container); };
@@ -189,6 +203,11 @@ async function renderTaskList() {
     default:
       filtered = allTasks;
       break;
+  }
+
+  // 按分类筛选
+  if (currentCategory) {
+    filtered = filtered.filter(t => t.category === currentCategory);
   }
 
   // 排序：未完成在前，按优先级
@@ -264,6 +283,15 @@ function showAddTaskDialog(container) {
       <div class="form-group">
         <label>业务分类（可选）</label>
         <input type="text" id="task-category" placeholder="如：车险、企财险、理赔...">
+        <div class="category-quick-tags" id="category-quick-tags">
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='车险'">车险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='企财险'">企财险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='理赔'">理赔</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='寿险'">寿险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='健康险'">健康险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='客户维护'">客户维护</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='续保'">续保</button>
+        </div>
       </div>
       <div class="form-group">
         <label>预计耗时（小时，可选）</label>
@@ -361,6 +389,15 @@ async function showEditTaskDialog(container, id) {
       <div class="form-group">
         <label>业务分类（可选）</label>
         <input type="text" id="task-category" value="${escapeHtml(task.category || '')}" placeholder="如：车险、企财险、理赔...">
+        <div class="category-quick-tags">
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='车险'">车险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='企财险'">企财险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='理赔'">理赔</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='寿险'">寿险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='健康险'">健康险</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='客户维护'">客户维护</button>
+          <button type="button" class="cat-quick-btn" onclick="document.getElementById('task-category').value='续保'">续保</button>
+        </div>
       </div>
       <div class="form-group">
         <label>预计耗时（小时，可选）</label>

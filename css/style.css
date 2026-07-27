@@ -658,6 +658,30 @@ body {
 .task-tag.high { background: var(--danger-bg); color: var(--danger); }
 .task-tag.medium { background: var(--warning-bg); color: var(--warning); }
 .task-tag.low { background: var(--success-bg); color: var(--success); }
+
+/* 快捷分类标签 */
+.category-quick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.cat-quick-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+  background: white;
+  color: var(--gray-600);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.cat-quick-btn:active {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
 .task-delete {
   color: var(--gray-300);
   font-size: 18px;
