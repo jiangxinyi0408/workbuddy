@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:47:52.702Z",
+  "updatedAt": "2026-07-27T17:48:02.571Z",
   "data": {
     "tasks": [
       {
@@ -395,6 +395,21 @@
         "interestRate": 0,
         "note": "",
         "createdAt": "2026-07-27T17:47:05.224Z"
+      },
+      {
+        "id": "ms3isik795p09q",
+        "bank": "俞莉",
+        "principal": 60000,
+        "currentBalance": 60000,
+        "monthlyPayment": 0,
+        "paymentType": "fixed",
+        "remainingPeriods": 0,
+        "estimatedMonthlyPayment": 0,
+        "startDate": "2026-07-28",
+        "endDate": "",
+        "interestRate": 0,
+        "note": "",
+        "createdAt": "2026-07-27T17:47:57.559Z"
       }
     ],
     "incomes": [
