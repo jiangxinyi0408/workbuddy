@@ -124,9 +124,10 @@ let currentFilter = 'today';
 let currentCategory = ''; // '' = 全部分类
 
 export async function renderWork(container) {
-  // 先获取所有任务，提取分类列表
+  // 先获取所有任务，提取有未完成任务的分类列表
   const allTasks = await getAll('tasks');
-  const categories = [...new Set(allTasks.map(t => t.category).filter(c => c && c.trim()))].sort();
+  const pendingTasks = allTasks.filter(t => t.status === 'pending');
+  const categories = [...new Set(pendingTasks.map(t => t.category).filter(c => c && c.trim()))].sort();
 
   container.innerHTML = `
     <div class="filter-tabs">
