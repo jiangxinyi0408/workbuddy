@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T06:07:06.623Z",
+  "updatedAt": "2026-07-27T06:07:29.966Z",
   "data": {
     "tasks": [
       {
@@ -71,11 +71,11 @@
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "medium",
-        "status": "pending",
+        "status": "done",
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:50.750Z",
-        "completedAt": null,
+        "completedAt": "2026-07-27T06:07:24.938Z",
         "image": null,
         "updatedAt": "2026-07-27T05:58:37.250Z"
       },
