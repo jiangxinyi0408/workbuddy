@@ -146,6 +146,7 @@ export async function renderWork(container) {
       renderWork(container);
     }
   };
+  window.__editTask = (id) => showEditTaskDialog(container, id);
   window.__viewTaskImage = async (id) => {
     const tasks = await getAll('tasks');
     const task = tasks.find(t => t.id === id);
@@ -223,6 +224,7 @@ async function renderTaskList() {
           ${t.estimateHours ? `<span class="task-tag">预计${t.estimateHours}h</span>` : ''}
         </div>
       </div>
+      <button class="task-edit" onclick="event.stopPropagation();window.__editTask('${t.id}')" title="编辑">✎</button>
       <button class="task-delete" onclick="window.__deleteTask('${t.id}')">✕</button>
     </li>
   `).join('')}</ul>`;
@@ -314,6 +316,114 @@ function showAddTaskDialog(container) {
     toast('任务已添加');
     sheet.close();
     renderWork(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 编辑任务对话框
+// ============================================================
+
+async function showEditTaskDialog(container, id) {
+  const allTasks = await getAll('tasks');
+  const task = allTasks.find(t => t.id === id);
+  if (!task) { toast('任务不存在'); return; }
+
+  const isToday = task.dueDate === today();
+  const isTomorrow = task.dueDate === tomorrow();
+  const presetDate = isToday ? today() : (isTomorrow ? tomorrow() : 'custom');
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>任务内容</label>
+        <textarea id="task-title" rows="2">${escapeHtml(task.title)}</textarea>
+      </div>
+      <div class="form-group">
+        <label>日期</label>
+        <select id="task-date">
+          <option value="${today()}" ${presetDate===today()?'selected':''}>今天 (${weekdayName(today())})</option>
+          <option value="${tomorrow()}" ${presetDate===tomorrow()?'selected':''}>明天 (${weekdayName(tomorrow())})</option>
+          <option value="custom" ${presetDate==='custom'?'selected':''}>自定义日期</option>
+        </select>
+      </div>
+      <div class="form-group" id="custom-date-group" style="display:${presetDate==='custom'?'block':'none'}">
+        <label>自定义日期</label>
+        <input type="date" id="task-custom-date" value="${task.dueDate}">
+      </div>
+      <div class="form-group">
+        <label>优先级</label>
+        <select id="task-priority">
+          <option value="high" ${task.priority==='high'?'selected':''}>高优先级</option>
+          <option value="medium" ${task.priority==='medium'?'selected':''}>中优先级</option>
+          <option value="low" ${task.priority==='low'?'selected':''}>低优先级</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>业务分类（可选）</label>
+        <input type="text" id="task-category" value="${escapeHtml(task.category || '')}" placeholder="如：车险、企财险、理赔...">
+      </div>
+      <div class="form-group">
+        <label>预计耗时（小时，可选）</label>
+        <input type="number" id="task-hours" step="0.5" min="0.5" value="${task.estimateHours || ''}" placeholder="如：1.5">
+      </div>
+      <div class="form-group">
+        <label>📷 图片备注（可选）</label>
+        <input type="file" id="task-image" accept="image/*" capture="environment">
+        <div id="task-image-preview">
+          ${task.image ? `<img src="${task.image}" style="max-height:100px;border-radius:8px;margin-top:8px"><div style="font-size:11px;color:var(--gray-400);margin-top:4px">已有图片，选择新图片将替换</div>` : ''}
+        </div>
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__updateTask()">保存修改</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delTaskFromEdit('${id}')">删除此任务</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('编辑任务', html);
+
+  document.getElementById('task-date').onchange = (e) => {
+    document.getElementById('custom-date-group').style.display = e.target.value === 'custom' ? 'block' : 'none';
+  };
+
+  let taskImageData = task.image || null;
+  document.getElementById('task-image').onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      taskImageData = ev.target.result;
+      document.getElementById('task-image-preview').innerHTML =
+        `<img src="${taskImageData}" style="max-height:100px;border-radius:8px;margin-top:8px"><div style="font-size:11px;color:var(--gray-400);margin-top:4px">新图片已选择</div>`;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.__updateTask = async () => {
+    const title = document.getElementById('task-title').value.trim();
+    if (!title) { toast('请输入任务内容'); return; }
+    let dueDate = document.getElementById('task-date').value;
+    if (dueDate === 'custom') {
+      dueDate = document.getElementById('task-custom-date').value || today();
+    }
+    task.title = title;
+    task.dueDate = dueDate;
+    task.priority = document.getElementById('task-priority').value;
+    task.category = document.getElementById('task-category').value.trim();
+    task.estimateHours = parseFloat(document.getElementById('task-hours').value) || null;
+    task.image = taskImageData;
+    task.updatedAt = new Date().toISOString();
+    await put('tasks', task);
+    toast('任务已更新');
+    sheet.close();
+    renderWork(document.getElementById('main-content'));
+  };
+
+  window.__delTaskFromEdit = async (delId) => {
+    if (await confirmDialog('确定删除这个任务吗？')) {
+      await deleteTask(delId);
+      toast('已删除');
+      sheet.close();
+      renderWork(document.getElementById('main-content'));
+    }
   };
 }
 
