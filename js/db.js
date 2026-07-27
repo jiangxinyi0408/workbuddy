@@ -3,14 +3,18 @@
 // ============================================================
 
 const DB_NAME = 'WorkBuddyDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // 数据库 store 定义
 const STORES = {
   tasks: { keyPath: 'id', indexes: ['dueDate', 'status', 'type'] },
   workLogs: { keyPath: 'id', indexes: ['date'] },
   pingpongSessions: { keyPath: 'id', indexes: ['date'] },
+  freeActivities: { keyPath: 'id', indexes: ['date'] },
   englishProgress: { keyPath: 'id', indexes: ['date', 'type'] },
+  englishFavorites: { keyPath: 'id', indexes: ['type'] },
+  aiProgress: { keyPath: 'id', indexes: ['date'] },
+  aiNotes: { keyPath: 'id', indexes: ['date'] },
   weights: { keyPath: 'id', indexes: ['date', 'time'] },
   meals: { keyPath: 'id', indexes: ['date', 'mealType'] },
   loans: { keyPath: 'id', indexes: ['bank'] },

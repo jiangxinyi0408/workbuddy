@@ -945,6 +945,78 @@ body {
 .pp-slot-name { font-size: 14px; font-weight: 600; line-height: 1.3; word-break: break-all; }
 .pp-slot-meta { font-size: 11px; color: var(--gray-400); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ============================================================
+   活动总览 - 时间网格
+   ============================================================ */
+.pp-overview { padding: 0 0 80px 0; }
+
+.pp-overview-grid-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.pp-overview-table {
+  width: 100%;
+  min-width: 500px;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pp-ov-th {
+  padding: 8px 4px;
+  font-size: 11px;
+  text-align: center;
+  background: var(--gray-50);
+  border-bottom: 2px solid var(--gray-200);
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.pp-ov-th.pp-ov-today {
+  background: #e6f7ff;
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+
+.pp-ov-td {
+  padding: 6px 4px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid var(--gray-100);
+  min-height: 48px;
+  transition: background 0.2s;
+}
+
+.pp-ov-slot-label {
+  background: var(--gray-50);
+  font-size: 12px;
+  min-width: 56px;
+  font-weight: 500;
+}
+
+.pp-ov-free {
+  background: #fafafa;
+}
+
+.pp-ov-free-text {
+  font-size: 11px;
+  color: var(--gray-300);
+  font-weight: 500;
+}
+
+.pp-ov-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 0;
+}
+
 /* 旧 pingpong 样式保留兼容 */
 .pingpong-session {
   background: white;
