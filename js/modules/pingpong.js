@@ -259,9 +259,11 @@ async function renderOverviewTab(container) {
 
     const row = [];
     for (const slot of timeSlots) {
-      // 找这个日期+时段的所有活动
-      const ppInSlot = sessions.filter(s => s.date === dateStr && s.timeSlot === slot);
-      const freeInSlot = freeActivities.filter(a => a.date === dateStr && a.timeSlot === slot);
+      // 找这个日期+时段的所有活动，标记来源
+      const ppInSlot = sessions.filter(s => s.date === dateStr && s.timeSlot === slot)
+        .map(s => ({ ...s, source: 'pp' }));
+      const freeInSlot = freeActivities.filter(a => a.date === dateStr && a.timeSlot === slot)
+        .map(a => ({ ...a, source: 'free' }));
       const allInSlot = [...ppInSlot, ...freeInSlot];
       row.push({
         slot,
@@ -337,7 +339,7 @@ async function renderOverviewTab(container) {
                     <td class="pp-ov-td" style="background:${slotColors[slot].bg};border:1px solid ${slotColors[slot].border}">
                       ${cell.activities.map(a => `
                         <div class="pp-ov-activity">
-                          <span style="font-size:11px">${a.name.startsWith('乒乓球') || a.name.includes('乒乓') ? '🏓' : '🎯'}</span>
+                          <span style="font-size:11px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
                           <span style="font-size:11px;font-weight:500;color:${slotColors[slot].text}">${escapeHtml(a.name.length > 6 ? a.name.slice(0, 6) + '…' : a.name)}</span>
                           ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
                           <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
