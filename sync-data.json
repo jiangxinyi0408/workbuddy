@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T16:44:18.330Z",
+  "updatedAt": "2026-07-27T16:44:38.094Z",
   "data": {
     "tasks": [
       {
@@ -246,7 +246,11 @@
         "duration": 6,
         "note": "",
         "createdAt": "2026-07-27T05:20:29.986Z",
-        "updatedAt": "2026-07-27T06:41:17.547Z"
+        "updatedAt": "2026-07-27T16:44:33.081Z",
+        "timeSlots": [
+          "下午",
+          "晚上"
+        ]
       },
       {
         "id": "ms2uykvximy16o",
