@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:46:55.513Z",
+  "updatedAt": "2026-07-27T17:47:10.233Z",
   "data": {
     "tasks": [
       {
@@ -380,6 +380,21 @@
         "interestRate": 0,
         "note": "车贷，2026.12可提前还款",
         "createdAt": "2026-07-27T17:46:02.014Z"
+      },
+      {
+        "id": "ms3ire6gz7473j",
+        "bank": "酷桔",
+        "principal": 330000,
+        "currentBalance": 330000,
+        "monthlyPayment": 0,
+        "paymentType": "fixed",
+        "remainingPeriods": 0,
+        "estimatedMonthlyPayment": 0,
+        "startDate": "2026-07-28",
+        "endDate": "",
+        "interestRate": 0,
+        "note": "",
+        "createdAt": "2026-07-27T17:47:05.224Z"
       }
     ],
     "incomes": [
