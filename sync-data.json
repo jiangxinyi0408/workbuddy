@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:53:02.433Z",
+  "updatedAt": "2026-07-27T17:53:19.077Z",
   "data": {
     "tasks": [
       {
@@ -129,7 +129,7 @@
         "title": "整理对账单",
         "type": "daily",
         "dueDate": "2026-07-28",
-        "priority": "medium",
+        "priority": "high",
         "status": "pending",
         "category": "商汤",
         "estimateHours": null,
@@ -137,7 +137,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.349Z",
-        "completedAt": null
+        "completedAt": null,
+        "updatedAt": "2026-07-27T17:53:14.066Z"
       },
       {
         "id": "ms3ez4evriock6",
