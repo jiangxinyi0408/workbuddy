@@ -22,14 +22,16 @@ async function addLoan(data) {
   const loan = {
     id: genId(),
     bank: data.bank,
-    loanName: data.loanName || '',
     principal: parseFloat(data.principal) || 0,
     currentBalance: parseFloat(data.currentBalance) || parseFloat(data.principal) || 0,
     monthlyPayment: parseFloat(data.monthlyPayment) || 0,
+    paymentType: data.paymentType || 'fixed', // 'fixed'=每月固定还款, 'variable'=每月不固定还款
+    remainingPeriods: parseInt(data.remainingPeriods) || 0,
+    estimatedMonthlyPayment: parseFloat(data.estimatedMonthlyPayment) || 0,
     startDate: data.startDate || today(),
     endDate: data.endDate || '',
     interestRate: parseFloat(data.interestRate) || 0,
-    type: data.type || '其他',
+    note: data.note || '',
     createdAt: new Date().toISOString(),
   };
   await put('loans', loan);
@@ -118,6 +120,7 @@ export async function renderFinance(container) {
       renderFinance(container);
     }
   };
+  window.__editLoan = (id) => showEditLoanDialog(container, id);
   window.__delIncome = async (id) => {
     if (await confirmDialog('删除这条收入记录？')) {
       await del('incomes', id);
@@ -185,18 +188,19 @@ async function renderOverview(container) {
       <div class="card-title"><span class="title-left">📋 贷款概览</span></div>
       ${loans.length > 0 ? loans.map(l => {
         const progress = l.principal > 0 ? Math.round((1 - l.currentBalance / l.principal) * 100) : 0;
+        const paymentLabel = l.paymentType === 'variable' ? '不固定' : `¥${formatNum(l.monthlyPayment)}`;
         return `
         <div style="padding:12px 0;border-bottom:1px solid var(--gray-100)">
           <div class="flex-between">
             <div>
               <span class="font-bold">${escapeHtml(l.bank)}</span>
-              <span class="text-xs text-gray ml-8">${escapeHtml(l.type)}</span>
+              ${l.remainingPeriods ? `<span class="text-xs text-gray ml-8">剩${l.remainingPeriods}期</span>` : ''}
             </div>
             <div class="font-bold text-danger">¥${formatNum(l.currentBalance)}</div>
           </div>
           <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
           <div class="flex-between text-xs text-gray mt-8">
-            <span>已还 ${progress}% · 月供 ¥${formatNum(l.monthlyPayment)}</span>
+            <span>已还 ${progress}% · 月供 ${paymentLabel}</span>
             <span>${l.endDate ? '到期 ' + fmtDate(l.endDate).slice(0,7) : ''}</span>
           </div>
         </div>`;
@@ -265,24 +269,30 @@ async function renderLoans(container) {
       </div>
       ${bankLoans.map(l => {
         const progress = l.principal > 0 ? Math.round((1 - l.currentBalance / l.principal) * 100) : 0;
+        const paymentLabel = l.paymentType === 'variable' ? '每月不固定' : `¥${formatNum(l.monthlyPayment)}`;
         return `
         <div style="padding:12px 0;border-bottom:1px solid var(--gray-100)">
           <div class="flex-between mb-8">
             <div>
-              <div class="font-bold text-sm">${escapeHtml(l.loanName || l.type)}</div>
-              <div class="text-xs text-gray">${escapeHtml(l.type)} · 利率 ${l.interestRate}%</div>
+              <div class="font-bold text-sm">${escapeHtml(l.bank)}</div>
+              <div class="text-xs text-gray">利率 ${l.interestRate}%${l.remainingPeriods ? ' · 剩' + l.remainingPeriods + '期' : ''}</div>
             </div>
-            <button class="task-delete" onclick="window.__delLoan('${l.id}')">✕</button>
+            <div style="display:flex;gap:4px">
+              <button class="task-edit" onclick="window.__editLoan('${l.id}')">✎</button>
+              <button class="task-delete" onclick="window.__delLoan('${l.id}')">✕</button>
+            </div>
           </div>
           <div class="flex-between text-sm mb-8">
             <span>剩余：¥${formatNum(l.currentBalance)}</span>
-            <span class="text-warning">月供：¥${formatNum(l.monthlyPayment)}</span>
+            <span class="text-warning">月供：${paymentLabel}</span>
           </div>
+          ${l.estimatedMonthlyPayment ? `<div class="text-xs text-gray mb-8">预估月还：¥${formatNum(l.estimatedMonthlyPayment)}</div>` : ''}
           <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
           <div class="flex-between text-xs text-gray mt-8">
             <span>本金 ¥${formatNum(l.principal)}</span>
             <span>已还 ${progress}%</span>
           </div>
+          ${l.note ? `<div class="text-xs text-gray mt-8">📝 ${escapeHtml(l.note)}</div>` : ''}
           <button class="btn-outline btn-full mt-8" onclick="window.__repayLoan('${l.id}')">记录还款</button>
         </div>`;
       }).join('')}
@@ -347,21 +357,6 @@ function showAddLoanDialog(container) {
         <input type="text" id="loan-bank" placeholder="如：工商银行、招商银行">
       </div>
       <div class="form-group">
-        <label>贷款名称（可选）</label>
-        <input type="text" id="loan-name" placeholder="如：房贷、车贷">
-      </div>
-      <div class="form-group">
-        <label>贷款类型</label>
-        <select id="loan-type">
-          <option value="房贷">房贷</option>
-          <option value="车贷">车贷</option>
-          <option value="消费贷">消费贷</option>
-          <option value="信用贷">信用贷</option>
-          <option value="经营贷">经营贷</option>
-          <option value="其他">其他</option>
-        </select>
-      </div>
-      <div class="form-group">
         <label>贷款本金 (元)</label>
         <input type="number" step="0.01" id="loan-principal" placeholder="如：500000.00">
       </div>
@@ -370,8 +365,23 @@ function showAddLoanDialog(container) {
         <input type="number" step="0.01" id="loan-balance" placeholder="留空则等于本金">
       </div>
       <div class="form-group">
-        <label>每月固定还款 (元)</label>
+        <label>还款方式</label>
+        <select id="loan-payment-type">
+          <option value="fixed">每月固定还款</option>
+          <option value="variable">每月不固定还款</option>
+        </select>
+      </div>
+      <div class="form-group" id="loan-monthly-group">
+        <label>每月固定还款金额 (元)</label>
         <input type="number" step="0.01" id="loan-monthly" placeholder="如：5000.00">
+      </div>
+      <div class="form-group">
+        <label>每月预估还款金额 (元)</label>
+        <input type="number" step="0.01" id="loan-estimated" placeholder="如：4500.00">
+      </div>
+      <div class="form-group">
+        <label>剩余期数 (月)</label>
+        <input type="number" id="loan-periods" placeholder="如：36">
       </div>
       <div class="form-group">
         <label>年利率 (%)</label>
@@ -381,6 +391,10 @@ function showAddLoanDialog(container) {
         <label>到期日期（可选）</label>
         <input type="date" id="loan-enddate">
       </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="loan-note" placeholder="如：等额本息、提前还款等">
+      </div>
       <button class="btn-primary btn-full" onclick="window.__saveLoan()">保存</button>
     </div>
   `;
@@ -388,22 +402,127 @@ function showAddLoanDialog(container) {
   const sheet = openBottomSheet('添加贷款', html);
   window.__currentSheet = sheet;
 
+  // 还款方式切换
+  document.getElementById('loan-payment-type').onchange = (e) => {
+    const monthlyGroup = document.getElementById('loan-monthly-group');
+    monthlyGroup.style.display = e.target.value === 'fixed' ? 'block' : 'none';
+  };
+
   window.__saveLoan = async () => {
     const bank = document.getElementById('loan-bank').value.trim();
     if (!bank) { toast('请输入银行名称'); return; }
+    const paymentType = document.getElementById('loan-payment-type').value;
     await addLoan({
       bank,
-      loanName: document.getElementById('loan-name').value.trim(),
-      type: document.getElementById('loan-type').value,
       principal: document.getElementById('loan-principal').value,
       currentBalance: document.getElementById('loan-balance').value,
-      monthlyPayment: document.getElementById('loan-monthly').value,
+      paymentType,
+      monthlyPayment: paymentType === 'fixed' ? document.getElementById('loan-monthly').value : 0,
+      estimatedMonthlyPayment: document.getElementById('loan-estimated').value,
+      remainingPeriods: document.getElementById('loan-periods').value,
       interestRate: document.getElementById('loan-rate').value,
       endDate: document.getElementById('loan-enddate').value,
+      note: document.getElementById('loan-note').value.trim(),
     });
     toast('贷款已添加');
     sheet.close();
     renderFinance(document.getElementById('main-content'));
+  };
+}
+
+// ============================================================
+// 编辑贷款对话框
+// ============================================================
+
+async function showEditLoanDialog(container, id) {
+  const all = await getAll('loans');
+  const loan = all.find(l => l.id === id);
+  if (!loan) { toast('记录不存在'); return; }
+
+  const html = `
+    <div class="settings-form">
+      <div class="form-group">
+        <label>银行名称</label>
+        <input type="text" id="loan-bank" value="${escapeHtml(loan.bank)}">
+      </div>
+      <div class="form-group">
+        <label>贷款本金 (元)</label>
+        <input type="number" step="0.01" id="loan-principal" value="${loan.principal}">
+      </div>
+      <div class="form-group">
+        <label>当前剩余欠款 (元)</label>
+        <input type="number" step="0.01" id="loan-balance" value="${loan.currentBalance}">
+      </div>
+      <div class="form-group">
+        <label>还款方式</label>
+        <select id="loan-payment-type">
+          <option value="fixed" ${loan.paymentType === 'fixed' || !loan.paymentType ? 'selected' : ''}>每月固定还款</option>
+          <option value="variable" ${loan.paymentType === 'variable' ? 'selected' : ''}>每月不固定还款</option>
+        </select>
+      </div>
+      <div class="form-group" id="loan-monthly-group" style="display:${loan.paymentType === 'variable' ? 'none' : 'block'}">
+        <label>每月固定还款金额 (元)</label>
+        <input type="number" step="0.01" id="loan-monthly" value="${loan.monthlyPayment || ''}">
+      </div>
+      <div class="form-group">
+        <label>每月预估还款金额 (元)</label>
+        <input type="number" step="0.01" id="loan-estimated" value="${loan.estimatedMonthlyPayment || ''}">
+      </div>
+      <div class="form-group">
+        <label>剩余期数 (月)</label>
+        <input type="number" id="loan-periods" value="${loan.remainingPeriods || ''}">
+      </div>
+      <div class="form-group">
+        <label>年利率 (%)</label>
+        <input type="number" id="loan-rate" step="0.01" value="${loan.interestRate}">
+      </div>
+      <div class="form-group">
+        <label>到期日期（可选）</label>
+        <input type="date" id="loan-enddate" value="${loan.endDate || ''}">
+      </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="loan-note" value="${escapeHtml(loan.note || '')}">
+      </div>
+      <button class="btn-primary btn-full" onclick="window.__updateLoan()">保存修改</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delLoanFromEdit('${id}')">删除此贷款</button>
+    </div>
+  `;
+
+  const sheet = openBottomSheet('编辑贷款', html);
+
+  document.getElementById('loan-payment-type').onchange = (e) => {
+    document.getElementById('loan-monthly-group').style.display = e.target.value === 'fixed' ? 'block' : 'none';
+  };
+
+  window.__updateLoan = async () => {
+    const bank = document.getElementById('loan-bank').value.trim();
+    if (!bank) { toast('请输入银行名称'); return; }
+    const paymentType = document.getElementById('loan-payment-type').value;
+    loan.bank = bank;
+    loan.principal = parseFloat(document.getElementById('loan-principal').value) || 0;
+    loan.currentBalance = parseFloat(document.getElementById('loan-balance').value) || loan.principal;
+    loan.paymentType = paymentType;
+    loan.monthlyPayment = paymentType === 'fixed' ? (parseFloat(document.getElementById('loan-monthly').value) || 0) : 0;
+    loan.estimatedMonthlyPayment = parseFloat(document.getElementById('loan-estimated').value) || 0;
+    loan.remainingPeriods = parseInt(document.getElementById('loan-periods').value) || 0;
+    loan.interestRate = parseFloat(document.getElementById('loan-rate').value) || 0;
+    loan.endDate = document.getElementById('loan-enddate').value;
+    loan.note = document.getElementById('loan-note').value.trim();
+    loan.updatedAt = new Date().toISOString();
+    await put('loans', loan);
+    toast('已修改');
+    sheet.close();
+    renderFinance(document.getElementById('main-content'));
+  };
+
+  window.__delLoanFromEdit = async (delId) => {
+    if (await confirmDialog('删除这笔贷款记录？')) {
+      await del('loans', delId);
+      toast('已删除');
+      sheet.close();
+      renderFinance(document.getElementById('main-content'));
+    }
   };
 }
 
