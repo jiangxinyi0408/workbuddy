@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:52:10.453Z",
+  "updatedAt": "2026-07-27T17:53:02.433Z",
   "data": {
     "tasks": [
       {
@@ -251,6 +251,19 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:52:05.444Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3iyxxrp3gfns",
+        "title": "（告知太科）慢性病理赔沟通处理结果",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "high",
+        "status": "pending",
+        "category": "",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-27T17:52:57.423Z",
         "completedAt": null
       }
     ],
