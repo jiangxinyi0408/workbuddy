@@ -9,6 +9,7 @@ import { genId, today, fmtDate, weekStart, weekRange, weekdayName, toast, openBo
 
 let initialized = false;
 let currentTab = 'overview'; // 'overview' | 'schedule' | 'free'
+let overviewWeekOffset = 0; // 总览周偏移：0=本周，-1=上周，1=下周
 
 export async function initPingpong() {
   if (initialized) return;
@@ -65,6 +66,18 @@ export async function getWeekSessions() {
   });
 }
 
+// 按周偏移获取活动
+async function getSessionsByWeek(offset) {
+  const ref = new Date();
+  ref.setDate(ref.getDate() + offset * 7);
+  const [wStart, wEnd] = weekRange(ref);
+  const all = await getAll('pingpongSessions');
+  return all.filter(s => s.date >= wStart && s.date <= wEnd).sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return (a.startTime || '').localeCompare(b.startTime || '');
+  });
+}
+
 // ============================================================
 // 数据操作：自由活动
 // ============================================================
@@ -86,6 +99,18 @@ async function addFreeActivity(data) {
 
 async function getWeekFreeActivities() {
   const [wStart, wEnd] = weekRange(new Date());
+  const all = await getAll('freeActivities');
+  return all.filter(a => a.date >= wStart && a.date <= wEnd).sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return (a.startTime || '').localeCompare(b.startTime || '');
+  });
+}
+
+// 按周偏移获取自由活动
+async function getFreeActivitiesByWeek(offset) {
+  const ref = new Date();
+  ref.setDate(ref.getDate() + offset * 7);
+  const [wStart, wEnd] = weekRange(ref);
   const all = await getAll('freeActivities');
   return all.filter(a => a.date >= wStart && a.date <= wEnd).sort((a, b) => {
     if (a.date !== b.date) return a.date.localeCompare(b.date);
@@ -256,12 +281,19 @@ async function renderScheduleTab(container) {
 // ============================================================
 
 async function renderOverviewTab(container) {
-  const sessions = await getWeekSessions();
-  const freeActivities = await getWeekFreeActivities();
+  const sessions = await getSessionsByWeek(overviewWeekOffset);
+  const freeActivities = await getFreeActivitiesByWeek(overviewWeekOffset);
 
-  const ws = weekStart(new Date());
+  // 计算当前偏移对应的周
+  const refDate = new Date();
+  refDate.setDate(refDate.getDate() + overviewWeekOffset * 7);
+  const ws = weekStart(refDate);
+  const [curWStart, curWEnd] = weekRange(refDate);
   const timeSlots = ['上午', '下午', '晚上'];
   const slotRanges = { '上午': '6:00-12:00', '下午': '12:00-18:00', '晚上': '18:00-24:00' };
+
+  // 周标签
+  const weekLabel = overviewWeekOffset === 0 ? '本周' : (overviewWeekOffset < 0 ? `${Math.abs(overviewWeekOffset)}周前` : `${overviewWeekOffset}周后`);
 
   // 颜色按活动来源区分
   const sourceColors = {
@@ -391,6 +423,14 @@ async function renderOverviewTab(container) {
         </div>
       </div>
 
+      <!-- 周切换器 -->
+      <div class="pp-week-switcher">
+        <button class="pp-week-btn" onclick="window.__ppWeekOffset(${overviewWeekOffset - 1})">‹ 上周</button>
+        <span class="pp-week-label">${weekLabel} (${curWStart.slice(5)} ~ ${curWEnd.slice(5)})</span>
+        <button class="pp-week-btn" onclick="window.__ppWeekOffset(${overviewWeekOffset + 1})">下周 ›</button>
+      </div>
+      ${overviewWeekOffset !== 0 ? `<div style="text-align:center;margin-bottom:8px"><button class="pp-week-today" onclick="window.__ppWeekOffset(0)">回到本周</button></div>` : ''}
+
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:12px;font-size:11px;color:var(--gray-500)">
         <span>🏓 打球</span><span>🎯 自由活动</span><span style="color:var(--gray-300)">⬜ 空闲</span>
       </div>
@@ -419,6 +459,11 @@ async function renderOverviewTab(container) {
       </div>
     </div>
   `;
+
+  window.__ppWeekOffset = (offset) => {
+    overviewWeekOffset = offset;
+    renderPingpong(document.getElementById('main-content'));
+  };
 }
 
 // ============================================================

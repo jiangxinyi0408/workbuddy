@@ -1002,6 +1002,48 @@ body {
    ============================================================ */
 .pp-overview { padding: 0 0 80px 0; }
 
+/* 周切换器 */
+.pp-week-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+}
+
+.pp-week-btn {
+  background: var(--gray-100);
+  border: none;
+  color: var(--gray-600);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pp-week-btn:active { background: var(--gray-200); }
+
+.pp-week-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.pp-week-today {
+  background: none;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 4px 16px;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pp-week-today:active { background: var(--primary-bg); }
+
 .pp-overview-grid-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
