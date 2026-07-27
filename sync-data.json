@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:50:04.640Z",
+  "updatedAt": "2026-07-27T17:51:03.972Z",
   "data": {
     "tasks": [
       {
@@ -213,6 +213,19 @@
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.360Z",
         "completedAt": "2026-07-27T16:01:35.605Z"
+      },
+      {
+        "id": "ms3iwej6q1gl2r",
+        "title": "环责TIS服务费用结算",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "low",
+        "status": "pending",
+        "category": "环责险",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-27T17:50:58.962Z",
+        "completedAt": null
       }
     ],
     "workLogs": [],
