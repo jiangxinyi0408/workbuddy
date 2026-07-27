@@ -84,10 +84,15 @@ export async function get(storeName, id) {
 export async function getAll(storeName) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const req = tx.objectStore(storeName).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
+    try {
+      const tx = db.transaction(storeName, 'readonly');
+      const req = tx.objectStore(storeName).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      // store 不存在时返回空数组
+      resolve([]);
+    }
   });
 }
 
@@ -95,11 +100,15 @@ export async function getAll(storeName) {
 export async function getByIndex(storeName, indexName, value) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const index = tx.objectStore(storeName).index(indexName);
-    const req = index.getAll(value);
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
+    try {
+      const tx = db.transaction(storeName, 'readonly');
+      const index = tx.objectStore(storeName).index(indexName);
+      const req = index.getAll(value);
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      resolve([]);
+    }
   });
 }
 
@@ -107,12 +116,16 @@ export async function getByIndex(storeName, indexName, value) {
 export async function getByRange(storeName, indexName, lower, upper) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const index = tx.objectStore(storeName).index(indexName);
-    const range = IDBKeyRange.bound(lower, upper);
-    const req = index.getAll(range);
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
+    try {
+      const tx = db.transaction(storeName, 'readonly');
+      const index = tx.objectStore(storeName).index(indexName);
+      const range = IDBKeyRange.bound(lower, upper);
+      const req = index.getAll(range);
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      resolve([]);
+    }
   });
 }
 
@@ -153,9 +166,13 @@ export async function getSetting(key, defaultVal = null) {
 export async function count(storeName) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readonly');
-    const req = tx.objectStore(storeName).count();
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    try {
+      const tx = db.transaction(storeName, 'readonly');
+      const req = tx.objectStore(storeName).count();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      resolve(0);
+    }
   });
 }
