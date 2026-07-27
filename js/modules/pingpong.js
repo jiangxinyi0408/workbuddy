@@ -1,6 +1,7 @@
 // ============================================================
 // modules/pingpong.js - 模块2：打球时间
-// 三标签：打球时间 | 活动总览 | 自由活动
+// 三标签：活动总览 | 打球时间 | 自由活动
+// 时段支持多选：上午、下午、晚上、全天
 // ============================================================
 
 import { put, getAll, del } from '../db.js';
@@ -15,6 +16,28 @@ export async function initPingpong() {
 }
 
 // ============================================================
+// 辅助：兼容旧数据 timeSlot → timeSlots 数组
+// ============================================================
+
+const ALL_SLOTS = ['上午', '下午', '晚上'];
+
+function getTimeSlots(item) {
+  if (item.timeSlots && Array.isArray(item.timeSlots) && item.timeSlots.length > 0) {
+    return item.timeSlots;
+  }
+  if (item.timeSlot) {
+    return [item.timeSlot];
+  }
+  return ['晚上'];
+}
+
+function slotsLabel(slots) {
+  if (!slots || slots.length === 0) return '晚上';
+  if (slots.length === 3) return '全天';
+  return slots.join('+');
+}
+
+// ============================================================
 // 数据操作：乒乓球活动
 // ============================================================
 
@@ -23,7 +46,7 @@ async function addSession(data) {
     id: genId(),
     date: data.date,
     name: data.name || '乒乓球活动',
-    timeSlot: data.timeSlot || '晚上',
+    timeSlots: data.timeSlots || ['晚上'],
     startTime: data.startTime || '',
     duration: data.duration || 2,
     note: data.note || '',
@@ -51,7 +74,7 @@ async function addFreeActivity(data) {
     id: genId(),
     date: data.date,
     name: data.name,
-    timeSlot: data.timeSlot || '下午',
+    timeSlots: data.timeSlots || ['下午'],
     startTime: data.startTime || '',
     duration: data.duration || 1,
     note: data.note || '',
@@ -75,7 +98,6 @@ async function getWeekFreeActivities() {
 // ============================================================
 
 export async function renderPingpong(container) {
-  // 三标签导航
   const tabs = [
     { key: 'overview', label: '📊 活动总览' },
     { key: 'schedule', label: '🏓 打球时间' },
@@ -101,10 +123,6 @@ export async function renderPingpong(container) {
   await renderCurrentTab();
 }
 
-// ============================================================
-// 根据当前标签渲染内容
-// ============================================================
-
 async function renderCurrentTab() {
   const area = document.getElementById('pp-content-area');
   if (!area) return;
@@ -117,7 +135,7 @@ async function renderCurrentTab() {
 }
 
 // ============================================================
-// Tab 1: 打球时间（周历视图）
+// Tab: 打球时间（周历视图）
 // ============================================================
 
 async function renderScheduleTab(container) {
@@ -150,7 +168,6 @@ async function renderScheduleTab(container) {
 
   container.innerHTML = `
     <div class="pp-weekly-view">
-      <!-- 顶部汇总 -->
       <div class="card" style="background:linear-gradient(135deg, var(--primary), #a48cc4);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
@@ -168,7 +185,6 @@ async function renderScheduleTab(container) {
         </div>
       </div>
 
-      <!-- 周一~周日 -->
       ${weekDays.map(day => `
         <div class="card pp-day-card ${day.isToday ? 'pp-today' : ''}" style="margin-bottom:12px;${day.isToday ? 'border:2px solid var(--primary)' : ''}">
           <div class="card-title" style="margin-bottom:10px">
@@ -181,23 +197,29 @@ async function renderScheduleTab(container) {
             </span>
           </div>
 
-          ${day.sessions.length > 0 ? day.sessions.map(s => `
+          ${day.sessions.length > 0 ? day.sessions.map(s => {
+            const slots = getTimeSlots(s);
+            const label = slotsLabel(slots);
+            const icon = slots.length === 3 ? '🌤️' : (slotIcon[slots[0]] || '🕐');
+            return `
             <div class="pp-slot pp-slot-filled" onclick="window.__editSession('${s.id}')">
               <div class="pp-slot-time">
-                <span class="pp-slot-icon">${slotIcon[s.timeSlot] || '🕐'}</span>
-                <span class="pp-slot-period">${s.timeSlot}</span>
+                <span class="pp-slot-icon">${icon}</span>
+                <span class="pp-slot-period">${label}</span>
                 ${s.startTime ? `<span class="pp-slot-clock">${s.startTime}</span>` : ''}
               </div>
               <div class="pp-slot-body">
                 <div class="pp-slot-name">${escapeHtml(s.name)}</div>
                 <div class="pp-slot-meta">
                   <span>⏱ ${s.duration}小时</span>
+                  ${slots.length > 1 ? `<span style="color:var(--primary);font-size:10px">${slots.map(sl => slotIcon[sl]).join('')} ${slots.join('·')}</span>` : ''}
                   ${s.note ? `<span>📝 ${escapeHtml(s.note)}</span>` : ''}
                 </div>
               </div>
               <button class="task-delete" onclick="event.stopPropagation();window.__delSession('${s.id}')">✕</button>
             </div>
-          `).join('') : `
+          `;
+          }).join('') : `
             <div class="pp-slot pp-slot-empty" onclick="window.__ppQuickAdd('${day.date}')">
               <div class="pp-slot-time">
                 <span class="pp-slot-icon">📅</span>
@@ -230,7 +252,7 @@ async function renderScheduleTab(container) {
 }
 
 // ============================================================
-// Tab 2: 活动总览（时间网格）
+// Tab: 活动总览（时间网格）
 // ============================================================
 
 async function renderOverviewTab(container) {
@@ -246,7 +268,6 @@ async function renderOverviewTab(container) {
     '晚上': { bg: '#f9f0ff', border: '#722ed1', text: '#531dab' },
   };
 
-  // 构建网格数据: dayIndex × slot → { activity, isFree }
   const grid = [];
   const dayLabels = [];
 
@@ -259,10 +280,10 @@ async function renderOverviewTab(container) {
 
     const row = [];
     for (const slot of timeSlots) {
-      // 找这个日期+时段的所有活动，标记来源
-      const ppInSlot = sessions.filter(s => s.date === dateStr && s.timeSlot === slot)
+      // 用 timeSlots 数组匹配（兼容旧 timeSlot）
+      const ppInSlot = sessions.filter(s => s.date === dateStr && getTimeSlots(s).includes(slot))
         .map(s => ({ ...s, source: 'pp' }));
-      const freeInSlot = freeActivities.filter(a => a.date === dateStr && a.timeSlot === slot)
+      const freeInSlot = freeActivities.filter(a => a.date === dateStr && getTimeSlots(a).includes(slot))
         .map(a => ({ ...a, source: 'free' }));
       const allInSlot = [...ppInSlot, ...freeInSlot];
       row.push({
@@ -282,7 +303,6 @@ async function renderOverviewTab(container) {
 
   container.innerHTML = `
     <div class="pp-overview">
-      <!-- 统计卡片 -->
       <div class="card" style="background:linear-gradient(135deg, #1890ff, #722ed1);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
@@ -300,12 +320,10 @@ async function renderOverviewTab(container) {
         </div>
       </div>
 
-      <!-- 图例 -->
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:12px;font-size:11px;color:var(--gray-500)">
         <span>🏓 打球</span><span>🎯 自由活动</span><span style="color:var(--gray-300)">⬜ 空闲</span>
       </div>
 
-      <!-- 时间网格表格 -->
       <div class="pp-overview-grid-wrapper">
         <table class="pp-overview-table">
           <thead>
@@ -362,7 +380,7 @@ async function renderOverviewTab(container) {
 }
 
 // ============================================================
-// Tab 3: 自由活动
+// Tab: 自由活动
 // ============================================================
 
 async function renderFreeTab(container) {
@@ -394,7 +412,6 @@ async function renderFreeTab(container) {
 
   container.innerHTML = `
     <div class="pp-weekly-view">
-      <!-- 汇总 -->
       <div class="card" style="background:linear-gradient(135deg, #52c41a, #1890ff);color:#fff;margin-bottom:16px">
         <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
           <div>
@@ -412,7 +429,6 @@ async function renderFreeTab(container) {
         </div>
       </div>
 
-      <!-- 按天分组 -->
       ${weekDays.map(day => `
         <div class="card pp-day-card ${day.isToday ? 'pp-today' : ''}" style="margin-bottom:12px;${day.isToday ? 'border:2px solid #52c41a' : ''}">
           <div class="card-title" style="margin-bottom:10px">
@@ -425,23 +441,29 @@ async function renderFreeTab(container) {
             </span>
           </div>
 
-          ${day.activities.length > 0 ? day.activities.map(a => `
+          ${day.activities.length > 0 ? day.activities.map(a => {
+            const slots = getTimeSlots(a);
+            const label = slotsLabel(slots);
+            const icon = slots.length === 3 ? '🌤️' : (slotIcon[slots[0]] || '🎯');
+            return `
             <div class="pp-slot pp-slot-filled" style="background:#f6ffed;border-left:3px solid #52c41a" onclick="window.__editFreeActivity('${a.id}')">
               <div class="pp-slot-time">
-                <span class="pp-slot-icon">${slotIcon[a.timeSlot] || '🎯'}</span>
-                <span class="pp-slot-period">${a.timeSlot}</span>
+                <span class="pp-slot-icon">${icon}</span>
+                <span class="pp-slot-period">${label}</span>
                 ${a.startTime ? `<span class="pp-slot-clock">${a.startTime}</span>` : ''}
               </div>
               <div class="pp-slot-body">
                 <div class="pp-slot-name">${escapeHtml(a.name)}</div>
                 <div class="pp-slot-meta">
                   <span>⏱ ${a.duration}小时</span>
+                  ${slots.length > 1 ? `<span style="color:#52c41a;font-size:10px">${slots.map(sl => slotIcon[sl]).join('')} ${slots.join('·')}</span>` : ''}
                   ${a.note ? `<span>📝 ${escapeHtml(a.note)}</span>` : ''}
                 </div>
               </div>
               <button class="task-delete" onclick="event.stopPropagation();window.__delFreeActivity('${a.id}')">✕</button>
             </div>
-          `).join('') : `
+          `;
+          }).join('') : `
             <div class="pp-slot pp-slot-empty" onclick="window.__addFreeActivity('${day.date}')">
               <div class="pp-slot-time">
                 <span class="pp-slot-icon">🎯</span>
@@ -472,6 +494,62 @@ async function renderFreeTab(container) {
 }
 
 // ============================================================
+// 时段多选组件（共享）
+// ============================================================
+
+function renderSlotPicker(idPrefix, selectedSlots) {
+  const slots = [
+    { value: '上午', icon: '🌅' },
+    { value: '下午', icon: '☀️' },
+    { value: '晚上', icon: '🌙' },
+  ];
+  return `
+    <div class="pp-slot-picker" id="${idPrefix}-picker">
+      ${slots.map(s => {
+        const checked = selectedSlots.includes(s.value);
+        return `
+          <button type="button"
+            class="pp-slot-chip ${checked ? 'pp-slot-chip-active' : ''}"
+            data-slot="${s.value}"
+            onclick="window.__toggleSlotChip(this)"
+            style="${checked ? '' : ''}">
+            ${s.icon} ${s.value}
+          </button>
+        `;
+      }).join('')}
+      <input type="hidden" id="${idPrefix}-slots" value="${selectedSlots.join(',')}">
+    </div>
+    <div class="form-hint" style="margin-top:4px">可多选，选3个 = 全天</div>
+  `;
+}
+
+function buildSlotPickerScript(idPrefix) {
+  return `
+    (function() {
+      const hidden = document.getElementById('${idPrefix}-slots');
+      const chips = document.querySelectorAll('#${idPrefix}-picker .pp-slot-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+          this.classList.toggle('pp-slot-chip-active');
+          const selected = [];
+          chips.forEach(c => {
+            if (c.classList.contains('pp-slot-chip-active')) {
+              selected.push(c.dataset.slot);
+            }
+          });
+          if (selected.length === 0) {
+            // 不允许取消最后一个
+            this.classList.add('pp-slot-chip-active');
+            return;
+          }
+          hidden.value = selected.join(',');
+        });
+      });
+    })();
+  `;
+}
+
+// ============================================================
 // 对话框：新增/编辑乒乓球活动
 // ============================================================
 
@@ -487,12 +565,8 @@ function showAddSessionDialog(presetDate) {
         <input type="date" id="pp-date" value="${presetDate || today()}">
       </div>
       <div class="form-group">
-        <label>时段</label>
-        <select id="pp-timeslot">
-          <option value="上午">🌅 上午</option>
-          <option value="下午">☀️ 下午</option>
-          <option value="晚上" selected>🌙 晚上</option>
-        </select>
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('pp', ['晚上'])}
       </div>
       <div class="form-group">
         <label>开始时间</label>
@@ -512,16 +586,24 @@ function showAddSessionDialog(presetDate) {
 
   const sheet = openBottomSheet('新增活动', html);
 
+  // 初始化多选按钮交互
+  setTimeout(() => {
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('pp');
+    document.body.appendChild(script);
+  }, 100);
+
   window.__saveSession = async () => {
     const name = document.getElementById('pp-name').value.trim();
     const date = document.getElementById('pp-date').value;
-    const timeSlot = document.getElementById('pp-timeslot').value;
+    const slotsVal = document.getElementById('pp-slots').value;
+    const timeSlots = slotsVal ? slotsVal.split(',').filter(Boolean) : ['晚上'];
     const startTime = document.getElementById('pp-start').value;
     const duration = parseFloat(document.getElementById('pp-duration').value);
     const note = document.getElementById('pp-note').value.trim();
     if (!date) { toast('请选择日期'); return; }
     if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
-    await addSession({ name, date, timeSlot, startTime, duration, note });
+    await addSession({ name, date, timeSlots, startTime, duration, note });
     toast('活动已添加');
     sheet.close();
     renderPingpong(document.getElementById('main-content'));
@@ -532,6 +614,8 @@ async function showEditSessionDialog(id) {
   const all = await getAll('pingpongSessions');
   const session = all.find(s => s.id === id);
   if (!session) { toast('记录不存在'); return; }
+
+  const selectedSlots = getTimeSlots(session);
 
   const html = `
     <div class="settings-form">
@@ -544,12 +628,8 @@ async function showEditSessionDialog(id) {
         <input type="date" id="pp-date" value="${session.date}">
       </div>
       <div class="form-group">
-        <label>时段</label>
-        <select id="pp-timeslot">
-          <option value="上午" ${session.timeSlot==='上午'?'selected':''}>🌅 上午</option>
-          <option value="下午" ${session.timeSlot==='下午'?'selected':''}>☀️ 下午</option>
-          <option value="晚上" ${session.timeSlot==='晚上'?'selected':''}>🌙 晚上</option>
-        </select>
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('pp', selectedSlots)}
       </div>
       <div class="form-group">
         <label>开始时间</label>
@@ -570,10 +650,17 @@ async function showEditSessionDialog(id) {
 
   const sheet = openBottomSheet('编辑活动', html);
 
+  setTimeout(() => {
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('pp');
+    document.body.appendChild(script);
+  }, 100);
+
   window.__updateSession = async () => {
     const name = document.getElementById('pp-name').value.trim();
     const date = document.getElementById('pp-date').value;
-    const timeSlot = document.getElementById('pp-timeslot').value;
+    const slotsVal = document.getElementById('pp-slots').value;
+    const timeSlots = slotsVal ? slotsVal.split(',').filter(Boolean) : ['晚上'];
     const startTime = document.getElementById('pp-start').value;
     const duration = parseFloat(document.getElementById('pp-duration').value);
     const note = document.getElementById('pp-note').value.trim();
@@ -581,7 +668,7 @@ async function showEditSessionDialog(id) {
     if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
     session.name = name;
     session.date = date;
-    session.timeSlot = timeSlot;
+    session.timeSlots = timeSlots;
     session.startTime = startTime;
     session.duration = duration;
     session.note = note;
@@ -618,12 +705,8 @@ function showAddFreeActivityDialog(presetDate) {
         <input type="date" id="fa-date" value="${presetDate || today()}">
       </div>
       <div class="form-group">
-        <label>时段</label>
-        <select id="fa-timeslot">
-          <option value="上午">🌅 上午</option>
-          <option value="下午" selected>☀️ 下午</option>
-          <option value="晚上">🌙 晚上</option>
-        </select>
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('fa', ['下午'])}
       </div>
       <div class="form-group">
         <label>开始时间</label>
@@ -643,17 +726,24 @@ function showAddFreeActivityDialog(presetDate) {
 
   const sheet = openBottomSheet('新增自由活动', html);
 
+  setTimeout(() => {
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('fa');
+    document.body.appendChild(script);
+  }, 100);
+
   window.__saveFreeActivity = async () => {
     const name = document.getElementById('fa-name').value.trim();
     const date = document.getElementById('fa-date').value;
-    const timeSlot = document.getElementById('fa-timeslot').value;
+    const slotsVal = document.getElementById('fa-slots').value;
+    const timeSlots = slotsVal ? slotsVal.split(',').filter(Boolean) : ['下午'];
     const startTime = document.getElementById('fa-start').value;
     const duration = parseFloat(document.getElementById('fa-duration').value);
     const note = document.getElementById('fa-note').value.trim();
     if (!name) { toast('请填写活动名称'); return; }
     if (!date) { toast('请选择日期'); return; }
     if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
-    await addFreeActivity({ name, date, timeSlot, startTime, duration, note });
+    await addFreeActivity({ name, date, timeSlots, startTime, duration, note });
     toast('自由活动已添加');
     sheet.close();
     renderPingpong(document.getElementById('main-content'));
@@ -664,6 +754,8 @@ async function showEditFreeActivityDialog(id) {
   const all = await getAll('freeActivities');
   const activity = all.find(a => a.id === id);
   if (!activity) { toast('记录不存在'); return; }
+
+  const selectedSlots = getTimeSlots(activity);
 
   const html = `
     <div class="settings-form">
@@ -676,19 +768,15 @@ async function showEditFreeActivityDialog(id) {
         <input type="date" id="fa-date" value="${activity.date}">
       </div>
       <div class="form-group">
-        <label>时段</label>
-        <select id="fa-timeslot">
-          <option value="上午" ${activity.timeSlot==='上午'?'selected':''}>🌅 上午</option>
-          <option value="下午" ${activity.timeSlot==='下午'?'selected':''}>☀️ 下午</option>
-          <option value="晚上" ${activity.timeSlot==='晚上'?'selected':''}>🌙 晚上</option>
-        </select>
+        <label>时段（可多选）</label>
+        ${renderSlotPicker('fa', selectedSlots)}
       </div>
       <div class="form-group">
         <label>开始时间</label>
         <input type="time" id="fa-start" value="${activity.startTime || ''}">
       </div>
       <div class="form-group">
-        <label>活动��长（小时）</label>
+        <label>活动时长（小时）</label>
         <input type="number" id="fa-duration" step="0.5" min="0.5" value="${activity.duration}">
       </div>
       <div class="form-group">
@@ -702,10 +790,17 @@ async function showEditFreeActivityDialog(id) {
 
   const sheet = openBottomSheet('编辑自由活动', html);
 
+  setTimeout(() => {
+    const script = document.createElement('script');
+    script.textContent = buildSlotPickerScript('fa');
+    document.body.appendChild(script);
+  }, 100);
+
   window.__updateFreeActivity = async () => {
     const name = document.getElementById('fa-name').value.trim();
     const date = document.getElementById('fa-date').value;
-    const timeSlot = document.getElementById('fa-timeslot').value;
+    const slotsVal = document.getElementById('fa-slots').value;
+    const timeSlots = slotsVal ? slotsVal.split(',').filter(Boolean) : ['下午'];
     const startTime = document.getElementById('fa-start').value;
     const duration = parseFloat(document.getElementById('fa-duration').value);
     const note = document.getElementById('fa-note').value.trim();
@@ -714,7 +809,7 @@ async function showEditFreeActivityDialog(id) {
     if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
     activity.name = name;
     activity.date = date;
-    activity.timeSlot = timeSlot;
+    activity.timeSlots = timeSlots;
     activity.startTime = startTime;
     activity.duration = duration;
     activity.note = note;
