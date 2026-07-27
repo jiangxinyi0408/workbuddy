@@ -2,7 +2,7 @@
 // sw.js - Service Worker（离线缓存）
 // ============================================================
 
-const CACHE_NAME = 'workbuddy-v11';
+const CACHE_NAME = 'workbuddy-v12';
 const CACHE_URLS = [
   './',
   './index.html',

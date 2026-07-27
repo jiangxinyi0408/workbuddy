@@ -3,7 +3,7 @@
 // 每天5+5+5分钟：词汇打卡 + 对话跟练 + 听力训练
 // ============================================================
 
-import { put, getAll, getSetting, setSetting } from '../db.js';
+import { put, getAll, del, getSetting, setSetting } from '../db.js';
 import { genId, today, fmtDate, toast, escapeHtml, openBottomSheet } from '../utils.js';
 
 let initialized = false;
@@ -73,6 +73,7 @@ const VOCAB_GROUPS = [
 const DIALOGUE_SCENES = [
   {
     title: '酒店入住',
+    scene: '寒暄',
     lines: [
       { speaker: 'Clerk', en: 'Welcome! Do you have a reservation?', cn: '欢迎！您有预订吗？' },
       { speaker: 'You', en: 'Yes, I have a reservation for tonight.', cn: '是的，我预订了今晚的。' },
@@ -83,6 +84,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '机场值机',
+    scene: '职场',
     lines: [
       { speaker: 'Staff', en: 'Where are you flying today?', cn: '您今天飞往哪里？' },
       { speaker: 'You', en: 'I am flying to Tokyo. What is the departure time?', cn: '我飞往东京。出发时间是几点？' },
@@ -93,6 +95,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '餐厅点餐',
+    scene: '餐饮',
     lines: [
       { speaker: 'Waiter', en: 'Would you like an appetizer to start?', cn: '您想先来个开胃菜吗？' },
       { speaker: 'You', en: 'Yes, please. I have a peanut allergy.', cn: '好的。我对花生过敏。' },
@@ -103,6 +106,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '购物退税',
+    scene: '购物',
     lines: [
       { speaker: 'Assistant', en: 'How can I help you today?', cn: '今天需要什么帮助？' },
       { speaker: 'You', en: 'I bought some souvenirs. Can I get a refund on tax?', cn: '我买了一些纪念品。可以退税吗？' },
@@ -113,6 +117,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '酒店退房',
+    scene: '旅游',
     lines: [
       { speaker: 'You', en: 'I am checking out today.', cn: '我今天退房。' },
       { speaker: 'Clerk', en: 'How was your stay? Did you enjoy the amenity?', cn: '您住得怎么样？喜欢酒店的设施吗？' },
@@ -123,6 +128,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '药店就医',
+    scene: '求助',
     lines: [
       { speaker: 'You', en: 'I need to fill a prescription.', cn: '我需要配药。' },
       { speaker: 'Pharmacist', en: 'Do you have an appointment with a doctor?', cn: '您有医生预约吗？' },
@@ -133,6 +139,7 @@ const DIALOGUE_SCENES = [
   },
   {
     title: '商场购物',
+    scene: '家庭聚餐',
     lines: [
       { speaker: 'You', en: 'Can I exchange this for a different size?', cn: '可以换个尺码吗？' },
       { speaker: 'Assistant', en: 'Sure. Does this have a warranty?', cn: '可以。这个有保修吗？' },
@@ -147,6 +154,7 @@ const DIALOGUE_SCENES = [
 const LISTENING_EXERCISES = [
   {
     title: '机场广播',
+    scene: '职场',
     text: 'Attention passengers. The departure for flight CA981 to Tokyo has been delayed by 30 minutes. The new boarding time is 3:30 PM. Please wait near the terminal gate. Thank you for your patience.',
     questions: [
       { q: '航班飞往哪里？', a: 'Tokyo（东京）' },
@@ -156,6 +164,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '酒店前台',
+    scene: '餐饮',
     text: 'Welcome to our hotel. Your accommodation includes breakfast and free WiFi. Checkout is at 11 AM. If you need anything, please call the concierge. We also have an airport shuttle every hour.',
     questions: [
       { q: '住宿包含什么？', a: '早餐和免费WiFi' },
@@ -165,6 +174,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '餐厅对话',
+    scene: '旅游',
     text: 'Good evening. Would you like an appetizer? Our specialty is grilled salmon. If you have any allergy, please let us know. We offer a 20% discount today, and a receipt will be provided.',
     questions: [
       { q: '特色菜是什么？', a: '烤三文鱼' },
@@ -174,6 +184,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '购物退税',
+    scene: '购物',
     text: 'You can get a tax refund for your souvenirs. Please show your receipt at the counter. The refund can be given in different currency. There is also an exchange office next door.',
     questions: [
       { q: '什么可以退税？', a: '纪念品（souvenirs）' },
@@ -183,6 +194,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '紧急就医',
+    scene: '寒暄',
     text: 'I understand your symptom. This is not an emergency, but you should see a doctor. I can help you make an appointment. The pharmacy is on the first floor, and you can fill your prescription there.',
     questions: [
       { q: '这是紧急情况吗？', a: '不是' },
@@ -192,6 +204,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '商场退换货',
+    scene: '情感',
     text: 'You can exchange this item within 30 days. Please bring your receipt. If you want a refund, it will take 3 to 5 business days. Does this have a warranty? Yes, one year warranty is included.',
     questions: [
       { q: '换货期限是多久？', a: '30天内' },
@@ -201,6 +214,7 @@ const LISTENING_EXERCISES = [
   },
   {
     title: '交通问路',
+    scene: '求助',
     text: 'To get to downtown, you can take the shuttle from the suburb. It runs every 20 minutes. The landmark you are looking for is the tall tower. You cannot miss it. The journey takes about 30 minutes.',
     questions: [
       { q: '去市中心坐什么？', a: '班车（shuttle）' },
@@ -304,6 +318,54 @@ async function getTodayContent() {
 }
 
 // ============================================================
+// 收藏管理
+// ============================================================
+
+const SCENE_COLORS = {
+  '寒暄': '#9d8ec4',
+  '职场': '#8caa94',
+  '购物': '#d4a574',
+  '餐饮': '#c08a8a',
+  '旅游': '#7eb8c9',
+  '求助': '#e8b44f',
+  '家庭聚餐': '#c49bb8',
+  '情感': '#a48cc4',
+};
+
+function sceneBadge(scene) {
+  const color = SCENE_COLORS[scene] || '#999';
+  return `<span style="background:${color};color:#fff;padding:2px 8px;border-radius:10px;font-size:11px">${escapeHtml(scene)}</span>`;
+}
+
+async function getFavorites(type) {
+  const all = await getAll('englishFavorites');
+  return all.filter(f => f.type === type);
+}
+
+async function isFavorited(type, itemIndex) {
+  const favs = await getFavorites(type);
+  return favs.some(f => f.type === type && f.itemIndex === itemIndex);
+}
+
+async function toggleFavorite(type, itemIndex, title) {
+  const favs = await getFavorites(type);
+  const existing = favs.find(f => f.itemIndex === itemIndex);
+  if (existing) {
+    await del('englishFavorites', existing.id);
+    toast('已取消收藏');
+  } else {
+    await put('englishFavorites', {
+      id: genId(),
+      type,
+      itemIndex,
+      title,
+      createdAt: new Date().toISOString(),
+    });
+    toast('已收藏');
+  }
+}
+
+// ============================================================
 // 渲染：英语能力提升主页面
 // ============================================================
 
@@ -315,6 +377,12 @@ export async function renderEnglish(container) {
   const totalMinutes = allRecords.reduce((s, r) => s + r.minutes, 0);
   const completedCount = (progress.vocab ? 1 : 0) + (progress.dialogue ? 1 : 0) + (progress.listening ? 1 : 0);
   const completionRate = Math.round(completedCount / 3 * 100);
+
+  // 查询收藏状态
+  const vocabFavs = await getFavorites('vocab');
+  const dialogueFav = await isFavorited('dialogue', content.day);
+  const listeningFav = await isFavorited('listening', content.day);
+  const vocabFavSet = new Set(vocabFavs.map(f => f.itemIndex));
 
   container.innerHTML = `
     <div class="english-stage">
@@ -341,7 +409,7 @@ export async function renderEnglish(container) {
       <div id="vocab-learn-area">
         ${content.vocab.map((v, i) => `
           <div class="vocab-item" style="padding:10px 0;border-bottom:1px solid var(--gray-100)">
-            <div class="font-bold text-sm">${i+1}. ${escapeHtml(v.word)} <span class="text-gray text-xs">${escapeHtml(v.meaning)}</span></div>
+            <div class="font-bold text-sm">${i+1}. ${escapeHtml(v.word)} <span class="text-gray text-xs">${escapeHtml(v.meaning)}</span> <span style="cursor:pointer;font-size:16px;color:#e8b44f;" onclick="window.__toggleVocabFav(${i})">${vocabFavSet.has(i) ? '★' : '☆'}</span></div>
             <div class="text-xs text-gray mt-4">例：${escapeHtml(v.example)}</div>
           </div>
         `).join('')}
@@ -354,7 +422,7 @@ export async function renderEnglish(container) {
     <!-- 任务2：对话跟练 -->
     <div class="english-task-card" style="border-left: 4px solid ${progress.dialogue ? 'var(--success)' : 'var(--purple)'}">
       <div class="english-task-day">🗣️ 任务二 · 5分钟对话跟练</div>
-      <div class="english-task-title">场景：${escapeHtml(content.dialogue.title)}</div>
+      <div class="english-task-title">场景：${escapeHtml(content.dialogue.title)} ${sceneBadge(content.dialogue.scene)} <span style="cursor:pointer;font-size:18px;color:#e8b44f;vertical-align:middle;" onclick="window.__toggleDialogueFav()">${dialogueFav ? '★' : '☆'}</span></div>
       <div class="english-task-detail text-xs text-gray">运用今日词汇的日常对话，跟读练习发音和语调</div>
       <div class="dialogue-area mt-16">
         ${content.dialogue.lines.map((line, i) => `
@@ -373,7 +441,7 @@ export async function renderEnglish(container) {
     <!-- 任务3：听力训练 -->
     <div class="english-task-card" style="border-left: 4px solid ${progress.listening ? 'var(--success)' : 'var(--cyan)'}">
       <div class="english-task-day">👂 任务三 · 5分钟听力训练</div>
-      <div class="english-task-title">${escapeHtml(content.listening.title)}</div>
+      <div class="english-task-title">${escapeHtml(content.listening.title)} ${sceneBadge(content.listening.scene)} <span style="cursor:pointer;font-size:18px;color:#e8b44f;vertical-align:middle;" onclick="window.__toggleListeningFav()">${listeningFav ? '★' : '☆'}</span></div>
       <div class="english-task-detail text-xs text-gray">阅读以下短文，理解内容后回答问题</div>
       <div class="listening-text mt-16" style="padding:14px;background:var(--gray-50);border-radius:8px;line-height:1.8;font-size:14px">
         ${escapeHtml(content.listening.text)}
@@ -437,6 +505,21 @@ export async function renderEnglish(container) {
     if (progress.listening) return;
     await logStudy('听力', 5, `听力训练：${content.listening.title}`);
     toast('听力训练完成！+5分钟');
+    renderEnglish(container);
+  };
+
+  window.__toggleVocabFav = async (i) => {
+    await toggleFavorite('vocab', i, content.vocab[i].word);
+    renderEnglish(container);
+  };
+
+  window.__toggleDialogueFav = async () => {
+    await toggleFavorite('dialogue', content.day, content.dialogue.title);
+    renderEnglish(container);
+  };
+
+  window.__toggleListeningFav = async () => {
+    await toggleFavorite('listening', content.day, content.listening.title);
     renderEnglish(container);
   };
 }

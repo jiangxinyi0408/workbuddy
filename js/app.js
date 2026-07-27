@@ -10,6 +10,7 @@ import { initFinance, renderFinance, dashboardFinance } from './modules/finance.
 import { initEnglish, renderEnglish, dashboardEnglish } from './modules/english.js';
 import { initPingpong, renderPingpong, dashboardPingpong } from './modules/pingpong.js';
 import { initNews, renderNews, dashboardNews } from './news.js';
+import { initAI, renderAI, dashboardAI } from './modules/ai.js';
 import { autoRestoreIfNeeded, backupToLocalStorage, formatBackupTime } from './backup.js';
 import { hasPassword, isAuthed, verifyPassword, getLockRemaining, getFailCount, setPassword, changePassword, removePassword, clearAuth } from './modules/auth.js';
 
@@ -22,6 +23,7 @@ const PAGES = {
   weight: { title: '健康管理', render: renderWeight },
   news: { title: '每日资讯', render: renderNews },
   finance: { title: '资产管理', render: renderFinance },
+  ai: { title: '了解AI', render: renderAI },
   more: { title: '设置', render: renderMore },
 };
 
@@ -232,13 +234,14 @@ async function showSetPasswordScreen(container) {
 // ============================================================
 
 async function renderHome(container) {
-  const [workHTML, weightHTML, financeHTML, englishHTML, pingpongHTML, newsHTML] = await Promise.all([
+  const [workHTML, weightHTML, financeHTML, englishHTML, pingpongHTML, newsHTML, aiHTML] = await Promise.all([
     dashboardWork(),
     dashboardWeight(),
     dashboardFinance(),
     dashboardEnglish(),
     dashboardPingpong(),
     dashboardNews(),
+    dashboardAI(),
   ]);
 
   container.innerHTML = `
@@ -251,6 +254,7 @@ async function renderHome(container) {
       ${workHTML}
       ${pingpongHTML}
       ${englishHTML}
+      ${aiHTML}
       ${weightHTML}
       ${financeHTML}
       ${newsHTML}
@@ -646,6 +650,7 @@ async function init() {
     initEnglish(),
     initPingpong(),
     initNews(),
+    initAI(),
   ]);
 
   // 初始化默认健康指标

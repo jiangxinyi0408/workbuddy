@@ -10,6 +10,51 @@ let initialized = false;
 export async function initWork() {
   if (initialized) return;
   initialized = true;
+
+  // 自动延续未完成的逾期任务到今天
+  const todayStr = today();
+  const allTasks = await getAll('tasks');
+  const overduePending = allTasks.filter(t => t.status === 'pending' && t.dueDate < todayStr);
+
+  if (overduePending.length > 0) {
+    const todays = allTasks.filter(t => t.dueDate === todayStr);
+    const newTasks = [];
+
+    for (const task of overduePending) {
+      // 已被标记过延续指向，避免重复处理
+      if (task.carriedOverTo) continue;
+
+      // 检查今天是否已有对应的延续副本（标题+分类一致）
+      const hasCopy = todays.some(t => t.carriedOver && t.title === task.title && t.category === (task.category || ''));
+      if (hasCopy) continue;
+
+      const newTask = {
+        id: genId(),
+        title: task.title,
+        type: task.type || 'daily',
+        dueDate: todayStr,
+        priority: task.priority || 'medium',
+        status: 'pending',
+        category: task.category || '',
+        estimateHours: task.estimateHours || null,
+        image: task.image || null,
+        carriedOver: true,
+        originalDueDate: task.dueDate,
+        createdAt: new Date().toISOString(),
+        completedAt: null,
+      };
+
+      // 标记原任务的延续指向
+      task.carriedOverTo = newTask.id;
+      newTasks.push(newTask);
+      await put('tasks', task);
+      todays.push(newTask);
+    }
+
+    if (newTasks.length > 0) {
+      await bulkPut('tasks', newTasks);
+    }
+  }
 }
 
 // ============================================================
@@ -26,6 +71,7 @@ async function addTask(data) {
     status: 'pending',
     category: data.category || '',
     estimateHours: data.estimateHours || null,
+    image: data.image || null,
     createdAt: new Date().toISOString(),
     completedAt: null,
   };
@@ -100,6 +146,16 @@ export async function renderWork(container) {
       renderWork(container);
     }
   };
+  window.__viewTaskImage = async (id) => {
+    const tasks = await getAll('tasks');
+    const task = tasks.find(t => t.id === id);
+    if (!task || !task.image) return;
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(`<html><head><title>图片预览</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#000"><img src="${task.image}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+      w.document.close();
+    }
+  };
 
   await renderTaskList();
 }
@@ -157,10 +213,12 @@ async function renderTaskList() {
         ${t.status==='done'?'✓':''}
       </div>
       <div class="task-content">
-        <div class="task-title">${escapeHtml(t.title)}</div>
+        <div class="task-title">${escapeHtml(t.title)}${t.carriedOver ? ' <span style="font-size:11px;color:var(--primary);background:var(--gray-100);padding:1px 6px;border-radius:4px;margin-left:4px">📋 延续</span>' : ''}</div>
+        ${t.image ? `<div style="margin-top:6px"><img src="${t.image}" style="max-height:120px;border-radius:8px;cursor:pointer" onclick="window.__viewTaskImage('${t.id}')"></div>` : ''}
         <div class="task-meta">
           <span class="task-tag ${t.priority}">${t.priority==='high'?'高优先级':t.priority==='medium'?'中优先级':'低优先级'}</span>
           ${t.dueDate ? `<span class="task-tag">${fmtDate(t.dueDate)} ${weekdayName(t.dueDate)}</span>` : ''}
+          ${t.carriedOver && t.originalDueDate ? `<span class="task-tag" style="color:var(--gray-400)">原定：${t.originalDueDate.slice(5)}</span>` : ''}
           ${t.category ? `<span class="task-tag">${escapeHtml(t.category)}</span>` : ''}
           ${t.estimateHours ? `<span class="task-tag">预计${t.estimateHours}h</span>` : ''}
         </div>
@@ -209,6 +267,11 @@ function showAddTaskDialog(container) {
         <label>预计耗时（小时，可选）</label>
         <input type="number" id="task-hours" step="0.5" min="0.5" placeholder="如：1.5">
       </div>
+      <div class="form-group">
+        <label>📷 图片备注（可选）</label>
+        <input type="file" id="task-image" accept="image/*" capture="environment">
+        <div id="task-image-preview"></div>
+      </div>
       <button class="btn-primary btn-full" onclick="window.__saveTask()">保存任务</button>
     </div>
   `;
@@ -218,6 +281,19 @@ function showAddTaskDialog(container) {
 
   document.getElementById('task-date').onchange = (e) => {
     document.getElementById('custom-date-group').style.display = e.target.value === 'custom' ? 'block' : 'none';
+  };
+
+  let taskImageData = null;
+  document.getElementById('task-image').onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      taskImageData = ev.target.result;
+      document.getElementById('task-image-preview').innerHTML =
+        `<img src="${taskImageData}" style="max-height:100px;border-radius:8px;margin-top:8px">`;
+    };
+    reader.readAsDataURL(file);
   };
 
   window.__saveTask = async () => {
@@ -233,6 +309,7 @@ function showAddTaskDialog(container) {
       priority: document.getElementById('task-priority').value,
       category: document.getElementById('task-category').value.trim(),
       estimateHours: parseFloat(document.getElementById('task-hours').value) || null,
+      image: taskImageData || null,
     });
     toast('任务已添加');
     sheet.close();

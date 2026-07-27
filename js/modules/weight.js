@@ -272,7 +272,7 @@ function showAddWeightDialog(container) {
 async function renderDietTab(container) {
   const todayMeals = await getTodayMeals();
   const totalCalories = todayMeals.reduce((sum, m) => sum + (m.totalCalories || 0), 0);
-  const targetCalories = 1800; // 默认目标
+  const targetCalories = 1100; // 目标卡路里
 
   container.innerHTML = `
     <div class="calorie-summary">
