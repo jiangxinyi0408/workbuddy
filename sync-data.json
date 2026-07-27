@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T18:06:32.505Z",
+  "updatedAt": "2026-07-27T18:07:22.230Z",
   "data": {
     "tasks": [
       {
@@ -468,6 +468,18 @@
         "duration": 2,
         "note": "",
         "createdAt": "2026-07-27T18:06:07.023Z"
+      },
+      {
+        "id": "ms3jhdd1i7ykp9",
+        "date": "2026-08-07",
+        "name": "嘉年华赛前训练",
+        "timeSlots": [
+          "下午"
+        ],
+        "startTime": "15:00",
+        "duration": 2,
+        "note": "",
+        "createdAt": "2026-07-27T18:07:17.221Z"
       }
     ],
     "englishProgress": [],
