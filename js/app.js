@@ -455,7 +455,7 @@ window.__setupSync = function() {
       <div class="form-group">
         <label>GitHub Token</label>
         <input type="password" id="sync-token" class="lock-input" placeholder="ghp_xxxxxxxx" autocomplete="off" value="${getSyncStatus().hasToken ? '(已设置，输入新Token可替换)' : ''}">
-        <div class="form-hint">需要一个有 gist 权限的 Token<br>到 github.com → Settings → Developer settings → Personal access tokens → Generate new token → 勾选 gist</div>
+        <div class="form-hint">需要一个有 repo 权限的 Token<br>到 github.com → 头像 → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → 勾选 repo → 生成后复制粘贴到上方</div>
       </div>
       <button class="btn-primary btn-full" onclick="window.__verifyAndSaveToken()">验证并保存</button>
     </div>
