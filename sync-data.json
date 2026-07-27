@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T17:51:03.972Z",
+  "updatedAt": "2026-07-27T17:51:46.191Z",
   "data": {
     "tasks": [
       {
@@ -225,6 +225,19 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:50:58.962Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms3ixb3w4g1stg",
+        "title": "嘉年华补充协议盖章后寄回",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "high",
+        "status": "pending",
+        "category": "常纺",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-27T17:51:41.180Z",
         "completedAt": null
       }
     ],
