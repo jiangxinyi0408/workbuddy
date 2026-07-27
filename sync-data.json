@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-27T05:20:53.175Z",
+  "updatedAt": "2026-07-27T05:21:05.765Z",
   "data": {
     "tasks": [
       {
@@ -69,13 +69,13 @@
       {
         "id": "ms1yjhw9ijdmau",
         "date": "2026-07-29",
-        "name": "乒乓球红双喜",
+        "name": "🏓红双喜",
         "timeSlot": "晚上",
         "startTime": "19:00",
         "duration": 2,
         "createdAt": "2026-07-26T15:33:18.297Z",
         "note": "",
-        "updatedAt": "2026-07-27T05:20:48.164Z"
+        "updatedAt": "2026-07-27T05:21:00.756Z"
       },
       {
         "id": "ms1yjxbqp13gaj",
