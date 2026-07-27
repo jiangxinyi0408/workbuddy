@@ -1,5 +1,6 @@
 // ============================================================
 // modules/pingpong.js - 模块2：打球时间
+// 周历视图：周一~周日，每天显示已安排活动 + 空闲时段
 // ============================================================
 
 import { put, getAll, del } from '../db.js';
@@ -13,7 +14,7 @@ export async function initPingpong() {
 }
 
 // ============================================================
-// 数据操作 - 活动安排
+// 数据操作
 // ============================================================
 
 async function addSession(data) {
@@ -24,6 +25,7 @@ async function addSession(data) {
     timeSlot: data.timeSlot || '晚上',
     startTime: data.startTime || '',
     duration: data.duration || 2,
+    note: data.note || '',
     createdAt: new Date().toISOString(),
   };
   await put('pingpongSessions', session);
@@ -33,138 +35,119 @@ async function addSession(data) {
 export async function getWeekSessions() {
   const [wStart, wEnd] = weekRange(new Date());
   const all = await getAll('pingpongSessions');
-  return all.filter(s => s.date >= wStart && s.date <= wEnd).sort((a, b) => a.date.localeCompare(b.date));
+  return all.filter(s => s.date >= wStart && s.date <= wEnd).sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return (a.startTime || '').localeCompare(b.startTime || '');
+  });
 }
 
 // ============================================================
-// 数据操作 - 自由活动
+// 渲染：周历视图
 // ============================================================
-
-async function addFreeActivity(data) {
-  const activity = {
-    id: genId(),
-    title: data.title,
-    date: data.date,
-    duration: data.duration || 0,
-    note: data.note || '',
-    createdAt: new Date().toISOString(),
-  };
-  await put('freeActivities', activity);
-  return activity;
-}
-
-async function getWeekFreeActivities() {
-  const [wStart, wEnd] = weekRange(new Date());
-  const all = await getAll('freeActivities');
-  return all.filter(a => a.date >= wStart && a.date <= wEnd).sort((a, b) => a.date.localeCompare(b.date));
-}
-
-// ============================================================
-// 渲染：主页面
-// ============================================================
-
-let currentView = 'schedule'; // 'schedule' | 'free'
 
 export async function renderPingpong(container) {
-  container.innerHTML = `
-    <div class="filter-tabs">
-      <button class="filter-tab ${currentView==='schedule'?'active':''}" onclick="window.__ppTab('schedule')">🏓 活动安排</button>
-      <button class="filter-tab ${currentView==='free'?'active':''}" onclick="window.__ppTab('free')">🎯 自由活动</button>
-    </div>
-    <div id="pp-content"></div>
-    <button class="fab" onclick="window.__ppAdd()">+</button>
-  `;
-
-  window.__ppTab = (t) => { currentView = t; renderPingpong(container); };
-  window.__ppAdd = () => {
-    if (currentView === 'schedule') showAddSessionDialog(container);
-    else showAddFreeDialog(container);
-  };
-
-  await renderPingpongContent();
-}
-
-async function renderPingpongContent() {
-  const content = document.getElementById('pp-content');
-  if (!content) return;
-
-  if (currentView === 'schedule') await renderSchedule(content);
-  else await renderFree(content);
-}
-
-// ============================================================
-// 活动安排 - 图表 + 列表
-// ============================================================
-
-async function renderSchedule(container) {
   const sessions = await getWeekSessions();
   const [wStart, wEnd] = weekRange(new Date());
 
-  if (sessions.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🏓</div>
-        <div class="empty-text">本周暂无乒乓球活动</div>
-        <div class="text-xs text-gray mt-8">点击 + 新增活动</div>
-      </div>
-    `;
-    return;
-  }
-
-  // 按天汇总小时数用于图表
-  const weekDays = [];
+  // 构建周一~周日列表
   const ws = weekStart(new Date());
+  const weekDays = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(ws);
     d.setDate(d.getDate() + i);
-    weekDays.push(fmtDate(d));
+    const dateStr = fmtDate(d);
+    const daySessions = sessions.filter(s => s.date === dateStr);
+    const dayOfWeek = d.getDay() || 7;
+    const isToday = dateStr === today();
+    weekDays.push({
+      date: dateStr,
+      dayName: weekdayName(d),
+      dayNum: parseInt(dateStr.slice(8)),
+      dayOfWeek,
+      isToday,
+      sessions: daySessions,
+      totalHours: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0),
+    });
   }
-  const hoursByDay = weekDays.map(d => {
-    return sessions.filter(s => s.date === d).reduce((sum, s) => sum + (s.duration || 0), 0);
-  });
-  const maxHours = Math.max(...hoursByDay, 1);
 
-  const dayLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  const totalSessions = sessions.length;
+  const totalHours = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+  const daysWithActivity = weekDays.filter(d => d.sessions.length > 0).length;
+  const daysFree = 7 - daysWithActivity;
 
   const slotIcon = { '上午': '🌅', '下午': '☀️', '晚上': '🌙' };
 
   container.innerHTML = `
-    <div class="activity-chart-container">
-      <div class="card-title">
-        <span class="title-left">📊 本周活动分布</span>
-        <span class="text-xs text-gray">${wStart.slice(5)} - ${wEnd.slice(5)}</span>
-      </div>
-      <canvas id="activity-chart" width="600" height="200"></canvas>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span class="title-left">📅 活动列表 (${sessions.length})</span>
-      </div>
-    </div>
-    ${sessions.map(s => `
-      <div class="pingpong-session">
-        <div class="pingpong-date">
-          <div class="pingpong-date-day">${s.date.slice(8)}</div>
-          <div class="pingpong-date-weekday">${weekdayName(s.date)}</div>
-        </div>
-        <div class="pingpong-info">
-          <div class="pingpong-time">${escapeHtml(s.name)}</div>
-          <div class="text-xs text-gray">
-            ${slotIcon[s.timeSlot] || '🕐'} ${s.timeSlot} ${s.startTime ? '· ' + s.startTime : ''} · ${s.duration}小时
+    <div class="pp-weekly-view">
+      <!-- 顶部汇总 -->
+      <div class="card" style="background:linear-gradient(135deg, var(--primary), #a48cc4);color:#fff;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
+          <div>
+            <div style="font-size:24px;font-weight:700">${totalSessions}</div>
+            <div style="font-size:11px;opacity:0.85">已安排活动</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700">${totalHours.toFixed(1)}h</div>
+            <div style="font-size:11px;opacity:0.85">活动总时长</div>
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700">${daysFree}</div>
+            <div style="font-size:11px;opacity:0.85">空闲天数</div>
           </div>
         </div>
-        <button class="task-delete" onclick="window.__delSession('${s.id}')">✕</button>
       </div>
-    `).join('')}
+
+      <!-- 周一~周日 时间轴 -->
+      ${weekDays.map(day => `
+        <div class="card pp-day-card ${day.isToday ? 'pp-today' : ''}" style="margin-bottom:12px;${day.isToday ? 'border:2px solid var(--primary)' : ''}">
+          <div class="card-title" style="margin-bottom:10px">
+            <span class="title-left">
+              ${day.isToday ? '🔵' : ''} ${day.dayName} ${day.date.slice(5)}
+              ${day.isToday ? '<span class="pp-today-badge">今天</span>' : ''}
+            </span>
+            <span class="text-xs" style="color:${day.totalHours > 0 ? 'var(--success)' : 'var(--gray-400)'}">
+              ${day.totalHours > 0 ? '⏱ ' + day.totalHours + 'h' : '🕊 空闲'}
+            </span>
+          </div>
+
+          ${day.sessions.length > 0 ? day.sessions.map(s => `
+            <div class="pp-slot pp-slot-filled" onclick="window.__editSession('${s.id}')">
+              <div class="pp-slot-time">
+                <span class="pp-slot-icon">${slotIcon[s.timeSlot] || '🕐'}</span>
+                <span class="pp-slot-period">${s.timeSlot}</span>
+                ${s.startTime ? `<span class="pp-slot-clock">${s.startTime}</span>` : ''}
+              </div>
+              <div class="pp-slot-body">
+                <div class="pp-slot-name">${escapeHtml(s.name)}</div>
+                <div class="pp-slot-meta">
+                  <span>⏱ ${s.duration}小时</span>
+                  ${s.note ? `<span>📝 ${escapeHtml(s.note)}</span>` : ''}
+                </div>
+              </div>
+              <button class="task-delete" onclick="event.stopPropagation();window.__delSession('${s.id}')">✕</button>
+            </div>
+          `).join('') : `
+            <div class="pp-slot pp-slot-empty" onclick="window.__ppQuickAdd('${day.date}')">
+              <div class="pp-slot-time">
+                <span class="pp-slot-icon">📅</span>
+                <span>全天</span>
+              </div>
+              <div class="pp-slot-body">
+                <div class="pp-slot-name" style="color:var(--gray-400)">暂无活动安排</div>
+                <div class="pp-slot-meta" style="color:var(--primary)">点击添加活动 +</div>
+              </div>
+            </div>
+          `}
+        </div>
+      `).join('')}
+    </div>
+
+    <button class="fab" onclick="window.__ppAdd()">+</button>
   `;
 
-  // 绘制图表
-  requestAnimationFrame(() => {
-    const canvas = document.getElementById('activity-chart');
-    if (!canvas) return;
-    drawActivityChart(canvas, hoursByDay, dayLabels, maxHours);
-  });
+  // 注册全局函数
+  window.__ppAdd = () => showAddSessionDialog(container, today());
+  window.__ppQuickAdd = (date) => showAddSessionDialog(container, date);
 
   window.__delSession = async (id) => {
     if (await confirmDialog('删除这条活动记录？')) {
@@ -172,157 +155,15 @@ async function renderSchedule(container) {
       renderPingpong(document.getElementById('main-content'));
     }
   };
-}
 
-function drawActivityChart(canvas, data, labels, maxVal) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const w = rect.width;
-  const h = rect.height;
-  const padding = { top: 16, right: 16, bottom: 28, left: 40 };
-  const chartW = w - padding.left - padding.right;
-  const chartH = h - padding.top - padding.bottom;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // 背景网格
-  const gridLines = 4;
-  ctx.strokeStyle = '#e8e6ec';
-  ctx.lineWidth = 0.5;
-  for (let i = 0; i <= gridLines; i++) {
-    const y = padding.top + (chartH / gridLines) * i;
-    ctx.beginPath();
-    ctx.moveTo(padding.left, y);
-    ctx.lineTo(w - padding.right, y);
-    ctx.stroke();
-
-    // Y轴标签
-    const val = (maxVal / gridLines) * (gridLines - i);
-    ctx.fillStyle = '#a8a4b0';
-    ctx.font = '10px -apple-system, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(val.toFixed(1) + 'h', padding.left - 6, y + 3);
-  }
-
-  // 柱状图
-  const barWidth = Math.min(40, (chartW / data.length) * 0.65);
-  const gap = chartW / data.length;
-
-  data.forEach((val, i) => {
-    const x = padding.left + gap * i + (gap - barWidth) / 2;
-    const barH = maxVal > 0 ? (val / maxVal) * chartH : 0;
-    const y = padding.top + chartH - barH;
-
-    // 渐变柱形
-    const gradient = ctx.createLinearGradient(x, y, x, padding.top + chartH);
-    gradient.addColorStop(0, '#9d8ec4');
-    gradient.addColorStop(1, '#c4b8dc');
-    ctx.fillStyle = gradient;
-
-    // 圆角矩形
-    const r = 4;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + barWidth - r, y);
-    ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + r);
-    ctx.lineTo(x + barWidth, padding.top + chartH);
-    ctx.lineTo(x, padding.top + chartH);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-    ctx.fill();
-
-    // 数值标签
-    if (val > 0) {
-      ctx.fillStyle = '#7b6ba6';
-      ctx.font = 'bold 10px -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(val + 'h', x + barWidth / 2, y - 6);
-    }
-
-    // X轴标签
-    ctx.fillStyle = '#7d7886';
-    ctx.font = '11px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(labels[i], x + barWidth / 2, h - 4);
-  });
+  window.__editSession = (id) => showEditSessionDialog(container, id);
 }
 
 // ============================================================
-// 自由活动
+// 添加活动对话框
 // ============================================================
 
-async function renderFree(container) {
-  const activities = await getWeekFreeActivities();
-  const [wStart, wEnd] = weekRange(new Date());
-
-  if (activities.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🎯</div>
-        <div class="empty-text">本周暂无自由活动</div>
-        <div class="text-xs text-gray mt-8">点击 + 新增自由活动</div>
-      </div>
-    `;
-    return;
-  }
-
-  // 按日期分组
-  const groups = {};
-  activities.forEach(a => {
-    if (!groups[a.date]) groups[a.date] = [];
-    groups[a.date].push(a);
-  });
-  const sortedDates = Object.keys(groups).sort();
-
-  container.innerHTML = `
-    <div class="card">
-      <div class="card-title">
-        <span class="title-left">🎯 自由活动 (${activities.length})</span>
-        <span class="text-xs text-gray">${wStart.slice(5)} - ${wEnd.slice(5)}</span>
-      </div>
-    </div>
-    ${sortedDates.map(date => `
-      <div class="card">
-        <div class="card-title">
-          <span class="title-left">${weekdayName(date)} ${date.slice(5)}</span>
-          <span class="text-xs text-gray">${groups[date].length} 项</span>
-        </div>
-        ${groups[date].map(a => `
-          <div class="free-activity-item">
-            <div class="free-activity-info">
-              <div class="free-activity-title">${escapeHtml(a.title)}</div>
-              <div class="text-xs text-gray">
-                ${a.duration ? '⏱ ' + a.duration + '小时' : ''}
-                ${a.duration && a.note ? ' · ' : ''}
-                ${a.note ? escapeHtml(a.note) : ''}
-              </div>
-            </div>
-            <button class="task-delete" onclick="window.__delFree('${a.id}')">✕</button>
-          </div>
-        `).join('')}
-      </div>
-    `).join('')}
-  `;
-
-  window.__delFree = async (id) => {
-    if (await confirmDialog('删除这条自由活动？')) {
-      await del('freeActivities', id);
-      renderPingpong(document.getElementById('main-content'));
-    }
-  };
-}
-
-// ============================================================
-// 新增活动对话框 - 活动安排
-// ============================================================
-
-function showAddSessionDialog(container) {
+function showAddSessionDialog(container, presetDate) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
@@ -331,10 +172,10 @@ function showAddSessionDialog(container) {
       </div>
       <div class="form-group">
         <label>日期</label>
-        <input type="date" id="pp-date" value="${today()}">
+        <input type="date" id="pp-date" value="${presetDate || today()}">
       </div>
       <div class="form-group">
-        <label>活动时间</label>
+        <label>时段</label>
         <select id="pp-timeslot">
           <option value="上午">🌅 上午</option>
           <option value="下午">☀️ 下午</option>
@@ -349,6 +190,10 @@ function showAddSessionDialog(container) {
         <label>活动时长（小时）</label>
         <input type="number" id="pp-duration" step="0.5" min="0.5" value="2" placeholder="如：2">
       </div>
+      <div class="form-group">
+        <label>备注（可选）</label>
+        <input type="text" id="pp-note" placeholder="如：和同事一起">
+      </div>
       <button class="btn-primary btn-full" onclick="window.__saveSession()">保存</button>
     </div>
   `;
@@ -361,9 +206,10 @@ function showAddSessionDialog(container) {
     const timeSlot = document.getElementById('pp-timeslot').value;
     const startTime = document.getElementById('pp-start').value;
     const duration = parseFloat(document.getElementById('pp-duration').value);
+    const note = document.getElementById('pp-note').value.trim();
     if (!date) { toast('请选择日期'); return; }
     if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
-    await addSession({ name, date, timeSlot, startTime, duration });
+    await addSession({ name, date, timeSlot, startTime, duration, note });
     toast('活动已添加');
     sheet.close();
     renderPingpong(document.getElementById('main-content'));
@@ -371,45 +217,80 @@ function showAddSessionDialog(container) {
 }
 
 // ============================================================
-// 新增活动对话框 - 自由活动
+// 编辑活动对话框
 // ============================================================
 
-function showAddFreeDialog(container) {
+async function showEditSessionDialog(container, id) {
+  const all = await getAll('pingpongSessions');
+  const session = all.find(s => s.id === id);
+  if (!session) { toast('记录不存在'); return; }
+
   const html = `
     <div class="settings-form">
       <div class="form-group">
         <label>活动名称</label>
-        <input type="text" id="free-title" placeholder="如：散步、看书、逛街" value="">
+        <input type="text" id="pp-name" value="${escapeHtml(session.name)}">
       </div>
       <div class="form-group">
         <label>日期</label>
-        <input type="date" id="free-date" value="${today()}">
+        <input type="date" id="pp-date" value="${session.date}">
       </div>
       <div class="form-group">
-        <label>时长（小时，可选）</label>
-        <input type="number" id="free-duration" step="0.5" min="0" value="" placeholder="如：1.5">
+        <label>时段</label>
+        <select id="pp-timeslot">
+          <option value="上午" ${session.timeSlot==='上午'?'selected':''}>🌅 上午</option>
+          <option value="下午" ${session.timeSlot==='下午'?'selected':''}>☀️ 下午</option>
+          <option value="晚上" ${session.timeSlot==='晚上'?'selected':''}>🌙 晚上</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>开始时间</label>
+        <input type="time" id="pp-start" value="${session.startTime || '19:00'}">
+      </div>
+      <div class="form-group">
+        <label>活动时长（小时）</label>
+        <input type="number" id="pp-duration" step="0.5" min="0.5" value="${session.duration}">
       </div>
       <div class="form-group">
         <label>备注（可选）</label>
-        <input type="text" id="free-note" placeholder="如：和同事一起">
+        <input type="text" id="pp-note" value="${escapeHtml(session.note || '')}">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__saveFree()">保存</button>
+      <button class="btn-primary btn-full" onclick="window.__updateSession()">保存修改</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delSessionFromEdit('${id}')">删除此活动</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('新增自由活动', html);
+  const sheet = openBottomSheet('编辑活动', html);
 
-  window.__saveFree = async () => {
-    const title = document.getElementById('free-title').value.trim();
-    const date = document.getElementById('free-date').value;
-    const duration = parseFloat(document.getElementById('free-duration').value) || 0;
-    const note = document.getElementById('free-note').value.trim();
-    if (!title) { toast('请输入活动名称'); return; }
+  window.__updateSession = async () => {
+    const name = document.getElementById('pp-name').value.trim();
+    const date = document.getElementById('pp-date').value;
+    const timeSlot = document.getElementById('pp-timeslot').value;
+    const startTime = document.getElementById('pp-start').value;
+    const duration = parseFloat(document.getElementById('pp-duration').value);
+    const note = document.getElementById('pp-note').value.trim();
     if (!date) { toast('请选择日期'); return; }
-    await addFreeActivity({ title, date, duration, note });
-    toast('自由活动已添加');
+    if (!duration || duration <= 0) { toast('请填写活动时长'); return; }
+    session.name = name;
+    session.date = date;
+    session.timeSlot = timeSlot;
+    session.startTime = startTime;
+    session.duration = duration;
+    session.note = note;
+    session.updatedAt = new Date().toISOString();
+    await put('pingpongSessions', session);
+    toast('已修改');
     sheet.close();
     renderPingpong(document.getElementById('main-content'));
+  };
+
+  window.__delSessionFromEdit = async (delId) => {
+    if (await confirmDialog('删除这条活动记录？')) {
+      await del('pingpongSessions', delId);
+      toast('已删除');
+      sheet.close();
+      renderPingpong(document.getElementById('main-content'));
+    }
   };
 }
 
@@ -419,8 +300,9 @@ function showAddFreeDialog(container) {
 
 export async function dashboardPingpong() {
   const sessions = await getWeekSessions();
-  const freeActivities = await getWeekFreeActivities();
   const totalHours = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+  const daysWithActivity = new Set(sessions.map(s => s.date)).size;
+  const daysFree = 7 - daysWithActivity;
 
   return `
     <div class="dash-card" onclick="window.__navigate('pingpong')" style="cursor:pointer">
@@ -431,15 +313,15 @@ export async function dashboardPingpong() {
       <div class="dash-stats">
         <div class="dash-stat primary">
           <div class="dash-stat-num">${sessions.length}</div>
-          <div class="dash-stat-label">本周活动数</div>
+          <div class="dash-stat-label">已安排</div>
         </div>
         <div class="dash-stat success">
-          <div class="dash-stat-num">${totalHours.toFixed(1)}</div>
-          <div class="dash-stat-label">活动总时长</div>
+          <div class="dash-stat-num">${totalHours.toFixed(1)}h</div>
+          <div class="dash-stat-label">总时长</div>
         </div>
         <div class="dash-stat warning">
-          <div class="dash-stat-num">${freeActivities.length}</div>
-          <div class="dash-stat-label">自由活动数</div>
+          <div class="dash-stat-num">${daysFree}</div>
+          <div class="dash-stat-label">空闲天</div>
         </div>
       </div>
     </div>
