@@ -3,7 +3,7 @@
 // 策略：网络优先，离线回退缓存
 // ============================================================
 
-const CACHE_NAME = 'workbuddy-v17';
+const CACHE_NAME = 'workbuddy-v18';
 const CACHE_URLS = [
   './',
   './index.html',
