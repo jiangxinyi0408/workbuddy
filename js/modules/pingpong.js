@@ -407,10 +407,11 @@ async function renderOverviewTab(container) {
       }
 
       // 渲染所有以本格为起始的活动
-      // 如果只有一个起始活动 → 正常 rowspan
-      // 如果有多个起始活动（不同活动同一时段）→ 各自独立，不用 rowspan
+      // 只有一个起始活动 → 正常 rowspan
+      // 多个起始活动（不同活动同一时段）→ 同一个 td 内显示多个活动
       const hasMultiple = startActivities.length > 1;
-      const tdsForCell = startActivities.map(cell => {
+
+      const cellContent = startActivities.map(cell => {
         const a = cell.activity;
         const colors = sourceColors[a.source] || sourceColors.pp;
         const slotCount = cell.rowspan;
@@ -418,23 +419,28 @@ async function renderOverviewTab(container) {
         const endIdx = cell.endIdx;
         const slotsLabel = slotCount === 3 ? '全天' : (slotCount === 2 ? `${timeSlots[startIdx]}+${timeSlots[endIdx]}` : timeSlots[startIdx]);
 
-        // 多个活动同时段时不用 rowspan（避免布局错乱）
-        const useRowspan = hasMultiple ? 1 : cell.rowspan;
-
         return `
-          <td class="pp-ov-td pp-ov-merged" rowspan="${useRowspan}" style="background:${colors.bg};border:1px solid ${colors.border};vertical-align:middle">
-            <div class="pp-ov-activity">
-              <span style="font-size:13px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
-              <span style="font-size:12px;font-weight:600;color:${colors.text}">${escapeHtml(a.name.length > 8 ? a.name.slice(0, 8) + '…' : a.name)}</span>
-              <span style="font-size:10px;color:${colors.text};opacity:0.7">${slotsLabel}</span>
-              ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
-              <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
-            </div>
-          </td>
+          <div class="pp-ov-activity" style="${startActivities.length > 1 ? 'border-bottom:1px solid var(--gray-100);padding-bottom:4px;margin-bottom:4px' : ''}">
+            <span style="font-size:13px">${a.source === 'pp' ? '🏓' : '🎯'}</span>
+            <span style="font-size:12px;font-weight:600;color:${colors.text}">${escapeHtml(a.name.length > 8 ? a.name.slice(0, 8) + '…' : a.name)}</span>
+            <span style="font-size:10px;color:${colors.text};opacity:0.7">${slotsLabel}</span>
+            ${a.startTime ? `<span style="font-size:10px;color:var(--gray-500)">${a.startTime}</span>` : ''}
+            <span style="font-size:10px;color:var(--gray-500)">${a.duration}h</span>
+          </div>
         `;
       }).join('');
 
-      tds.push(tdsForCell);
+      // 多个活动同时段时 rowspan=1，单个活动跨时段时用实际 rowspan
+      const useRowspan = hasMultiple ? 1 : startActivities[0].rowspan;
+      // 多个活动时用渐变色背景
+      const bg = hasMultiple ? '#f0f5ff' : (sourceColors[startActivities[0].activity.source] || sourceColors.pp).bg;
+      const border = hasMultiple ? '#adc6ff' : (sourceColors[startActivities[0].activity.source] || sourceColors.pp).border;
+
+      tds.push(`
+        <td class="pp-ov-td pp-ov-merged" rowspan="${useRowspan}" style="background:${bg};border:1px solid ${border};vertical-align:middle">
+          ${cellContent}
+        </td>
+      `);
     }
 
     return `
