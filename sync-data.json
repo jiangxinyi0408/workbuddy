@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-28T07:04:26.101Z",
+  "updatedAt": "2026-07-28T07:08:13.158Z",
   "data": {
     "tasks": [
       {
@@ -305,6 +305,19 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-28T05:42:49.210Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms4bdb92nyd0vz",
+        "title": "给谭丹发邮件申请药量理赔新规则",
+        "type": "daily",
+        "dueDate": "2026-07-28",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-28T07:07:57.110Z",
         "completedAt": null
       }
     ],
