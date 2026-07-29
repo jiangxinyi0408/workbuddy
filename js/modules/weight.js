@@ -1,5 +1,5 @@
 // ============================================================
-// modules/weight.js - Ä£¿é5£º¼õ·Ê¹ÜÀí£¨ÌåÖØ+ÒûÊ³£©
+// modules/weight.js - æ¨¡å—5ï¼šå‡è‚¥ç®¡ç†ï¼ˆä½“é‡+é¥®é£Ÿï¼‰
 // ============================================================
 
 import { put, getAll, del, getByIndex, getByRange, getSetting, setSetting } from '../db.js';
@@ -7,209 +7,209 @@ import { genId, today, fmtDate, toast, openBottomSheet, confirmDialog, escapeHtm
 import { recognizeFood, generateDietRecommendation, ruleBasedDietAdvice } from '../ai.js';
 
 // ============================================================
-// Ê³ÎïÈÈÁ¿Êı¾İ¿â£¨ÖĞ¹ú³£¼ûÊ³Îï£¬µ¥Î»£º¿¨/100g »ò ¿¨/·İ£©
+// é£Ÿç‰©çƒ­é‡æ•°æ®åº“ï¼ˆä¸­å›½å¸¸è§é£Ÿç‰©ï¼Œå•ä½ï¼šå¡/100g æˆ– å¡/ä»½ï¼‰
 // ============================================================
 
 const FOOD_DB = [
-  // === Ö÷Ê³Àà ===
-  { name: '°×Ã×·¹', unit: '100g', calories: 116, cat: 'Ö÷Ê³' },
-  { name: '°×Ã×·¹', unit: '1Íë(200g)', calories: 232, cat: 'Ö÷Ê³' },
-  { name: 'ÂøÍ·', unit: '100g', calories: 223, cat: 'Ö÷Ê³' },
-  { name: 'ÂøÍ·', unit: '1¸ö(100g)', calories: 223, cat: 'Ö÷Ê³' },
-  { name: '»¨¾í', unit: '100g', calories: 211, cat: 'Ö÷Ê³' },
-  { name: '°ü×Ó(ÖíÈâ)', unit: '1¸ö(100g)', calories: 227, cat: 'Ö÷Ê³' },
-  { name: '½È×Ó(ÖíÈâ)', unit: '1¸ö(25g)', calories: 60, cat: 'Ö÷Ê³' },
-  { name: '½È×Ó(ÖíÈâ)', unit: '10¸ö', calories: 600, cat: 'Ö÷Ê³' },
-  { name: 'ÃæÌõ(Öó)', unit: '100g', calories: 110, cat: 'Ö÷Ê³' },
-  { name: 'ÃæÌõ(Öó)', unit: '1Íë(300g)', calories: 330, cat: 'Ö÷Ê³' },
-  { name: 'À­Ãæ', unit: '1Íë(400g)', calories: 440, cat: 'Ö÷Ê³' },
-  { name: 'âÆâ½', unit: '10¸ö', calories: 350, cat: 'Ö÷Ê³' },
-  { name: 'ÓÍÌõ', unit: '1¸ù(70g)', calories: 270, cat: 'Ö÷Ê³' },
-  { name: 'ÉÕ±ı', unit: '1¸ö(100g)', calories: 326, cat: 'Ö÷Ê³' },
-  { name: 'È«ÂóÃæ°ü', unit: '1Æ¬(50g)', calories: 123, cat: 'Ö÷Ê³' },
-  { name: '°×Ãæ°ü', unit: '1Æ¬(50g)', calories: 133, cat: 'Ö÷Ê³' },
-  { name: 'Ğ¡Ã×Öà', unit: '1Íë(300g)', calories: 138, cat: 'Ö÷Ê³' },
-  { name: '°×Öà', unit: '1Íë(300g)', calories: 90, cat: 'Ö÷Ê³' },
-  { name: '°Ë±¦Öà', unit: '1Íë(300g)', calories: 195, cat: 'Ö÷Ê³' },
-  { name: '³´·¹', unit: '1·İ(300g)', calories: 564, cat: 'Ö÷Ê³' },
-  { name: '³´Ãæ', unit: '1·İ(300g)', calories: 480, cat: 'Ö÷Ê³' },
-  { name: 'ÓñÃ×', unit: '1¸ù(200g)', calories: 224, cat: 'Ö÷Ê³' },
-  { name: 'ºìÊí', unit: '100g', calories: 86, cat: 'Ö÷Ê³' },
-  { name: '×ÏÊí', unit: '100g', calories: 82, cat: 'Ö÷Ê³' },
-  { name: 'ÍÁ¶¹', unit: '100g', calories: 76, cat: 'Ö÷Ê³' },
-  { name: 'ÑàÂóÆ¬', unit: '100g', calories: 377, cat: 'Ö÷Ê³' },
-  { name: 'ÑàÂóÆ¬', unit: '1Íë(50g)', calories: 188, cat: 'Ö÷Ê³' },
-  { name: 'ôÕ×Ó', unit: '1¸ö(150g)', calories: 300, cat: 'Ö÷Ê³' },
-  { name: 'Äê¸â', unit: '100g', calories: 154, cat: 'Ö÷Ê³' },
+  // === ä¸»é£Ÿç±» ===
+  { name: 'ç™½ç±³é¥­', unit: '100g', calories: 116, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç™½ç±³é¥­', unit: '1ç¢—(200g)', calories: 232, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¦’å¤´', unit: '100g', calories: 223, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¦’å¤´', unit: '1ä¸ª(100g)', calories: 223, cat: 'ä¸»é£Ÿ' },
+  { name: 'èŠ±å·', unit: '100g', calories: 211, cat: 'ä¸»é£Ÿ' },
+  { name: 'åŒ…å­(çŒªè‚‰)', unit: '1ä¸ª(100g)', calories: 227, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¥ºå­(çŒªè‚‰)', unit: '1ä¸ª(25g)', calories: 60, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¥ºå­(çŒªè‚‰)', unit: '10ä¸ª', calories: 600, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¢æ¡(ç…®)', unit: '100g', calories: 110, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¢æ¡(ç…®)', unit: '1ç¢—(300g)', calories: 330, cat: 'ä¸»é£Ÿ' },
+  { name: 'æ‹‰é¢', unit: '1ç¢—(400g)', calories: 440, cat: 'ä¸»é£Ÿ' },
+  { name: 'é¦„é¥¨', unit: '10ä¸ª', calories: 350, cat: 'ä¸»é£Ÿ' },
+  { name: 'æ²¹æ¡', unit: '1æ ¹(70g)', calories: 270, cat: 'ä¸»é£Ÿ' },
+  { name: 'çƒ§é¥¼', unit: '1ä¸ª(100g)', calories: 326, cat: 'ä¸»é£Ÿ' },
+  { name: 'å…¨éº¦é¢åŒ…', unit: '1ç‰‡(50g)', calories: 123, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç™½é¢åŒ…', unit: '1ç‰‡(50g)', calories: 133, cat: 'ä¸»é£Ÿ' },
+  { name: 'å°ç±³ç²¥', unit: '1ç¢—(300g)', calories: 138, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç™½ç²¥', unit: '1ç¢—(300g)', calories: 90, cat: 'ä¸»é£Ÿ' },
+  { name: 'å…«å®ç²¥', unit: '1ç¢—(300g)', calories: 195, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç‚’é¥­', unit: '1ä»½(300g)', calories: 564, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç‚’é¢', unit: '1ä»½(300g)', calories: 480, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç‰ç±³', unit: '1æ ¹(200g)', calories: 224, cat: 'ä¸»é£Ÿ' },
+  { name: 'çº¢è–¯', unit: '100g', calories: 86, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç´«è–¯', unit: '100g', calories: 82, cat: 'ä¸»é£Ÿ' },
+  { name: 'åœŸè±†', unit: '100g', calories: 76, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç‡•éº¦ç‰‡', unit: '100g', calories: 377, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç‡•éº¦ç‰‡', unit: '1ç¢—(50g)', calories: 188, cat: 'ä¸»é£Ÿ' },
+  { name: 'ç²½å­', unit: '1ä¸ª(150g)', calories: 300, cat: 'ä¸»é£Ÿ' },
+  { name: 'å¹´ç³•', unit: '100g', calories: 154, cat: 'ä¸»é£Ÿ' },
 
-  // === ÈâÀà ===
-  { name: 'ÖíÈâ(Êİ)', unit: '100g', calories: 143, cat: 'ÈâÀà' },
-  { name: 'ÖíÈâ(Îå»¨)', unit: '100g', calories: 395, cat: 'ÈâÀà' },
-  { name: 'ÖíÅÅ¹Ç', unit: '100g', calories: 264, cat: 'ÈâÀà' },
-  { name: 'ºìÉÕÈâ', unit: '100g', calories: 479, cat: 'ÈâÀà' },
-  { name: '»Ø¹øÈâ', unit: '100g', calories: 266, cat: 'ÈâÀà' },
-  { name: 'ÖíÌã', unit: '100g', calories: 260, cat: 'ÈâÀà' },
-  { name: 'Å£Èâ(Êİ)', unit: '100g', calories: 106, cat: 'ÈâÀà' },
-  { name: 'Å£Èâ(·ÊÅ£)', unit: '100g', calories: 250, cat: 'ÈâÀà' },
-  { name: '½´Å£Èâ', unit: '100g', calories: 246, cat: 'ÈâÀà' },
-  { name: 'Å£ÅÅ', unit: '1·İ(200g)', calories: 350, cat: 'ÈâÀà' },
-  { name: 'ÑòÈâ', unit: '100g', calories: 203, cat: 'ÈâÀà' },
-  { name: 'äÌÑòÈâ', unit: '1·İ(200g)', calories: 400, cat: 'ÈâÀà' },
-  { name: '¼¦ĞØÈâ', unit: '100g', calories: 133, cat: 'ÈâÀà' },
-  { name: '¼¦ÍÈ', unit: '1¸ö(150g)', calories: 270, cat: 'ÈâÀà' },
-  { name: '¼¦³á', unit: '1¸ö(50g)', calories: 97, cat: 'ÈâÀà' },
-  { name: 'Õ¨¼¦ÍÈ', unit: '1¸ö(150g)', calories: 390, cat: 'ÈâÀà' },
-  { name: '¿¾Ñ¼', unit: '100g', calories: 336, cat: 'ÈâÀà' },
-  { name: 'Ñ¼Èâ', unit: '100g', calories: 240, cat: 'ÈâÀà' },
-  { name: 'Ïã³¦', unit: '1¸ù(50g)', calories: 254, cat: 'ÈâÀà' },
-  { name: '»ğÍÈ³¦', unit: '1¸ù(50g)', calories: 106, cat: 'ÈâÀà' },
-  { name: 'Åà¸ù', unit: '2Æ¬(30g)', calories: 162, cat: 'ÈâÀà' },
-  { name: 'Îç²ÍÈâ', unit: '100g', calories: 229, cat: 'ÈâÀà' },
+  // === è‚‰ç±» ===
+  { name: 'çŒªè‚‰(ç˜¦)', unit: '100g', calories: 143, cat: 'è‚‰ç±»' },
+  { name: 'çŒªè‚‰(äº”èŠ±)', unit: '100g', calories: 395, cat: 'è‚‰ç±»' },
+  { name: 'çŒªæ’éª¨', unit: '100g', calories: 264, cat: 'è‚‰ç±»' },
+  { name: 'çº¢çƒ§è‚‰', unit: '100g', calories: 479, cat: 'è‚‰ç±»' },
+  { name: 'å›é”…è‚‰', unit: '100g', calories: 266, cat: 'è‚‰ç±»' },
+  { name: 'çŒªè¹„', unit: '100g', calories: 260, cat: 'è‚‰ç±»' },
+  { name: 'ç‰›è‚‰(ç˜¦)', unit: '100g', calories: 106, cat: 'è‚‰ç±»' },
+  { name: 'ç‰›è‚‰(è‚¥ç‰›)', unit: '100g', calories: 250, cat: 'è‚‰ç±»' },
+  { name: 'é…±ç‰›è‚‰', unit: '100g', calories: 246, cat: 'è‚‰ç±»' },
+  { name: 'ç‰›æ’', unit: '1ä»½(200g)', calories: 350, cat: 'è‚‰ç±»' },
+  { name: 'ç¾Šè‚‰', unit: '100g', calories: 203, cat: 'è‚‰ç±»' },
+  { name: 'æ¶®ç¾Šè‚‰', unit: '1ä»½(200g)', calories: 400, cat: 'è‚‰ç±»' },
+  { name: 'é¸¡èƒ¸è‚‰', unit: '100g', calories: 133, cat: 'è‚‰ç±»' },
+  { name: 'é¸¡è…¿', unit: '1ä¸ª(150g)', calories: 270, cat: 'è‚‰ç±»' },
+  { name: 'é¸¡ç¿…', unit: '1ä¸ª(50g)', calories: 97, cat: 'è‚‰ç±»' },
+  { name: 'ç‚¸é¸¡è…¿', unit: '1ä¸ª(150g)', calories: 390, cat: 'è‚‰ç±»' },
+  { name: 'çƒ¤é¸­', unit: '100g', calories: 336, cat: 'è‚‰ç±»' },
+  { name: 'é¸­è‚‰', unit: '100g', calories: 240, cat: 'è‚‰ç±»' },
+  { name: 'é¦™è‚ ', unit: '1æ ¹(50g)', calories: 254, cat: 'è‚‰ç±»' },
+  { name: 'ç«è…¿è‚ ', unit: '1æ ¹(50g)', calories: 106, cat: 'è‚‰ç±»' },
+  { name: 'åŸ¹æ ¹', unit: '2ç‰‡(30g)', calories: 162, cat: 'è‚‰ç±»' },
+  { name: 'åˆé¤è‚‰', unit: '100g', calories: 229, cat: 'è‚‰ç±»' },
 
-  // === µ°Àà ===
-  { name: '¼¦µ°(Öó)', unit: '1¸ö(60g)', calories: 86, cat: 'µ°Àà' },
-  { name: '¼¦µ°(³´)', unit: '1¸ö(60g)', calories: 110, cat: 'µ°Àà' },
-  { name: '¼åµ°', unit: '1¸ö(60g)', calories: 118, cat: 'µ°Àà' },
-  { name: 'µ°°×', unit: '1¸ö', calories: 17, cat: 'µ°Àà' },
-  { name: 'µ°»Æ', unit: '1¸ö', calories: 55, cat: 'µ°Àà' },
-  { name: 'ÏÌÑ¼µ°', unit: '1¸ö(70g)', calories: 133, cat: 'µ°Àà' },
-  { name: 'Æ¤µ°', unit: '1¸ö(60g)', calories: 103, cat: 'µ°Àà' },
+  // === è›‹ç±» ===
+  { name: 'é¸¡è›‹(ç…®)', unit: '1ä¸ª(60g)', calories: 86, cat: 'è›‹ç±»' },
+  { name: 'é¸¡è›‹(ç‚’)', unit: '1ä¸ª(60g)', calories: 110, cat: 'è›‹ç±»' },
+  { name: 'ç…è›‹', unit: '1ä¸ª(60g)', calories: 118, cat: 'è›‹ç±»' },
+  { name: 'è›‹ç™½', unit: '1ä¸ª', calories: 17, cat: 'è›‹ç±»' },
+  { name: 'è›‹é»„', unit: '1ä¸ª', calories: 55, cat: 'è›‹ç±»' },
+  { name: 'å’¸é¸­è›‹', unit: '1ä¸ª(70g)', calories: 133, cat: 'è›‹ç±»' },
+  { name: 'çš®è›‹', unit: '1ä¸ª(60g)', calories: 103, cat: 'è›‹ç±»' },
 
-  // === Ë®²úÀà ===
-  { name: 'ÈıÎÄÓã', unit: '100g', calories: 139, cat: 'Ë®²ú' },
-  { name: '´øÓã', unit: '100g', calories: 127, cat: 'Ë®²ú' },
-  { name: 'öêÓã', unit: '100g', calories: 108, cat: 'Ë®²ú' },
-  { name: 'ÀğÓã', unit: '100g', calories: 109, cat: 'Ë®²ú' },
-  { name: 'Ïº', unit: '100g', calories: 93, cat: 'Ë®²ú' },
-  { name: 'ÏºÈÊ', unit: '100g', calories: 48, cat: 'Ë®²ú' },
-  { name: 'ó¦Ğ·', unit: '1Ö»(200g)', calories: 190, cat: 'Ë®²ú' },
-  { name: 'Éúòº', unit: '100g', calories: 57, cat: 'Ë®²ú' },
-  { name: 'öÏÓã', unit: '100g', calories: 75, cat: 'Ë®²ú' },
-  { name: '¸òòÛ', unit: '100g', calories: 56, cat: 'Ë®²ú' },
-  { name: '½ğÇ¹Óã¹ŞÍ·', unit: '100g', calories: 198, cat: 'Ë®²ú' },
+  // === æ°´äº§ç±» ===
+  { name: 'ä¸‰æ–‡é±¼', unit: '100g', calories: 139, cat: 'æ°´äº§' },
+  { name: 'å¸¦é±¼', unit: '100g', calories: 127, cat: 'æ°´äº§' },
+  { name: 'é²«é±¼', unit: '100g', calories: 108, cat: 'æ°´äº§' },
+  { name: 'é²¤é±¼', unit: '100g', calories: 109, cat: 'æ°´äº§' },
+  { name: 'è™¾', unit: '100g', calories: 93, cat: 'æ°´äº§' },
+  { name: 'è™¾ä»', unit: '100g', calories: 48, cat: 'æ°´äº§' },
+  { name: 'èƒèŸ¹', unit: '1åª(200g)', calories: 190, cat: 'æ°´äº§' },
+  { name: 'ç”Ÿèš', unit: '100g', calories: 57, cat: 'æ°´äº§' },
+  { name: 'é±¿é±¼', unit: '100g', calories: 75, cat: 'æ°´äº§' },
+  { name: 'è›¤èœŠ', unit: '100g', calories: 56, cat: 'æ°´äº§' },
+  { name: 'é‡‘æªé±¼ç½å¤´', unit: '100g', calories: 198, cat: 'æ°´äº§' },
 
-  // === ¶¹ÖÆÆ· ===
-  { name: '¶¹¸¯', unit: '100g', calories: 76, cat: '¶¹ÖÆÆ·' },
-  { name: '¶¹¸¯¸É', unit: '100g', calories: 140, cat: '¶¹ÖÆÆ·' },
-  { name: '¶¹½¬', unit: '1±­(250ml)', calories: 40, cat: '¶¹ÖÆÆ·' },
-  { name: '¶¹½¬(Ìğ)', unit: '1±­(250ml)', calories: 83, cat: '¶¹ÖÆÆ·' },
-  { name: '¶¹¸¯ÄÔ', unit: '1Íë(300g)', calories: 45, cat: '¶¹ÖÆÆ·' },
-  { name: '¸¯Öñ', unit: '100g', calories: 459, cat: '¶¹ÖÆÆ·' },
+  // === è±†åˆ¶å“ ===
+  { name: 'è±†è…', unit: '100g', calories: 76, cat: 'è±†åˆ¶å“' },
+  { name: 'è±†è…å¹²', unit: '100g', calories: 140, cat: 'è±†åˆ¶å“' },
+  { name: 'è±†æµ†', unit: '1æ¯(250ml)', calories: 40, cat: 'è±†åˆ¶å“' },
+  { name: 'è±†æµ†(ç”œ)', unit: '1æ¯(250ml)', calories: 83, cat: 'è±†åˆ¶å“' },
+  { name: 'è±†è…è„‘', unit: '1ç¢—(300g)', calories: 45, cat: 'è±†åˆ¶å“' },
+  { name: 'è…ç«¹', unit: '100g', calories: 459, cat: 'è±†åˆ¶å“' },
 
-  // === Êß²ËÀà ===
-  { name: '°×²Ë', unit: '100g', calories: 13, cat: 'Êß²Ë' },
-  { name: '²¤²Ë', unit: '100g', calories: 23, cat: 'Êß²Ë' },
-  { name: 'Î÷À¼»¨', unit: '100g', calories: 34, cat: 'Êß²Ë' },
-  { name: '·¬ÇÑ', unit: '100g', calories: 18, cat: 'Êß²Ë' },
-  { name: '»Æ¹Ï', unit: '100g', calories: 15, cat: 'Êß²Ë' },
-  { name: 'ºúÂÜ²·', unit: '100g', calories: 37, cat: 'Êß²Ë' },
-  { name: '°×ÂÜ²·', unit: '100g', calories: 16, cat: 'Êß²Ë' },
-  { name: 'ÇÑ×Ó', unit: '100g', calories: 21, cat: 'Êß²Ë' },
-  { name: 'Çà½·', unit: '100g', calories: 20, cat: 'Êß²Ë' },
-  { name: 'ÇÛ²Ë', unit: '100g', calories: 13, cat: 'Êß²Ë' },
-  { name: '¾Â²Ë', unit: '100g', calories: 25, cat: 'Êß²Ë' },
-  { name: 'Éú²Ë', unit: '100g', calories: 13, cat: 'Êß²Ë' },
-  { name: 'ÓÍÂó²Ë', unit: '100g', calories: 15, cat: 'Êß²Ë' },
-  { name: '¿ÕĞÄ²Ë', unit: '100g', calories: 20, cat: 'Êß²Ë' },
-  { name: '¶¹Ñ¿', unit: '100g', calories: 18, cat: 'Êß²Ë' },
-  { name: 'Ñó´Ğ', unit: '100g', calories: 40, cat: 'Êß²Ë' },
-  { name: 'ËâÌ¦', unit: '100g', calories: 36, cat: 'Êß²Ë' },
-  { name: 'Åº', unit: '100g', calories: 73, cat: 'Êß²Ë' },
-  { name: 'ÄÏ¹Ï', unit: '100g', calories: 22, cat: 'Êß²Ë' },
-  { name: '¶¬¹Ï', unit: '100g', calories: 11, cat: 'Êß²Ë' },
-  { name: 'Ë¿¹Ï', unit: '100g', calories: 20, cat: 'Êß²Ë' },
-  { name: '¿à¹Ï', unit: '100g', calories: 19, cat: 'Êß²Ë' },
-  { name: 'Ä¢¹½', unit: '100g', calories: 22, cat: 'Êß²Ë' },
-  { name: 'Ïã¹½', unit: '100g', calories: 26, cat: 'Êß²Ë' },
-  { name: '½ğÕë¹½', unit: '100g', calories: 32, cat: 'Êß²Ë' },
-  { name: 'Ä¾¶ú', unit: '100g', calories: 21, cat: 'Êß²Ë' },
-  { name: 'º£´ø', unit: '100g', calories: 12, cat: 'Êß²Ë' },
-  { name: '×Ï²Ë', unit: '100g', calories: 35, cat: 'Êß²Ë' },
+  // === è”¬èœç±» ===
+  { name: 'ç™½èœ', unit: '100g', calories: 13, cat: 'è”¬èœ' },
+  { name: 'è èœ', unit: '100g', calories: 23, cat: 'è”¬èœ' },
+  { name: 'è¥¿å…°èŠ±', unit: '100g', calories: 34, cat: 'è”¬èœ' },
+  { name: 'ç•ªèŒ„', unit: '100g', calories: 18, cat: 'è”¬èœ' },
+  { name: 'é»„ç“œ', unit: '100g', calories: 15, cat: 'è”¬èœ' },
+  { name: 'èƒ¡èåœ', unit: '100g', calories: 37, cat: 'è”¬èœ' },
+  { name: 'ç™½èåœ', unit: '100g', calories: 16, cat: 'è”¬èœ' },
+  { name: 'èŒ„å­', unit: '100g', calories: 21, cat: 'è”¬èœ' },
+  { name: 'é’æ¤’', unit: '100g', calories: 20, cat: 'è”¬èœ' },
+  { name: 'èŠ¹èœ', unit: '100g', calories: 13, cat: 'è”¬èœ' },
+  { name: 'éŸ­èœ', unit: '100g', calories: 25, cat: 'è”¬èœ' },
+  { name: 'ç”Ÿèœ', unit: '100g', calories: 13, cat: 'è”¬èœ' },
+  { name: 'æ²¹éº¦èœ', unit: '100g', calories: 15, cat: 'è”¬èœ' },
+  { name: 'ç©ºå¿ƒèœ', unit: '100g', calories: 20, cat: 'è”¬èœ' },
+  { name: 'è±†èŠ½', unit: '100g', calories: 18, cat: 'è”¬èœ' },
+  { name: 'æ´‹è‘±', unit: '100g', calories: 40, cat: 'è”¬èœ' },
+  { name: 'è’œè‹”', unit: '100g', calories: 36, cat: 'è”¬èœ' },
+  { name: 'è—•', unit: '100g', calories: 73, cat: 'è”¬èœ' },
+  { name: 'å—ç“œ', unit: '100g', calories: 22, cat: 'è”¬èœ' },
+  { name: 'å†¬ç“œ', unit: '100g', calories: 11, cat: 'è”¬èœ' },
+  { name: 'ä¸ç“œ', unit: '100g', calories: 20, cat: 'è”¬èœ' },
+  { name: 'è‹¦ç“œ', unit: '100g', calories: 19, cat: 'è”¬èœ' },
+  { name: 'è˜‘è‡', unit: '100g', calories: 22, cat: 'è”¬èœ' },
+  { name: 'é¦™è‡', unit: '100g', calories: 26, cat: 'è”¬èœ' },
+  { name: 'é‡‘é’ˆè‡', unit: '100g', calories: 32, cat: 'è”¬èœ' },
+  { name: 'æœ¨è€³', unit: '100g', calories: 21, cat: 'è”¬èœ' },
+  { name: 'æµ·å¸¦', unit: '100g', calories: 12, cat: 'è”¬èœ' },
+  { name: 'ç´«èœ', unit: '100g', calories: 35, cat: 'è”¬èœ' },
 
-  // === Ë®¹ûÀà ===
-  { name: 'Æ»¹û', unit: '1¸ö(200g)', calories: 106, cat: 'Ë®¹û' },
-  { name: 'Ïã½¶', unit: '1¸ù(120g)', calories: 111, cat: 'Ë®¹û' },
-  { name: '³È×Ó', unit: '1¸ö(200g)', calories: 96, cat: 'Ë®¹û' },
-  { name: 'éÙ×Ó', unit: '1¸ö(100g)', calories: 44, cat: 'Ë®¹û' },
-  { name: 'Î÷¹Ï', unit: '1¿é(300g)', calories: 93, cat: 'Ë®¹û' },
-  { name: 'ÆÏÌÑ', unit: '100g', calories: 69, cat: 'Ë®¹û' },
-  { name: '²İİ®', unit: '100g', calories: 32, cat: 'Ë®¹û' },
-  { name: 'À¶İ®', unit: '100g', calories: 57, cat: 'Ë®¹û' },
-  { name: 'â¨ºïÌÒ', unit: '1¸ö(100g)', calories: 61, cat: 'Ë®¹û' },
-  { name: 'Ã¢¹û', unit: '1¸ö(200g)', calories: 70, cat: 'Ë®¹û' },
-  { name: 'Àæ', unit: '1¸ö(200g)', calories: 88, cat: 'Ë®¹û' },
-  { name: 'ÌÒ×Ó', unit: '1¸ö(200g)', calories: 84, cat: 'Ë®¹û' },
-  { name: 'Ó£ÌÒ', unit: '100g', calories: 50, cat: 'Ë®¹û' },
-  { name: 'èÖ×Ó', unit: '1°ê(100g)', calories: 42, cat: 'Ë®¹û' },
-  { name: '»ğÁú¹û', unit: '1¸ö(300g)', calories: 165, cat: 'Ë®¹û' },
-  { name: 'Ê¯Áñ', unit: '100g', calories: 147, cat: 'Ë®¹û' },
-  { name: 'Å£ÓÍ¹û', unit: '1¸ö(150g)', calories: 240, cat: 'Ë®¹û' },
-  { name: '¹şÃÜ¹Ï', unit: '1¿é(200g)', calories: 68, cat: 'Ë®¹û' },
-  { name: '²¤ÂÜ', unit: '100g', calories: 44, cat: 'Ë®¹û' },
-  { name: 'ÀóÖ¦', unit: '10¿Å(200g)', calories: 142, cat: 'Ë®¹û' },
+  // === æ°´æœç±» ===
+  { name: 'è‹¹æœ', unit: '1ä¸ª(200g)', calories: 106, cat: 'æ°´æœ' },
+  { name: 'é¦™è•‰', unit: '1æ ¹(120g)', calories: 111, cat: 'æ°´æœ' },
+  { name: 'æ©™å­', unit: '1ä¸ª(200g)', calories: 96, cat: 'æ°´æœ' },
+  { name: 'æ©˜å­', unit: '1ä¸ª(100g)', calories: 44, cat: 'æ°´æœ' },
+  { name: 'è¥¿ç“œ', unit: '1å—(300g)', calories: 93, cat: 'æ°´æœ' },
+  { name: 'è‘¡è„', unit: '100g', calories: 69, cat: 'æ°´æœ' },
+  { name: 'è‰è“', unit: '100g', calories: 32, cat: 'æ°´æœ' },
+  { name: 'è“è“', unit: '100g', calories: 57, cat: 'æ°´æœ' },
+  { name: 'çŒ•çŒ´æ¡ƒ', unit: '1ä¸ª(100g)', calories: 61, cat: 'æ°´æœ' },
+  { name: 'èŠ’æœ', unit: '1ä¸ª(200g)', calories: 70, cat: 'æ°´æœ' },
+  { name: 'æ¢¨', unit: '1ä¸ª(200g)', calories: 88, cat: 'æ°´æœ' },
+  { name: 'æ¡ƒå­', unit: '1ä¸ª(200g)', calories: 84, cat: 'æ°´æœ' },
+  { name: 'æ¨±æ¡ƒ', unit: '100g', calories: 50, cat: 'æ°´æœ' },
+  { name: 'æŸšå­', unit: '1ç“£(100g)', calories: 42, cat: 'æ°´æœ' },
+  { name: 'ç«é¾™æœ', unit: '1ä¸ª(300g)', calories: 165, cat: 'æ°´æœ' },
+  { name: 'çŸ³æ¦´', unit: '100g', calories: 147, cat: 'æ°´æœ' },
+  { name: 'ç‰›æ²¹æœ', unit: '1ä¸ª(150g)', calories: 240, cat: 'æ°´æœ' },
+  { name: 'å“ˆå¯†ç“œ', unit: '1å—(200g)', calories: 68, cat: 'æ°´æœ' },
+  { name: 'è è', unit: '100g', calories: 44, cat: 'æ°´æœ' },
+  { name: 'è”æ', unit: '10é¢—(200g)', calories: 142, cat: 'æ°´æœ' },
 
-  // === ÄÌÖÆÆ· ===
-  { name: 'È«Ö¬Å£ÄÌ', unit: '1±­(250ml)', calories: 163, cat: 'ÄÌÖÆÆ·' },
-  { name: 'ÍÑÖ¬Å£ÄÌ', unit: '1±­(250ml)', calories: 88, cat: 'ÄÌÖÆÆ·' },
-  { name: 'ËáÄÌ(Ô­Î¶)', unit: '1±­(200g)', calories: 144, cat: 'ÄÌÖÆÆ·' },
-  { name: 'ËáÄÌ(¹ûÎ¶)', unit: '1±­(200g)', calories: 180, cat: 'ÄÌÖÆÆ·' },
-  { name: 'ÄÌÀÒ', unit: '1Æ¬(20g)', calories: 66, cat: 'ÄÌÖÆÆ·' },
+  // === å¥¶åˆ¶å“ ===
+  { name: 'å…¨è„‚ç‰›å¥¶', unit: '1æ¯(250ml)', calories: 163, cat: 'å¥¶åˆ¶å“' },
+  { name: 'è„±è„‚ç‰›å¥¶', unit: '1æ¯(250ml)', calories: 88, cat: 'å¥¶åˆ¶å“' },
+  { name: 'é…¸å¥¶(åŸå‘³)', unit: '1æ¯(200g)', calories: 144, cat: 'å¥¶åˆ¶å“' },
+  { name: 'é…¸å¥¶(æœå‘³)', unit: '1æ¯(200g)', calories: 180, cat: 'å¥¶åˆ¶å“' },
+  { name: 'å¥¶é…ª', unit: '1ç‰‡(20g)', calories: 66, cat: 'å¥¶åˆ¶å“' },
 
-  // === ÁãÊ³/ÒûÁÏ ===
-  { name: '¿ÉÀÖ', unit: '1¹Ş(330ml)', calories: 139, cat: 'ÒûÁÏ' },
-  { name: 'Ñ©±Ì', unit: '1¹Ş(330ml)', calories: 151, cat: 'ÒûÁÏ' },
-  { name: '³ÈÖ­', unit: '1±­(250ml)', calories: 113, cat: 'ÒûÁÏ' },
-  { name: 'Æ¡¾Æ', unit: '1¹Ş(330ml)', calories: 106, cat: 'ÒûÁÏ' },
-  { name: 'ºì¾Æ', unit: '1±­(150ml)', calories: 128, cat: 'ÒûÁÏ' },
-  { name: 'ÄÃÌú¿§·È', unit: '1±­(360ml)', calories: 176, cat: 'ÒûÁÏ' },
-  { name: 'ÃÀÊ½¿§·È', unit: '1±­(360ml)', calories: 10, cat: 'ÒûÁÏ' },
-  { name: 'ÄÌ²è(ÕäÖé)', unit: '1±­(500ml)', calories: 350, cat: 'ÒûÁÏ' },
-  { name: 'ÄÌ²è(Ô­Î¶)', unit: '1±­(500ml)', calories: 265, cat: 'ÒûÁÏ' },
-  { name: 'ÊíÆ¬', unit: '1°ü(75g)', calories: 410, cat: 'ÁãÊ³' },
-  { name: '±ı¸É', unit: '100g', calories: 433, cat: 'ÁãÊ³' },
-  { name: 'ÇÉ¿ËÁ¦', unit: '1¿é(50g)', calories: 273, cat: 'ÁãÊ³' },
-  { name: '±ùä¿ÁÜ', unit: '1Çò(100g)', calories: 207, cat: 'ÁãÊ³' },
-  { name: 'µ°¸â', unit: '1¿é(100g)', calories: 347, cat: 'ÁãÊ³' },
-  { name: '¼á¹û(»ìºÏ)', unit: '100g', calories: 607, cat: 'ÁãÊ³' },
-  { name: 'ºËÌÒ', unit: '100g', calories: 654, cat: 'ÁãÊ³' },
-  { name: 'ĞÓÈÊ', unit: '100g', calories: 579, cat: 'ÁãÊ³' },
-  { name: '¹Ï×Ó', unit: '100g', calories: 574, cat: 'ÁãÊ³' },
-  { name: 'À±Ìõ', unit: '1°ü(100g)', calories: 450, cat: 'ÁãÊ³' },
+  // === é›¶é£Ÿ/é¥®æ–™ ===
+  { name: 'å¯ä¹', unit: '1ç½(330ml)', calories: 139, cat: 'é¥®æ–™' },
+  { name: 'é›ªç¢§', unit: '1ç½(330ml)', calories: 151, cat: 'é¥®æ–™' },
+  { name: 'æ©™æ±', unit: '1æ¯(250ml)', calories: 113, cat: 'é¥®æ–™' },
+  { name: 'å•¤é…’', unit: '1ç½(330ml)', calories: 106, cat: 'é¥®æ–™' },
+  { name: 'çº¢é…’', unit: '1æ¯(150ml)', calories: 128, cat: 'é¥®æ–™' },
+  { name: 'æ‹¿é“å’–å•¡', unit: '1æ¯(360ml)', calories: 176, cat: 'é¥®æ–™' },
+  { name: 'ç¾å¼å’–å•¡', unit: '1æ¯(360ml)', calories: 10, cat: 'é¥®æ–™' },
+  { name: 'å¥¶èŒ¶(çç )', unit: '1æ¯(500ml)', calories: 350, cat: 'é¥®æ–™' },
+  { name: 'å¥¶èŒ¶(åŸå‘³)', unit: '1æ¯(500ml)', calories: 265, cat: 'é¥®æ–™' },
+  { name: 'è–¯ç‰‡', unit: '1åŒ…(75g)', calories: 410, cat: 'é›¶é£Ÿ' },
+  { name: 'é¥¼å¹²', unit: '100g', calories: 433, cat: 'é›¶é£Ÿ' },
+  { name: 'å·§å…‹åŠ›', unit: '1å—(50g)', calories: 273, cat: 'é›¶é£Ÿ' },
+  { name: 'å†°æ·‡æ·‹', unit: '1çƒ(100g)', calories: 207, cat: 'é›¶é£Ÿ' },
+  { name: 'è›‹ç³•', unit: '1å—(100g)', calories: 347, cat: 'é›¶é£Ÿ' },
+  { name: 'åšæœ(æ··åˆ)', unit: '100g', calories: 607, cat: 'é›¶é£Ÿ' },
+  { name: 'æ ¸æ¡ƒ', unit: '100g', calories: 654, cat: 'é›¶é£Ÿ' },
+  { name: 'æä»', unit: '100g', calories: 579, cat: 'é›¶é£Ÿ' },
+  { name: 'ç“œå­', unit: '100g', calories: 574, cat: 'é›¶é£Ÿ' },
+  { name: 'è¾£æ¡', unit: '1åŒ…(100g)', calories: 450, cat: 'é›¶é£Ÿ' },
 
-  // === ÍâÂô/¿ì²Í ===
-  { name: 'ºº±¤', unit: '1¸ö(200g)', calories: 456, cat: '¿ì²Í' },
-  { name: 'ÊíÌõ(´ó)', unit: '1·İ(150g)', calories: 468, cat: '¿ì²Í' },
-  { name: 'Õ¨¼¦', unit: '1¿é(100g)', calories: 289, cat: '¿ì²Í' },
-  { name: 'ÅûÈø', unit: '1Æ¬(150g)', calories: 320, cat: '¿ì²Í' },
-  { name: 'ÂéÀ±ÌÌ', unit: '1·İ(500g)', calories: 350, cat: '¿ì²Í' },
-  { name: '»ğ¹ø', unit: '1¶Ù(¹ÀËã)', calories: 1500, cat: '¿ì²Í' },
-  { name: 'ÂéÀ±Ïã¹ø', unit: '1·İ(400g)', calories: 600, cat: '¿ì²Í' },
-  { name: '»ÆìË¼¦Ã×·¹', unit: '1·İ', calories: 680, cat: '¿ì²Í' },
-  { name: 'É³ÏØĞ¡³Ô(¼¦ÍÈ·¹)', unit: '1·İ', calories: 550, cat: '¿ì²Í' },
-  { name: 'À¼ÖİÀ­Ãæ', unit: '1Íë', calories: 500, cat: '¿ì²Í' },
-  { name: 'ÂİòÏ·Û', unit: '1Íë', calories: 550, cat: '¿ì²Í' },
-  { name: 'Ã×Ïß', unit: '1Íë', calories: 480, cat: '¿ì²Í' },
-  { name: 'ËáÀ±·Û', unit: '1Íë', calories: 400, cat: '¿ì²Í' },
-  { name: 'Á¹Æ¤', unit: '1·İ(350g)', calories: 350, cat: '¿ì²Í' },
+  // === å¤–å–/å¿«é¤ ===
+  { name: 'æ±‰å ¡', unit: '1ä¸ª(200g)', calories: 456, cat: 'å¿«é¤' },
+  { name: 'è–¯æ¡(å¤§)', unit: '1ä»½(150g)', calories: 468, cat: 'å¿«é¤' },
+  { name: 'ç‚¸é¸¡', unit: '1å—(100g)', calories: 289, cat: 'å¿«é¤' },
+  { name: 'æŠ«è¨', unit: '1ç‰‡(150g)', calories: 320, cat: 'å¿«é¤' },
+  { name: 'éº»è¾£çƒ«', unit: '1ä»½(500g)', calories: 350, cat: 'å¿«é¤' },
+  { name: 'ç«é”…', unit: '1é¡¿(ä¼°ç®—)', calories: 1500, cat: 'å¿«é¤' },
+  { name: 'éº»è¾£é¦™é”…', unit: '1ä»½(400g)', calories: 600, cat: 'å¿«é¤' },
+  { name: 'é»„ç„–é¸¡ç±³é¥­', unit: '1ä»½', calories: 680, cat: 'å¿«é¤' },
+  { name: 'æ²™å¿å°åƒ(é¸¡è…¿é¥­)', unit: '1ä»½', calories: 550, cat: 'å¿«é¤' },
+  { name: 'å…°å·æ‹‰é¢', unit: '1ç¢—', calories: 500, cat: 'å¿«é¤' },
+  { name: 'èºè›³ç²‰', unit: '1ç¢—', calories: 550, cat: 'å¿«é¤' },
+  { name: 'ç±³çº¿', unit: '1ç¢—', calories: 480, cat: 'å¿«é¤' },
+  { name: 'é…¸è¾£ç²‰', unit: '1ç¢—', calories: 400, cat: 'å¿«é¤' },
+  { name: 'å‡‰çš®', unit: '1ä»½(350g)', calories: 350, cat: 'å¿«é¤' },
 
-  // === ¼Ò³£²Ë ===
-  { name: 'Î÷ºìÊÁ³´µ°', unit: '1·İ(250g)', calories: 210, cat: '¼Ò³£²Ë' },
-  { name: 'ÂéÆÅ¶¹¸¯', unit: '1·İ(250g)', calories: 290, cat: '¼Ò³£²Ë' },
-  { name: '¹¬±£¼¦¶¡', unit: '1·İ(250g)', calories: 330, cat: '¼Ò³£²Ë' },
-  { name: 'ÓãÏãÈâË¿', unit: '1·İ(250g)', calories: 310, cat: '¼Ò³£²Ë' },
-  { name: 'ÌÇ´×Àï¼¹', unit: '1·İ(250g)', calories: 410, cat: '¼Ò³£²Ë' },
-  { name: 'ÇåÕôÓã', unit: '1Ìõ(300g)', calories: 270, cat: '¼Ò³£²Ë' },
-  { name: 'Ë®ÖóÓã', unit: '1·İ(400g)', calories: 580, cat: '¼Ò³£²Ë' },
-  { name: 'Ëá²ËÓã', unit: '1·İ(400g)', calories: 480, cat: '¼Ò³£²Ë' },
-  { name: 'ºìÉÕÅÅ¹Ç', unit: '1·İ(250g)', calories: 520, cat: '¼Ò³£²Ë' },
-  { name: '³´Çà²Ë', unit: '1·İ(200g)', calories: 60, cat: '¼Ò³£²Ë' },
-  { name: 'µØÈıÏÊ', unit: '1·İ(300g)', calories: 330, cat: '¼Ò³£²Ë' },
-  { name: '¸ÉìÔËÄ¼¾¶¹', unit: '1·İ(200g)', calories: 260, cat: '¼Ò³£²Ë' },
-  { name: '¿ÉÀÖ¼¦³á', unit: '1·İ(300g)', calories: 480, cat: '¼Ò³£²Ë' },
-  { name: 'ËâÈØÎ÷À¼»¨', unit: '1·İ(200g)', calories: 80, cat: '¼Ò³£²Ë' },
+  // === å®¶å¸¸èœ ===
+  { name: 'è¥¿çº¢æŸ¿ç‚’è›‹', unit: '1ä»½(250g)', calories: 210, cat: 'å®¶å¸¸èœ' },
+  { name: 'éº»å©†è±†è…', unit: '1ä»½(250g)', calories: 290, cat: 'å®¶å¸¸èœ' },
+  { name: 'å®«ä¿é¸¡ä¸', unit: '1ä»½(250g)', calories: 330, cat: 'å®¶å¸¸èœ' },
+  { name: 'é±¼é¦™è‚‰ä¸', unit: '1ä»½(250g)', calories: 310, cat: 'å®¶å¸¸èœ' },
+  { name: 'ç³–é†‹é‡Œè„Š', unit: '1ä»½(250g)', calories: 410, cat: 'å®¶å¸¸èœ' },
+  { name: 'æ¸…è’¸é±¼', unit: '1æ¡(300g)', calories: 270, cat: 'å®¶å¸¸èœ' },
+  { name: 'æ°´ç…®é±¼', unit: '1ä»½(400g)', calories: 580, cat: 'å®¶å¸¸èœ' },
+  { name: 'é…¸èœé±¼', unit: '1ä»½(400g)', calories: 480, cat: 'å®¶å¸¸èœ' },
+  { name: 'çº¢çƒ§æ’éª¨', unit: '1ä»½(250g)', calories: 520, cat: 'å®¶å¸¸èœ' },
+  { name: 'ç‚’é’èœ', unit: '1ä»½(200g)', calories: 60, cat: 'å®¶å¸¸èœ' },
+  { name: 'åœ°ä¸‰é²œ', unit: '1ä»½(300g)', calories: 330, cat: 'å®¶å¸¸èœ' },
+  { name: 'å¹²ç…¸å››å­£è±†', unit: '1ä»½(200g)', calories: 260, cat: 'å®¶å¸¸èœ' },
+  { name: 'å¯ä¹é¸¡ç¿…', unit: '1ä»½(300g)', calories: 480, cat: 'å®¶å¸¸èœ' },
+  { name: 'è’œè“‰è¥¿å…°èŠ±', unit: '1ä»½(200g)', calories: 80, cat: 'å®¶å¸¸èœ' },
 ];
 
-// ËÑË÷Ê³Îï
+// æœç´¢é£Ÿç‰©
 function searchFood(query) {
   if (!query || query.length < 1) return [];
   const q = query.toLowerCase();
@@ -219,7 +219,7 @@ function searchFood(query) {
 }
 
 // ============================================================
-// ³õÊ¼»¯
+// åˆå§‹åŒ–
 // ============================================================
 
 let initialized = false;
@@ -231,7 +231,7 @@ export async function initWeight() {
 }
 
 // ============================================================
-// ÌåÖØ¼ÇÂ¼
+// ä½“é‡è®°å½•
 // ============================================================
 
 async function addWeight(data) {
@@ -257,7 +257,7 @@ async function getWeightRecords(days = 30) {
 }
 
 // ============================================================
-// ÒûÊ³¼ÇÂ¼
+// é¥®é£Ÿè®°å½•
 // ============================================================
 
 async function addMeal(data) {
@@ -287,7 +287,7 @@ async function getWeekMeals() {
 }
 
 // ============================================================
-// äÖÈ¾£º¼õ·Ê¹ÜÀíÖ÷Ò³Ãæ
+// æ¸²æŸ“ï¼šå‡è‚¥ç®¡ç†ä¸»é¡µé¢
 // ============================================================
 
 let currentTab = 'weight';
@@ -295,9 +295,9 @@ let currentTab = 'weight';
 export async function renderWeight(container) {
   container.innerHTML = `
     <div class="filter-tabs">
-      <button class="filter-tab ${currentTab==='weight'?'active':''}" onclick="window.__weightTab('weight')">ÌåÖØ¼ÇÂ¼</button>
-      <button class="filter-tab ${currentTab==='diet'?'active':''}" onclick="window.__weightTab('diet')">ÒûÊ³¼ÇÂ¼</button>
-      <button class="filter-tab ${currentTab==='advice'?'active':''}" onclick="window.__weightTab('advice')">ÒûÊ³ÍÆ¼ö</button>
+      <button class="filter-tab ${currentTab==='weight'?'active':''}" onclick="window.__weightTab('weight')">ä½“é‡è®°å½•</button>
+      <button class="filter-tab ${currentTab==='diet'?'active':''}" onclick="window.__weightTab('diet')">é¥®é£Ÿè®°å½•</button>
+      <button class="filter-tab ${currentTab==='advice'?'active':''}" onclick="window.__weightTab('advice')">é¥®é£Ÿæ¨è</button>
     </div>
     <div id="weight-content"></div>
     <button class="fab" onclick="window.__weightAdd()">+</button>
@@ -327,7 +327,7 @@ async function renderWeightContent() {
 }
 
 // ============================================================
-// ÌåÖØ Tab
+// ä½“é‡ Tab
 // ============================================================
 
 async function renderWeightTab(container) {
@@ -341,24 +341,24 @@ async function renderWeightTab(container) {
   container.innerHTML = `
     <div class="weight-display">
       <div class="weight-current">${latest ? latest.weight : '--'}<span class="weight-unit"> kg</span></div>
-      ${change !== 0 ? `<div class="weight-change ${change < 0 ? 'down' : 'up'}">${change < 0 ? '¡ı' : '¡ü'} ${Math.abs(change)} kg</div>` : ''}
-      ${targetWeight ? `<div class="text-sm text-gray mt-8">Ä¿±êÌåÖØ£º${targetWeight} kg</div>` : ''}
+      ${change !== 0 ? `<div class="weight-change ${change < 0 ? 'down' : 'up'}">${change < 0 ? 'â†“' : 'â†‘'} ${Math.abs(change)} kg</div>` : ''}
+      ${targetWeight ? `<div class="text-sm text-gray mt-8">ç›®æ ‡ä½“é‡ï¼š${targetWeight} kg</div>` : ''}
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="title-left">? ÌåÖØÇ÷ÊÆ£¨30Ìì£©</span></div>
+      <div class="card-title"><span class="title-left">? ä½“é‡è¶‹åŠ¿ï¼ˆ30å¤©ï¼‰</span></div>
       <div class="chart-container"><canvas id="weight-chart"></canvas></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="title-left">? ×î½ü¼ÇÂ¼</span></div>
+      <div class="card-title"><span class="title-left">? æœ€è¿‘è®°å½•</span></div>
       ${records.length > 0 ? `
       <ul class="weight-record-list">
         ${records.slice(-10).reverse().map(r => `
           <li class="weight-record-item" onclick="window.__editWeight('${r.id}')" style="cursor:pointer">
             <div>
               <div class="text-sm font-bold">${r.weight} kg</div>
-              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '?ÔçÉÏ' : '?ÍíÉÏ'}${r.note ? ' ¡¤ ' + escapeHtml(r.note) : ''}</div>
+              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '?æ—©ä¸Š' : '?æ™šä¸Š'}${r.note ? ' Â· ' + escapeHtml(r.note) : ''}</div>
             </div>
             <div style="display:flex;gap:4px;align-items:center">
               <button class="task-edit" onclick="event.stopPropagation();window.__editWeight('${r.id}')">?</button>
@@ -366,12 +366,12 @@ async function renderWeightTab(container) {
             </div>
           </li>
         `).join('')}
-      </ul>` : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">ÔİÎŞÌåÖØ¼ÇÂ¼</div></div>'}
+      </ul>` : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">æš‚æ— ä½“é‡è®°å½•</div></div>'}
     </div>
   `;
 
   window.__delWeight = async (id) => {
-    if (await confirmDialog('É¾³ıÕâÌõ¼ÇÂ¼£¿')) {
+    if (await confirmDialog('åˆ é™¤è¿™æ¡è®°å½•ï¼Ÿ')) {
       await del('weights', id);
       renderWeightTab(container);
     }
@@ -400,7 +400,7 @@ function drawWeightChart(records, targetWeight) {
   const data = sorted.map(r => r.weight);
 
   const datasets = [{
-    label: 'ÌåÖØ (kg)',
+    label: 'ä½“é‡ (kg)',
     data,
     borderColor: '#2563eb',
     backgroundColor: 'rgba(37,99,235,0.1)',
@@ -412,7 +412,7 @@ function drawWeightChart(records, targetWeight) {
 
   if (targetWeight) {
     datasets.push({
-      label: 'Ä¿±ê',
+      label: 'ç›®æ ‡',
       data: sorted.map(() => parseFloat(targetWeight)),
       borderColor: '#10b981',
       borderDash: [5, 5],
@@ -442,106 +442,106 @@ function round(num, decimals = 1) {
 }
 
 // ============================================================
-// Ìí¼ÓÌåÖØ¶Ô»°¿ò
+// æ·»åŠ ä½“é‡å¯¹è¯æ¡†
 // ============================================================
 
 function showAddWeightDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>ÈÕÆÚ</label>
+        <label>æ—¥æœŸ</label>
         <input type="date" id="weight-date" value="${today()}">
       </div>
       <div class="form-group">
-        <label>ÌåÖØ (kg)</label>
-        <input type="number" id="weight-value" step="0.1" placeholder="Èç£º65.5" autofocus>
+        <label>ä½“é‡ (kg)</label>
+        <input type="number" id="weight-value" step="0.1" placeholder="å¦‚ï¼š65.5" autofocus>
       </div>
       <div class="form-group">
-        <label>³ÆÖØÊ±¼ä</label>
+        <label>ç§°é‡æ—¶é—´</label>
         <select id="weight-time">
-          <option value="morning">? ÔçÉÏ</option>
-          <option value="evening">? ÍíÉÏ</option>
+          <option value="morning">? æ—©ä¸Š</option>
+          <option value="evening">? æ™šä¸Š</option>
         </select>
       </div>
       <div class="form-group">
-        <label>±¸×¢£¨¿ÉÑ¡£©</label>
-        <input type="text" id="weight-note" placeholder="Èç£ºÔË¶¯ºó¡¢¿Õ¸¹...">
+        <label>å¤‡æ³¨ï¼ˆå¯é€‰ï¼‰</label>
+        <input type="text" id="weight-note" placeholder="å¦‚ï¼šè¿åŠ¨åã€ç©ºè…¹...">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__saveWeight()">±£´æ</button>
+      <button class="btn-primary btn-full" onclick="window.__saveWeight()">ä¿å­˜</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('¼ÇÂ¼ÌåÖØ', html);
+  const sheet = openBottomSheet('è®°å½•ä½“é‡', html);
   window.__currentSheet = sheet;
 
   window.__saveWeight = async () => {
     const weight = document.getElementById('weight-value').value;
-    if (!weight) { toast('ÇëÊäÈëÌåÖØ'); return; }
+    if (!weight) { toast('è¯·è¾“å…¥ä½“é‡'); return; }
     const date = document.getElementById('weight-date').value || today();
     const time = document.getElementById('weight-time').value;
     const note = document.getElementById('weight-note').value;
     await addWeight({ weight, date, time, note });
-    toast('ÌåÖØÒÑ¼ÇÂ¼');
+    toast('ä½“é‡å·²è®°å½•');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 }
 
 // ============================================================
-// ±à¼­ÌåÖØ¶Ô»°¿ò
+// ç¼–è¾‘ä½“é‡å¯¹è¯æ¡†
 // ============================================================
 
 async function showEditWeightDialog(container, id) {
   const all = await getAll('weights');
   const record = all.find(r => r.id === id);
-  if (!record) { toast('¼ÇÂ¼²»´æÔÚ'); return; }
+  if (!record) { toast('è®°å½•ä¸å­˜åœ¨'); return; }
 
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>ÈÕÆÚ</label>
+        <label>æ—¥æœŸ</label>
         <input type="date" id="weight-date" value="${record.date}">
       </div>
       <div class="form-group">
-        <label>ÌåÖØ (kg)</label>
+        <label>ä½“é‡ (kg)</label>
         <input type="number" id="weight-value" step="0.1" value="${record.weight}">
       </div>
       <div class="form-group">
-        <label>³ÆÖØÊ±¼ä</label>
+        <label>ç§°é‡æ—¶é—´</label>
         <select id="weight-time">
-          <option value="morning" ${record.time==='morning'?'selected':''}>? ÔçÉÏ</option>
-          <option value="evening" ${record.time==='evening'?'selected':''}>? ÍíÉÏ</option>
+          <option value="morning" ${record.time==='morning'?'selected':''}>? æ—©ä¸Š</option>
+          <option value="evening" ${record.time==='evening'?'selected':''}>? æ™šä¸Š</option>
         </select>
       </div>
       <div class="form-group">
-        <label>±¸×¢£¨¿ÉÑ¡£©</label>
+        <label>å¤‡æ³¨ï¼ˆå¯é€‰ï¼‰</label>
         <input type="text" id="weight-note" value="${escapeHtml(record.note || '')}">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__updateWeight()">±£´æĞŞ¸Ä</button>
-      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delWeightFromEdit('${id}')">É¾³ı´Ë¼ÇÂ¼</button>
+      <button class="btn-primary btn-full" onclick="window.__updateWeight()">ä¿å­˜ä¿®æ”¹</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delWeightFromEdit('${id}')">åˆ é™¤æ­¤è®°å½•</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('±à¼­ÌåÖØ', html);
+  const sheet = openBottomSheet('ç¼–è¾‘ä½“é‡', html);
 
   window.__updateWeight = async () => {
     const weight = document.getElementById('weight-value').value;
-    if (!weight) { toast('ÇëÊäÈëÌåÖØ'); return; }
+    if (!weight) { toast('è¯·è¾“å…¥ä½“é‡'); return; }
     record.date = document.getElementById('weight-date').value || today();
     record.time = document.getElementById('weight-time').value;
     record.weight = parseFloat(weight);
     record.note = document.getElementById('weight-note').value;
     record.updatedAt = new Date().toISOString();
     await put('weights', record);
-    toast('ÒÑĞŞ¸Ä');
+    toast('å·²ä¿®æ”¹');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__delWeightFromEdit = async (delId) => {
-    if (await confirmDialog('É¾³ıÕâÌõ¼ÇÂ¼£¿')) {
+    if (await confirmDialog('åˆ é™¤è¿™æ¡è®°å½•ï¼Ÿ')) {
       await del('weights', delId);
-      toast('ÒÑÉ¾³ı');
+      toast('å·²åˆ é™¤');
       sheet.close();
       renderWeight(document.getElementById('main-content'));
     }
@@ -549,7 +549,7 @@ async function showEditWeightDialog(container, id) {
 }
 
 // ============================================================
-// ÒûÊ³ Tab
+// é¥®é£Ÿ Tab
 // ============================================================
 
 async function renderDietTab(container) {
@@ -561,15 +561,15 @@ async function renderDietTab(container) {
     <div class="calorie-summary">
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${totalCalories}</div>
-        <div class="calorie-summary-label">½ñÈÕÉãÈë(¿¨)</div>
+        <div class="calorie-summary-label">ä»Šæ—¥æ‘„å…¥(å¡)</div>
       </div>
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${targetCalories}</div>
-        <div class="calorie-summary-label">½¨ÒéÄ¿±ê</div>
+        <div class="calorie-summary-label">å»ºè®®ç›®æ ‡</div>
       </div>
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${Math.max(0, targetCalories - totalCalories)}</div>
-        <div class="calorie-summary-label">Ê£Óà</div>
+        <div class="calorie-summary-label">å‰©ä½™</div>
       </div>
     </div>
 
@@ -577,25 +577,25 @@ async function renderDietTab(container) {
       <div class="meal-card">
         <div class="meal-header" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
           <span class="meal-type-badge">${m.mealType}</span>
-          <span class="meal-calories">${m.totalCalories} ¿¨</span>
+          <span class="meal-calories">${m.totalCalories} å¡</span>
         </div>
         <div class="meal-foods" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
-          ${(m.foods || []).map(f => `<span class="meal-food-tag">${escapeHtml(f.name)} ${f.calories}¿¨</span>`).join('')}
+          ${(m.foods || []).map(f => `<span class="meal-food-tag">${escapeHtml(f.name)} ${f.calories}å¡</span>`).join('')}
         </div>
-        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="Ê³Îï" onclick="window.__editMeal('${m.id}')">` : ''}
+        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="é£Ÿç‰©" onclick="window.__editMeal('${m.id}')">` : ''}
         <div class="flex-between mt-8">
-          <span class="text-xs text-gray">${m.source === 'ai' ? '? AIÊ¶±ğ' : m.source === 'photo' ? '? ÕÕÆ¬¼ÇÂ¼' : '?? ÊÖ¶¯Â¼Èë'} ¡¤ ${fmtDate(m.date)}</span>
+          <span class="text-xs text-gray">${m.source === 'ai' ? '? AIè¯†åˆ«' : m.source === 'photo' ? '? ç…§ç‰‡è®°å½•' : '?? æ‰‹åŠ¨å½•å…¥'} Â· ${fmtDate(m.date)}</span>
           <div style="display:flex;gap:4px">
             <button class="task-edit" onclick="window.__editMeal('${m.id}')">?</button>
             <button class="task-delete" onclick="window.__delMeal('${m.id}')">?</button>
           </div>
         </div>
       </div>
-    `).join('') : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">½ñÌì»¹Ã»ÓĞÒûÊ³¼ÇÂ¼</div></div>'}
+    `).join('') : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">ä»Šå¤©è¿˜æ²¡æœ‰é¥®é£Ÿè®°å½•</div></div>'}
   `;
 
   window.__delMeal = async (id) => {
-    if (await confirmDialog('É¾³ıÕâÌõÒûÊ³¼ÇÂ¼£¿')) {
+    if (await confirmDialog('åˆ é™¤è¿™æ¡é¥®é£Ÿè®°å½•ï¼Ÿ')) {
       await del('meals', id);
       renderDietTab(container);
     }
@@ -604,50 +604,50 @@ async function renderDietTab(container) {
 }
 
 // ============================================================
-// Ìí¼ÓÒûÊ³¶Ô»°¿ò£¨Ê³ÎïËÑË÷ + ÊÖ¶¯ + ÅÄÕÕ£©
+// æ·»åŠ é¥®é£Ÿå¯¹è¯æ¡†ï¼ˆé£Ÿç‰©æœç´¢ + æ‰‹åŠ¨ + æ‹ç…§ï¼‰
 // ============================================================
 
 function showAddMealDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>ÈÕÆÚ</label>
+        <label>æ—¥æœŸ</label>
         <input type="date" id="meal-date" value="${today()}">
       </div>
       <div class="form-group">
-        <label>ÓÃ²ÍÀàĞÍ</label>
+        <label>ç”¨é¤ç±»å‹</label>
         <select id="meal-type">
-          <option value="Ôç²Í">? Ôç²Í</option>
-          <option value="Îç²Í">?? Îç²Í</option>
-          <option value="Íí²Í">? Íí²Í</option>
-          <option value="¼Ó²Í">? ¼Ó²Í</option>
+          <option value="æ—©é¤">? æ—©é¤</option>
+          <option value="åˆé¤">?? åˆé¤</option>
+          <option value="æ™šé¤">? æ™šé¤</option>
+          <option value="åŠ é¤">? åŠ é¤</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>? ËÑË÷Ê³Îï£¨ÊäÈëÃû³ÆËÑË÷ÄÚÖÃÊı¾İ¿â£©</label>
-        <input type="text" id="food-search" placeholder="Èç£ºÃ×·¹¡¢¼¦µ°¡¢ºìÉÕÈâ..." autocomplete="off">
+        <label>? æœç´¢é£Ÿç‰©ï¼ˆè¾“å…¥åç§°æœç´¢å†…ç½®æ•°æ®åº“ï¼‰</label>
+        <input type="text" id="food-search" placeholder="å¦‚ï¼šç±³é¥­ã€é¸¡è›‹ã€çº¢çƒ§è‚‰..." autocomplete="off">
         <div id="food-search-results" style="max-height:200px;overflow-y:auto;margin-top:8px"></div>
       </div>
 
       <div class="form-group">
-        <label>ÒÑÑ¡Ê³Îï</label>
+        <label>å·²é€‰é£Ÿç‰©</label>
         <div id="selected-foods-list">
-          <div class="text-xs text-gray" id="no-foods-hint">ÉĞÎ´Ìí¼ÓÊ³Îï£¬ÇëËÑË÷²¢µã»÷Ìí¼Ó</div>
+          <div class="text-xs text-gray" id="no-foods-hint">å°šæœªæ·»åŠ é£Ÿç‰©ï¼Œè¯·æœç´¢å¹¶ç‚¹å‡»æ·»åŠ </div>
         </div>
         <div class="flex-between mt-8">
-          <span class="text-sm text-gray">×Ü¼Æ£º<span id="foods-total-cal" class="font-bold">0</span> ¿¨</span>
-          <button class="btn-outline" onclick="window.__addManualFoodRow()" style="font-size:13px">+ ÊÖ¶¯ÊäÈë</button>
+          <span class="text-sm text-gray">æ€»è®¡ï¼š<span id="foods-total-cal" class="font-bold">0</span> å¡</span>
+          <button class="btn-outline" onclick="window.__addManualFoodRow()" style="font-size:13px">+ æ‰‹åŠ¨è¾“å…¥</button>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Ê³ÎïÕÕÆ¬£¨¿ÉÑ¡£©</label>
+        <label>é£Ÿç‰©ç…§ç‰‡ï¼ˆå¯é€‰ï¼‰</label>
         <div class="meal-photo-area" onclick="document.getElementById('meal-photo-input').click()" style="border:2px dashed var(--gray-300);border-radius:12px;padding:20px;text-align:center;cursor:pointer">
           <div id="meal-photo-preview" class="meal-photo-placeholder">
             <div style="font-size:36px">?</div>
-            <div class="text-sm text-gray">µã»÷ÅÄÕÕ»òÑ¡ÔñÍ¼Æ¬</div>
-            <div class="text-xs text-gray mt-8">Ò²¿ÉÓÃAIÊ¶±ğ¿¨Â·Àï£¨ĞèÅäÖÃAPI Key£©</div>
+            <div class="text-sm text-gray">ç‚¹å‡»æ‹ç…§æˆ–é€‰æ‹©å›¾ç‰‡</div>
+            <div class="text-xs text-gray mt-8">ä¹Ÿå¯ç”¨AIè¯†åˆ«å¡è·¯é‡Œï¼ˆéœ€é…ç½®API Keyï¼‰</div>
           </div>
           <input type="file" id="meal-photo-input" accept="image/*" capture="environment" style="display:none">
         </div>
@@ -656,20 +656,20 @@ function showAddMealDialog(container) {
       <div id="ai-result-area"></div>
 
       <div class="flex gap-8 mt-16">
-        <button class="btn-outline" style="flex:1" onclick="window.__saveMealOnly()">½ö±£´æÕÕÆ¬</button>
-        <button class="btn-primary" style="flex:1" onclick="window.__saveMeal()">±£´æ¼ÇÂ¼</button>
+        <button class="btn-outline" style="flex:1" onclick="window.__saveMealOnly()">ä»…ä¿å­˜ç…§ç‰‡</button>
+        <button class="btn-primary" style="flex:1" onclick="window.__saveMeal()">ä¿å­˜è®°å½•</button>
       </div>
     </div>
   `;
 
-  const sheet = openBottomSheet('¼ÇÂ¼ÒûÊ³', html);
+  const sheet = openBottomSheet('è®°å½•é¥®é£Ÿ', html);
   window.__currentSheet = sheet;
 
   let currentImageBase64 = null;
   let recognizedFoods = [];
-  let selectedFoods = []; // ÓÃ»§ÒÑÑ¡µÄÊ³ÎïÁĞ±í
+  let selectedFoods = []; // ç”¨æˆ·å·²é€‰çš„é£Ÿç‰©åˆ—è¡¨
 
-  // ---- Ê³ÎïËÑË÷¹¦ÄÜ ----
+  // ---- é£Ÿç‰©æœç´¢åŠŸèƒ½ ----
   const searchInput = document.getElementById('food-search');
   const resultsDiv = document.getElementById('food-search-results');
   let searchTimer;
@@ -684,7 +684,7 @@ function showAddMealDialog(container) {
       }
       const results = searchFood(query);
       if (results.length === 0) {
-        resultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">Î´ÕÒµ½Æ¥ÅäÊ³Îï£¬¿ÉÊÖ¶¯ÊäÈë</div>';
+        resultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">æœªæ‰¾åˆ°åŒ¹é…é£Ÿç‰©ï¼Œå¯æ‰‹åŠ¨è¾“å…¥</div>';
         return;
       }
       resultsDiv.innerHTML = results.map((f, i) => `
@@ -695,10 +695,10 @@ function showAddMealDialog(container) {
             <span style="font-weight:500">${escapeHtml(f.name)}</span>
             <span class="text-xs text-gray" style="margin-left:6px">${escapeHtml(f.unit)}</span>
           </div>
-          <span style="font-weight:600;color:var(--warning)">${f.calories} ¿¨</span>
+          <span style="font-weight:600;color:var(--warning)">${f.calories} å¡</span>
         </div>
       `).join('');
-      // ´æ´¢µ±Ç°ËÑË÷½á¹û¹©Ñ¡ÔñÊ¹ÓÃ
+      // å­˜å‚¨å½“å‰æœç´¢ç»“æœä¾›é€‰æ‹©ä½¿ç”¨
       window.__currentSearchResults = results;
     }, 200);
   });
@@ -708,7 +708,7 @@ function showAddMealDialog(container) {
   window.__selectFood = (idx) => {
     const food = window.__currentSearchResults[idx];
     if (!food) return;
-    // Ìí¼Óµ½ÒÑÑ¡ÁĞ±í
+    // æ·»åŠ åˆ°å·²é€‰åˆ—è¡¨
     selectedFoods.push({ name: food.name, unit: food.unit, calories: food.calories, grams: 0 });
     renderSelectedFoods();
     searchInput.value = '';
@@ -720,7 +720,7 @@ function showAddMealDialog(container) {
     const list = document.getElementById('selected-foods-list');
     const hint = document.getElementById('no-foods-hint');
     if (selectedFoods.length === 0) {
-      list.innerHTML = '<div class="text-xs text-gray" id="no-foods-hint">ÉĞÎ´Ìí¼ÓÊ³Îï£¬ÇëËÑË÷²¢µã»÷Ìí¼Ó</div>';
+      list.innerHTML = '<div class="text-xs text-gray" id="no-foods-hint">å°šæœªæ·»åŠ é£Ÿç‰©ï¼Œè¯·æœç´¢å¹¶ç‚¹å‡»æ·»åŠ </div>';
     } else {
       list.innerHTML = selectedFoods.map((f, i) => `
         <div class="selected-food-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--gray-50);border-radius:8px;margin-bottom:6px">
@@ -729,13 +729,13 @@ function showAddMealDialog(container) {
             <div class="text-xs text-gray">${escapeHtml(f.unit)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-weight:600;font-size:14px;color:var(--warning);white-space:nowrap">${f.calories} ¿¨</span>
+            <span style="font-weight:600;font-size:14px;color:var(--warning);white-space:nowrap">${f.calories} å¡</span>
             <button onclick="window.__removeSelectedFood(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px">?</button>
           </div>
         </div>
       `).join('');
     }
-    // ¸üĞÂ×Ü¿¨Â·Àï
+    // æ›´æ–°æ€»å¡è·¯é‡Œ
     const total = selectedFoods.reduce((sum, f) => sum + f.calories, 0);
     document.getElementById('foods-total-cal').textContent = total;
   }
@@ -745,10 +745,10 @@ function showAddMealDialog(container) {
     renderSelectedFoods();
   };
 
-  // ---- ÊÖ¶¯ÊäÈë ----
+  // ---- æ‰‹åŠ¨è¾“å…¥ ----
   window.__addManualFoodRow = () => {
     const list = document.getElementById('selected-foods-list');
-    // Òş²ØÌáÊ¾
+    // éšè—æç¤º
     const hint = document.getElementById('no-foods-hint');
     if (hint) hint.remove();
 
@@ -756,8 +756,8 @@ function showAddMealDialog(container) {
     row.className = 'manual-food-row';
     row.style.cssText = 'display:flex;gap:8px;align-items:center;padding:8px;background:var(--warning-bg);border-radius:8px;margin-bottom:6px';
     row.innerHTML = `
-      <input type="text" placeholder="Ê³ÎïÃû" style="flex:1;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-name>
-      <input type="number" placeholder="¿¨Â·Àï" style="width:70px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-cal>
+      <input type="text" placeholder="é£Ÿç‰©å" style="flex:1;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-name>
+      <input type="number" placeholder="å¡è·¯é‡Œ" style="width:70px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-cal>
       <button onclick="this.parentElement.remove();window.__recalcManualTotal()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px">?</button>
     `;
     list.appendChild(row);
@@ -772,27 +772,27 @@ function showAddMealDialog(container) {
     document.getElementById('foods-total-cal').textContent = dbTotal + manualTotal;
   };
 
-  // ¼àÌıÊÖ¶¯ÊäÈë±ä»¯
+  // ç›‘å¬æ‰‹åŠ¨è¾“å…¥å˜åŒ–
   document.getElementById('selected-foods-list').addEventListener('input', (e) => {
     if (e.target.dataset.manualCal) {
       window.__recalcManualTotal();
     }
   });
 
-  // ---- ÅÄÕÕ + AI Ê¶±ğ ----
+  // ---- æ‹ç…§ + AI è¯†åˆ« ----
   document.getElementById('meal-photo-input').onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const preview = document.getElementById('meal-photo-preview');
-    preview.innerHTML = '<div class="spinner"></div><p>´¦ÀíÖĞ...</p>';
+    preview.innerHTML = '<div class="spinner"></div><p>å¤„ç†ä¸­...</p>';
 
     try {
       currentImageBase64 = await compressImage(file, 800);
       preview.innerHTML = `<img src="${currentImageBase64}" style="width:100%;border-radius:8px">`;
 
       const resultArea = document.getElementById('ai-result-area');
-      resultArea.innerHTML = '<div class="text-sm text-gray" style="padding:12px">? AIÊ¶±ğÖĞ...</div>';
+      resultArea.innerHTML = '<div class="text-sm text-gray" style="padding:12px">? AIè¯†åˆ«ä¸­...</div>';
 
       const result = await recognizeFood(currentImageBase64);
       if (result.success) {
@@ -800,16 +800,16 @@ function showAddMealDialog(container) {
         resultArea.innerHTML = `
           <div class="card" style="margin:0;background:var(--success-bg);box-shadow:none">
             <div class="flex-between mb-8">
-              <span class="font-bold" style="color:var(--success)">? AIÊ¶±ğ³É¹¦</span>
-              <span class="font-bold">${result.data.totalCalories} ¿¨</span>
+              <span class="font-bold" style="color:var(--success)">? AIè¯†åˆ«æˆåŠŸ</span>
+              <span class="font-bold">${result.data.totalCalories} å¡</span>
             </div>
             <div id="recognized-foods">
               ${result.data.foods.map((f, i) => `
                 <div class="flex-between text-sm" style="padding:4px 0">
                   <input type="text" value="${escapeHtml(f.name)}" style="flex:1;border:none;background:transparent;font-size:14px" data-food-idx="${i}" data-field="name">
                   <input type="number" value="${f.calories}" style="width:60px;text-align:right;border:1px solid var(--gray-200);border-radius:4px;padding:2px 4px;font-size:13px" data-food-idx="${i}" data-field="calories">
-                  <span class="text-xs text-gray">¿¨</span>
-                  <button onclick="window.__addAiFoodToSelected(${i})" style="background:var(--success);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px">+Ìí¼Ó</button>
+                  <span class="text-xs text-gray">å¡</span>
+                  <button onclick="window.__addAiFoodToSelected(${i})" style="background:var(--success);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px">+æ·»åŠ </button>
                 </div>
               `).join('')}
             </div>
@@ -822,14 +822,14 @@ function showAddMealDialog(container) {
             <div class="text-sm" style="color:var(--warning)">
               ?? ${result.message}
             </div>
-            <div class="text-xs text-gray mt-8">¿ÉÊ¹ÓÃÉÏ·½Ê³ÎïËÑË÷¹¦ÄÜ²éÕÒ¿¨Â·Àï</div>
+            <div class="text-xs text-gray mt-8">å¯ä½¿ç”¨ä¸Šæ–¹é£Ÿç‰©æœç´¢åŠŸèƒ½æŸ¥æ‰¾å¡è·¯é‡Œ</div>
           </div>
         `;
       } else {
-        resultArea.innerHTML = `<div class="text-sm" style="color:var(--danger)">? Ê¶±ğÊ§°Ü£º${escapeHtml(result.error)}</div>`;
+        resultArea.innerHTML = `<div class="text-sm" style="color:var(--danger)">? è¯†åˆ«å¤±è´¥ï¼š${escapeHtml(result.error)}</div>`;
       }
     } catch (err) {
-      preview.innerHTML = '<div style="color:var(--danger)">Í¼Æ¬´¦ÀíÊ§°Ü</div>';
+      preview.innerHTML = '<div style="color:var(--danger)">å›¾ç‰‡å¤„ç†å¤±è´¥</div>';
     }
   };
 
@@ -840,13 +840,13 @@ function showAddMealDialog(container) {
     renderSelectedFoods();
   };
 
-  // ---- ±£´æ ----
+  // ---- ä¿å­˜ ----
   window.__saveMeal = async () => {
     const date = document.getElementById('meal-date').value || today();
     const mealType = document.getElementById('meal-type').value;
     const foods = [...selectedFoods];
 
-    // ÊÕ¼¯ÊÖ¶¯ÊäÈë
+    // æ”¶é›†æ‰‹åŠ¨è¾“å…¥
     document.querySelectorAll('.manual-food-row').forEach(row => {
       const nameInput = row.querySelector('[data-manual-name]');
       const calInput = row.querySelector('[data-manual-cal]');
@@ -856,7 +856,7 @@ function showAddMealDialog(container) {
     });
 
     if (foods.length === 0) {
-      toast('ÇëÌí¼ÓÖÁÉÙÒ»ÖÖÊ³Îï');
+      toast('è¯·æ·»åŠ è‡³å°‘ä¸€ç§é£Ÿç‰©');
       return;
     }
 
@@ -870,14 +870,14 @@ function showAddMealDialog(container) {
       source: currentImageBase64 ? 'manual' : 'manual',
     });
 
-    toast('ÒûÊ³ÒÑ¼ÇÂ¼');
+    toast('é¥®é£Ÿå·²è®°å½•');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__saveMealOnly = async () => {
     if (!currentImageBase64) {
-      toast('ÇëÏÈÉÏ´«Ê³ÎïÕÕÆ¬');
+      toast('è¯·å…ˆä¸Šä¼ é£Ÿç‰©ç…§ç‰‡');
       return;
     }
     const date = document.getElementById('meal-date').value || today();
@@ -890,72 +890,72 @@ function showAddMealDialog(container) {
       imageBase64: currentImageBase64,
       source: 'photo',
     });
-    toast('ÕÕÆ¬ÒÑ±£´æ');
+    toast('ç…§ç‰‡å·²ä¿å­˜');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 }
 
 // ============================================================
-// ±à¼­ÒûÊ³¶Ô»°¿ò£¨º¬Ê³ÎïËÑË÷£©
+// ç¼–è¾‘é¥®é£Ÿå¯¹è¯æ¡†ï¼ˆå«é£Ÿç‰©æœç´¢ï¼‰
 // ============================================================
 
 async function showEditMealDialog(container, id) {
   const all = await getAll('meals');
   const meal = all.find(m => m.id === id);
-  if (!meal) { toast('¼ÇÂ¼²»´æÔÚ'); return; }
+  if (!meal) { toast('è®°å½•ä¸å­˜åœ¨'); return; }
 
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>ÈÕÆÚ</label>
+        <label>æ—¥æœŸ</label>
         <input type="date" id="meal-date" value="${meal.date}">
       </div>
       <div class="form-group">
-        <label>ÓÃ²ÍÀàĞÍ</label>
+        <label>ç”¨é¤ç±»å‹</label>
         <select id="meal-type">
-          <option value="Ôç²Í" ${meal.mealType==='Ôç²Í'?'selected':''}>? Ôç²Í</option>
-          <option value="Îç²Í" ${meal.mealType==='Îç²Í'?'selected':''}>?? Îç²Í</option>
-          <option value="Íí²Í" ${meal.mealType==='Íí²Í'?'selected':''}>? Íí²Í</option>
-          <option value="¼Ó²Í" ${meal.mealType==='¼Ó²Í'?'selected':''}>? ¼Ó²Í</option>
+          <option value="æ—©é¤" ${meal.mealType==='æ—©é¤'?'selected':''}>? æ—©é¤</option>
+          <option value="åˆé¤" ${meal.mealType==='åˆé¤'?'selected':''}>?? åˆé¤</option>
+          <option value="æ™šé¤" ${meal.mealType==='æ™šé¤'?'selected':''}>? æ™šé¤</option>
+          <option value="åŠ é¤" ${meal.mealType==='åŠ é¤'?'selected':''}>? åŠ é¤</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>? ËÑË÷Ê³ÎïÌí¼Óµ½ÁĞ±í</label>
-        <input type="text" id="edit-food-search" placeholder="Èç£ºÃ×·¹¡¢¼¦µ°¡¢ºìÉÕÈâ..." autocomplete="off">
+        <label>? æœç´¢é£Ÿç‰©æ·»åŠ åˆ°åˆ—è¡¨</label>
+        <input type="text" id="edit-food-search" placeholder="å¦‚ï¼šç±³é¥­ã€é¸¡è›‹ã€çº¢çƒ§è‚‰..." autocomplete="off">
         <div id="edit-food-search-results" style="max-height:200px;overflow-y:auto;margin-top:8px"></div>
       </div>
 
       <div class="form-group">
-        <label>Ê³ÎïÁĞ±í</label>
+        <label>é£Ÿç‰©åˆ—è¡¨</label>
         <div id="edit-foods-list"></div>
         <div class="flex-between mt-8">
-          <span class="text-sm text-gray">×Ü¼Æ£º<span id="edit-foods-total" class="font-bold">${meal.totalCalories || 0}</span> ¿¨</span>
-          <button class="btn-outline" onclick="window.__addEditManualFood()" style="font-size:13px">+ ÊÖ¶¯ÊäÈë</button>
+          <span class="text-sm text-gray">æ€»è®¡ï¼š<span id="edit-foods-total" class="font-bold">${meal.totalCalories || 0}</span> å¡</span>
+          <button class="btn-outline" onclick="window.__addEditManualFood()" style="font-size:13px">+ æ‰‹åŠ¨è¾“å…¥</button>
         </div>
       </div>
 
       ${meal.imageBase64 ? `
       <div class="form-group">
-        <label>ÒÑÓĞÕÕÆ¬</label>
+        <label>å·²æœ‰ç…§ç‰‡</label>
         <img src="${meal.imageBase64}" style="max-height:120px;border-radius:8px">
       </div>
       ` : ''}
-      <button class="btn-primary btn-full" onclick="window.__updateMeal()">±£´æĞŞ¸Ä</button>
-      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delMealFromEdit('${id}')">É¾³ı´Ë¼ÇÂ¼</button>
+      <button class="btn-primary btn-full" onclick="window.__updateMeal()">ä¿å­˜ä¿®æ”¹</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delMealFromEdit('${id}')">åˆ é™¤æ­¤è®°å½•</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('±à¼­ÒûÊ³', html);
+  const sheet = openBottomSheet('ç¼–è¾‘é¥®é£Ÿ', html);
 
-  // µ±Ç°±à¼­ÖĞµÄÊ³ÎïÁĞ±í£¨´ÓÒÑÓĞ¼ÇÂ¼³õÊ¼»¯£©
+  // å½“å‰ç¼–è¾‘ä¸­çš„é£Ÿç‰©åˆ—è¡¨ï¼ˆä»å·²æœ‰è®°å½•åˆå§‹åŒ–ï¼‰
   let editFoods = (meal.foods || []).map(f => ({ ...f }));
 
   function renderEditFoods() {
     const list = document.getElementById('edit-foods-list');
     if (editFoods.length === 0) {
-      list.innerHTML = '<div class="text-xs text-gray">ÔİÎŞÊ³Îï£¬ÇëËÑË÷Ìí¼Ó</div>';
+      list.innerHTML = '<div class="text-xs text-gray">æš‚æ— é£Ÿç‰©ï¼Œè¯·æœç´¢æ·»åŠ </div>';
     } else {
       list.innerHTML = editFoods.map((f, i) => `
         <div class="edit-food-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--gray-50);border-radius:8px;margin-bottom:6px">
@@ -965,20 +965,20 @@ async function showEditMealDialog(container, id) {
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="number" value="${f.calories}" style="width:65px;text-align:right;border:1px solid var(--gray-200);border-radius:4px;padding:2px 4px;font-size:13px" data-edit-cal="${i}">
-            <span class="text-xs text-gray">¿¨</span>
+            <span class="text-xs text-gray">å¡</span>
             <button onclick="window.__removeEditFood(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px">?</button>
           </div>
         </div>
       `).join('');
     }
-    // ¸üĞÂ×Ü¼Æ
+    // æ›´æ–°æ€»è®¡
     const total = editFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
     document.getElementById('edit-foods-total').textContent = total;
   }
 
   renderEditFoods();
 
-  // ¼àÌıÊ³ÎïÃûºÍ¿¨Â·ÀïµÄ±à¼­
+  // ç›‘å¬é£Ÿç‰©åå’Œå¡è·¯é‡Œçš„ç¼–è¾‘
   document.getElementById('edit-foods-list').addEventListener('input', (e) => {
     if (e.target.dataset.editName !== undefined) {
       editFoods[parseInt(e.target.dataset.editName)].name = e.target.value;
@@ -986,7 +986,7 @@ async function showEditMealDialog(container, id) {
     if (e.target.dataset.editCal !== undefined) {
       const idx = parseInt(e.target.dataset.editCal);
       editFoods[idx].calories = parseInt(e.target.value) || 0;
-      // ¸üĞÂ×Ü¼Æ
+      // æ›´æ–°æ€»è®¡
       const total = editFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
       document.getElementById('edit-foods-total').textContent = total;
     }
@@ -1000,14 +1000,14 @@ async function showEditMealDialog(container, id) {
   window.__addEditManualFood = () => {
     editFoods.push({ name: '', unit: '', calories: 0, grams: 0 });
     renderEditFoods();
-    // ¾Û½¹µ½ĞÂÌí¼ÓµÄÊ³ÎïÃûÊäÈë¿ò
+    // èšç„¦åˆ°æ–°æ·»åŠ çš„é£Ÿç‰©åè¾“å…¥æ¡†
     setTimeout(() => {
       const inputs = document.querySelectorAll('[data-edit-name]');
       if (inputs.length > 0) inputs[inputs.length - 1].focus();
     }, 100);
   };
 
-  // ---- Ê³ÎïËÑË÷ ----
+  // ---- é£Ÿç‰©æœç´¢ ----
   const editSearchInput = document.getElementById('edit-food-search');
   const editResultsDiv = document.getElementById('edit-food-search-results');
   let editSearchTimer;
@@ -1022,7 +1022,7 @@ async function showEditMealDialog(container, id) {
       }
       const results = searchFood(query);
       if (results.length === 0) {
-        editResultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">Î´ÕÒµ½Æ¥ÅäÊ³Îï</div>';
+        editResultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">æœªæ‰¾åˆ°åŒ¹é…é£Ÿç‰©</div>';
         return;
       }
       editResultsDiv.innerHTML = results.map((f, i) => `
@@ -1033,7 +1033,7 @@ async function showEditMealDialog(container, id) {
             <span style="font-weight:500">${escapeHtml(f.name)}</span>
             <span class="text-xs text-gray" style="margin-left:6px">${escapeHtml(f.unit)}</span>
           </div>
-          <span style="font-weight:600;color:var(--warning)">${f.calories} ¿¨</span>
+          <span style="font-weight:600;color:var(--warning)">${f.calories} å¡</span>
         </div>
       `).join('');
       window.__editCurrentResults = results;
@@ -1051,12 +1051,12 @@ async function showEditMealDialog(container, id) {
     editResultsDiv.innerHTML = '';
   };
 
-  // ---- ±£´æĞŞ¸Ä ----
+  // ---- ä¿å­˜ä¿®æ”¹ ----
   window.__updateMeal = async () => {
     const date = document.getElementById('meal-date').value || today();
     const mealType = document.getElementById('meal-type').value;
 
-    // ´Ó DOM ÊÕ¼¯×îĞÂÊı¾İ
+    // ä» DOM æ”¶é›†æœ€æ–°æ•°æ®
     const foods = [];
     document.querySelectorAll('[data-edit-name]').forEach((input, i) => {
       const name = input.value.trim();
@@ -1073,15 +1073,15 @@ async function showEditMealDialog(container, id) {
     meal.totalCalories = totalCalories;
     meal.updatedAt = new Date().toISOString();
     await put('meals', meal);
-    toast('ÒÑĞŞ¸Ä');
+    toast('å·²ä¿®æ”¹');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__delMealFromEdit = async (delId) => {
-    if (await confirmDialog('É¾³ıÕâÌõÒûÊ³¼ÇÂ¼£¿')) {
+    if (await confirmDialog('åˆ é™¤è¿™æ¡é¥®é£Ÿè®°å½•ï¼Ÿ')) {
       await del('meals', delId);
-      toast('ÒÑÉ¾³ı');
+      toast('å·²åˆ é™¤');
       sheet.close();
       renderWeight(document.getElementById('main-content'));
     }
@@ -1089,7 +1089,7 @@ async function showEditMealDialog(container, id) {
 }
 
 // ============================================================
-// ÒûÊ³ÍÆ¼ö Tab
+// é¥®é£Ÿæ¨è Tab
 // ============================================================
 
 async function renderAdviceTab(container) {
@@ -1101,8 +1101,8 @@ async function renderAdviceTab(container) {
       ${cachedAdvice ? renderAdviceContent(cachedAdvice, adviceDate) : `
         <div class="empty-state">
           <div class="empty-icon">?</div>
-          <div class="empty-text">ÔİÎŞÒûÊ³ÍÆ¼ö</div>
-          <div class="text-xs text-gray mt-8">µã»÷ÓÒÏÂ½Ç + Éú³ÉÃ¿ÖÜÒûÊ³ÍÆ¼ö</div>
+          <div class="empty-text">æš‚æ— é¥®é£Ÿæ¨è</div>
+          <div class="text-xs text-gray mt-8">ç‚¹å‡»å³ä¸‹è§’ + ç”Ÿæˆæ¯å‘¨é¥®é£Ÿæ¨è</div>
         </div>
       `}
     </div>
@@ -1114,79 +1114,79 @@ function renderAdviceContent(advice, dateStr) {
   return `
     <div class="card">
       <div class="flex-between mb-8">
-        <span class="font-bold">? ÒûÊ³ÍÆ¼ö</span>
-        <span class="text-xs text-gray">${dateStr || ''} ${isRuleBased ? '¡¤ »ù´¡°æ' : '¡¤ AI°æ'}</span>
+        <span class="font-bold">? é¥®é£Ÿæ¨è</span>
+        <span class="text-xs text-gray">${dateStr || ''} ${isRuleBased ? 'Â· åŸºç¡€ç‰ˆ' : 'Â· AIç‰ˆ'}</span>
       </div>
 
       ${advice.assessment ? `
       <div class="mb-16">
-        <div class="text-sm font-bold mb-8">? ±¾ÖÜÆÀ¹À</div>
+        <div class="text-sm font-bold mb-8">? æœ¬å‘¨è¯„ä¼°</div>
         <div class="text-sm" style="color:var(--gray-600);line-height:1.6">${escapeHtml(advice.assessment)}</div>
       </div>` : ''}
 
       ${advice.advice ? `
       <div class="mb-16">
-        <div class="text-sm font-bold mb-8">? ½¡¿µ½¨Òé</div>
+        <div class="text-sm font-bold mb-8">? å¥åº·å»ºè®®</div>
         <div class="text-sm" style="color:var(--gray-600);line-height:1.6">${escapeHtml(advice.advice)}</div>
       </div>` : ''}
     </div>
 
     ${advice.recommendations ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">?? ÍÆ¼öÊ³Æ×</span></div>
+      <div class="card-title"><span class="title-left">?? æ¨èé£Ÿè°±</span></div>
       ${advice.recommendations.breakfast ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">? Ôç²Í</div>
-          ${advice.recommendations.breakfast.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}¿¨)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">? æ—©é¤</div>
+          ${advice.recommendations.breakfast.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}å¡)</span></div>`).join('')}
         </div>` : ''}
       ${advice.recommendations.lunch ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">?? Îç²Í</div>
-          ${advice.recommendations.lunch.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}¿¨)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">?? åˆé¤</div>
+          ${advice.recommendations.lunch.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}å¡)</span></div>`).join('')}
         </div>` : ''}
       ${advice.recommendations.dinner ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">? Íí²Í</div>
-          ${advice.recommendations.dinner.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}¿¨)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">? æ™šé¤</div>
+          ${advice.recommendations.dinner.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}å¡)</span></div>`).join('')}
         </div>` : ''}
     </div>` : ''}
 
     ${advice.avoid ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">? Ğè±ÜÃâÊ³Îï</span></div>
+      <div class="card-title"><span class="title-left">? éœ€é¿å…é£Ÿç‰©</span></div>
       ${advice.avoid.map(a => `<div class="text-sm" style="padding:4px 0;color:var(--danger)">? ${escapeHtml(typeof a === 'string' ? a : a.name)}</div>`).join('')}
     </div>` : ''}
 
     ${advice.recommend ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">? ÍÆ¼öÊ³Îï</span></div>
+      <div class="card-title"><span class="title-left">? æ¨èé£Ÿç‰©</span></div>
       ${advice.recommend.map(r => `<div class="text-sm" style="padding:4px 0;color:var(--success)">? ${escapeHtml(typeof r === 'string' ? r : r.name)}</div>`).join('')}
     </div>` : ''}
   `;
 }
 
 // ============================================================
-// Éú³ÉÒûÊ³ÍÆ¼ö
+// ç”Ÿæˆé¥®é£Ÿæ¨è
 // ============================================================
 
 function showGenerateAdviceDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="text-sm" style="color:var(--gray-600);line-height:1.6;margin-bottom:16px">
-        ½«¸ù¾İÄã±¾ÖÜµÄÒûÊ³¼ÇÂ¼¡¢ÌåÖØ±ä»¯ºÍ½¡¿µÖ¸±ê£¨µÍÃÜ¶ÈÖ¬µ°°×¹ı¸ß¡¢µ¨¹Ì´¼¹ı¸ß£©Éú³É¸öĞÔ»¯ÒûÊ³ÍÆ¼ö¡£
+        å°†æ ¹æ®ä½ æœ¬å‘¨çš„é¥®é£Ÿè®°å½•ã€ä½“é‡å˜åŒ–å’Œå¥åº·æŒ‡æ ‡ï¼ˆä½å¯†åº¦è„‚è›‹ç™½è¿‡é«˜ã€èƒ†å›ºé†‡è¿‡é«˜ï¼‰ç”Ÿæˆä¸ªæ€§åŒ–é¥®é£Ÿæ¨èã€‚
       </div>
       <div class="form-group">
-        <label>Éú³É·½Ê½</label>
+        <label>ç”Ÿæˆæ–¹å¼</label>
         <select id="advice-mode">
-          <option value="ai">? AIÉú³É£¨ĞèÅäÖÃAPI Key£¬¸ü¾«×¼£©</option>
-          <option value="rule">? »ù´¡°æ£¨»ùÓÚ½¡¿µÖ¸±ê£¬ÎŞĞèAPI Key£©</option>
+          <option value="ai">? AIç”Ÿæˆï¼ˆéœ€é…ç½®API Keyï¼Œæ›´ç²¾å‡†ï¼‰</option>
+          <option value="rule">? åŸºç¡€ç‰ˆï¼ˆåŸºäºå¥åº·æŒ‡æ ‡ï¼Œæ— éœ€API Keyï¼‰</option>
         </select>
       </div>
-      <button class="btn-primary btn-full" onclick="window.__genAdvice()">Éú³ÉÍÆ¼ö</button>
+      <button class="btn-primary btn-full" onclick="window.__genAdvice()">ç”Ÿæˆæ¨è</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('Éú³ÉÒûÊ³ÍÆ¼ö', html);
+  const sheet = openBottomSheet('ç”Ÿæˆé¥®é£Ÿæ¨è', html);
   window.__currentSheet = sheet;
 
   window.__genAdvice = async () => {
@@ -1194,13 +1194,13 @@ function showGenerateAdviceDialog(container) {
     sheet.close();
 
     const content = document.getElementById('weight-content');
-    content.innerHTML = '<div class="loading"><div class="spinner"></div><p>Éú³ÉÖĞ...</p></div>';
+    content.innerHTML = '<div class="loading"><div class="spinner"></div><p>ç”Ÿæˆä¸­...</p></div>';
 
     const weekMeals = await getWeekMeals();
     const weightRecords = await getWeightRecords(7);
     const healthProfile = await getSetting('healthProfile', {
-      healthIndicators: ['µÍÃÜ¶ÈÖ¬µ°°×¹ı¸ß', 'µ¨¹Ì´¼¹ı¸ß'],
-      dietRestrictions: ['µÍµ¨¹Ì´¼', 'µÍ±¥ºÍÖ¬·¾', '¸ßÏËÎ¬', 'ÉÙÓÍÕ¨'],
+      healthIndicators: ['ä½å¯†åº¦è„‚è›‹ç™½è¿‡é«˜', 'èƒ†å›ºé†‡è¿‡é«˜'],
+      dietRestrictions: ['ä½èƒ†å›ºé†‡', 'ä½é¥±å’Œè„‚è‚ª', 'é«˜çº¤ç»´', 'å°‘æ²¹ç‚¸'],
     });
 
     let weightTrend = null;
@@ -1220,7 +1220,7 @@ function showGenerateAdviceDialog(container) {
       result = await generateDietRecommendation(weekMeals, weightTrend, healthProfile);
       if (!result.success && result.error === 'NO_API_KEY') {
         result = { success: true, data: ruleBasedDietAdvice(weekMeals, healthProfile) };
-        toast('Î´ÅäÖÃAPI Key£¬ÒÑÊ¹ÓÃ»ù´¡°æÍÆ¼ö');
+        toast('æœªé…ç½®API Keyï¼Œå·²ä½¿ç”¨åŸºç¡€ç‰ˆæ¨è');
       }
     }
 
@@ -1228,15 +1228,15 @@ function showGenerateAdviceDialog(container) {
       await setSetting('lastDietAdvice', result.data);
       await setSetting('lastAdviceDate', fmtDate(new Date()));
       renderAdviceTab(content);
-      toast('ÒûÊ³ÍÆ¼öÒÑÉú³É');
+      toast('é¥®é£Ÿæ¨èå·²ç”Ÿæˆ');
     } else {
-      content.innerHTML = `<div class="empty-state"><div class="empty-icon">?</div><div class="empty-text">Éú³ÉÊ§°Ü£º${escapeHtml(result.error)}</div></div>`;
+      content.innerHTML = `<div class="empty-state"><div class="empty-icon">?</div><div class="empty-text">ç”Ÿæˆå¤±è´¥ï¼š${escapeHtml(result.error)}</div></div>`;
     }
   };
 }
 
 // ============================================================
-// Ê×Ò³ Dashboard ¿¨Æ¬
+// é¦–é¡µ Dashboard å¡ç‰‡
 // ============================================================
 
 export async function dashboardWeight() {
@@ -1251,21 +1251,21 @@ export async function dashboardWeight() {
   return `
     <div class="dash-card" onclick="window.__navigate('weight')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">?? ½¡¿µ¹ÜÀí</div>
-        <div class="dash-card-more">²é¿´ÏêÇé ?</div>
+        <div class="dash-card-title">?? å¥åº·ç®¡ç†</div>
+        <div class="dash-card-more">æŸ¥çœ‹è¯¦æƒ… ?</div>
       </div>
       <div class="dash-stats">
         <div class="dash-stat primary">
           <div class="dash-stat-num">${latest ? latest.weight : '--'}</div>
-          <div class="dash-stat-label">µ±Ç°ÌåÖØ(kg)</div>
+          <div class="dash-stat-label">å½“å‰ä½“é‡(kg)</div>
         </div>
         <div class="dash-stat ${change < 0 ? 'success' : change > 0 ? 'danger' : ''}">
-          <div class="dash-stat-num">${change === 0 ? '--' : (change < 0 ? '¡ı' : '¡ü') + Math.abs(change)}</div>
-          <div class="dash-stat-label">±¾ÖÜ±ä»¯</div>
+          <div class="dash-stat-num">${change === 0 ? '--' : (change < 0 ? 'â†“' : 'â†‘') + Math.abs(change)}</div>
+          <div class="dash-stat-label">æœ¬å‘¨å˜åŒ–</div>
         </div>
         <div class="dash-stat warning">
           <div class="dash-stat-num">${totalCalories}</div>
-          <div class="dash-stat-label">½ñÈÕ¿¨Â·Àï</div>
+          <div class="dash-stat-label">ä»Šæ—¥å¡è·¯é‡Œ</div>
         </div>
       </div>
     </div>
