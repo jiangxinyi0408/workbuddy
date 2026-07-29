@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-29T08:17:46.073Z",
+  "updatedAt": "2026-07-29T08:20:06.919Z",
   "data": {
     "tasks": [
       {
@@ -117,12 +117,12 @@
         "type": "daily",
         "dueDate": "2026-07-27",
         "priority": "high",
-        "status": "pending",
+        "status": "done",
         "category": "商汤",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T06:39:30.494Z",
-        "completedAt": null,
+        "completedAt": "2026-07-29T08:19:57.552Z",
         "carriedOverTo": "ms3ez4f4jxq46k"
       },
       {
@@ -526,12 +526,12 @@
         "type": "daily",
         "dueDate": "2026-07-29",
         "priority": "high",
-        "status": "pending",
+        "status": "done",
         "category": "上海路桥",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-29T07:51:04.049Z",
-        "completedAt": null
+        "completedAt": "2026-07-29T08:20:01.900Z"
       }
     ],
     "workLogs": [],
