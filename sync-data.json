@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-29T05:03:15.699Z",
+  "updatedAt": "2026-07-29T05:32:14.383Z",
   "data": {
     "tasks": [
       {
@@ -79,8 +79,7 @@
         "category": "天马",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:37.966Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnow4o872z"
+        "completedAt": null
       },
       {
         "id": "ms2spl0ebwhlei",
@@ -108,8 +107,7 @@
         "image": null,
         "createdAt": "2026-07-27T05:38:21.914Z",
         "completedAt": null,
-        "updatedAt": "2026-07-27T05:57:49.023Z",
-        "carriedOverTo": "ms5mcnp4vyfgi7"
+        "updatedAt": "2026-07-27T05:57:49.023Z"
       },
       {
         "id": "ms2uwvr2rvzpl7",
@@ -139,8 +137,7 @@
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.349Z",
         "completedAt": null,
-        "updatedAt": "2026-07-27T17:53:14.066Z",
-        "carriedOverTo": "ms5mcnp4nth9l9"
+        "updatedAt": "2026-07-27T17:53:14.066Z"
       },
       {
         "id": "ms3ez4evriock6",
@@ -155,8 +152,7 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.351Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp46vbd41"
+        "completedAt": null
       },
       {
         "id": "ms3ez4evz2zcdb",
@@ -171,8 +167,7 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.351Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp5gphj53"
+        "completedAt": null
       },
       {
         "id": "ms3ez4ezukoxls",
@@ -187,8 +182,7 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.355Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp52gfptd"
+        "completedAt": null
       },
       {
         "id": "ms3ez4f1wtrs3p",
@@ -231,8 +225,7 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:50:58.962Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp5bpya90"
+        "completedAt": null
       },
       {
         "id": "ms3ixb3w4g1stg",
@@ -245,8 +238,7 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:51:41.180Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp5jnkfg7"
+        "completedAt": null
       },
       {
         "id": "ms3ixttwc9fcda",
@@ -260,8 +252,7 @@
         "image": null,
         "createdAt": "2026-07-27T17:52:05.444Z",
         "completedAt": null,
-        "updatedAt": "2026-07-27T17:55:22.720Z",
-        "carriedOverTo": "ms5mcnp5tww57l"
+        "updatedAt": "2026-07-27T17:55:22.720Z"
       },
       {
         "id": "ms3iyxxrp3gfns",
@@ -288,8 +279,7 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:53:56.841Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp693sr56"
+        "completedAt": null
       },
       {
         "id": "ms477edae80ek1",
@@ -315,8 +305,7 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-28T05:42:49.210Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5mcnp6z56dzf"
+        "completedAt": null
       },
       {
         "id": "ms4bdb92nyd0vz",
@@ -330,171 +319,6 @@
         "image": null,
         "createdAt": "2026-07-28T07:07:57.110Z",
         "completedAt": "2026-07-28T09:34:55.273Z"
-      },
-      {
-        "id": "ms5mcnow4o872z",
-        "title": "环责险电子保单及发票邮件",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "天马",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-27",
-        "createdAt": "2026-07-29T05:03:08.528Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp46vbd41",
-        "title": "供应商系统注册",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.536Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp4nth9l9",
-        "title": "整理对账单",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.536Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp4vyfgi7",
-        "title": "弹福保费核销",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "low",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.536Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp52gfptd",
-        "title": "处理投诉咨询",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "太享保",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.537Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp5bpya90",
-        "title": "环责TIS服务费用结算",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "low",
-        "status": "pending",
-        "category": "环责险",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.537Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp5gphj53",
-        "title": "弹福无主被的理赔问题沟通（需要太科加速提供理赔平台）",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.537Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp5jnkfg7",
-        "title": "嘉年华补充协议盖章后寄回",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.537Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp5tww57l",
-        "title": "银行许可证盖章后上传供应商平台",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.537Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp693sr56",
-        "title": "（告知太科）离职员工需继续维护理赔入口",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.538Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms5mcnp6z56dzf",
-        "title": "发票两张整理",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "low",
-        "status": "pending",
-        "category": "报销",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:03:08.538Z",
-        "completedAt": null
       }
     ],
     "workLogs": [],
@@ -1181,7 +1005,7 @@
       },
       {
         "key": "lastSummaryDate",
-        "value": "2026-07-28"
+        "value": "2026-07-26"
       },
       {
         "key": "newsCache_top",
@@ -1189,141 +1013,141 @@
           "news": [
             {
               "id": "60s_0",
-              "title": "上半年全国税费收入达 16.7 万亿元，其中税收收入超过 10 万亿元，同比增长 4.9%",
+              "title": "“红霞” 停止编号，今年第 13 号台风 “白海豚” 生成，未来 5 天对我国无影响",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_1",
-              "title": "2025 年度个税汇算超 1 亿纳税人享受退税 1500 多亿元，中低收入者受益面提升",
+              "title": "2026 上半年规上工业企业利润增长 18.7%，营收利润率创 2024 年来最高",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_2",
-              "title": "上半年我国银行理财产品为投资者创造收益 3052 亿元，平均年化收益率为 2.05%",
+              "title": "京沪高铁、京沪铁路 28 日起可预约 2026 年中秋假期火车票",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_3",
-              "title": "北京出台信用卡业务新规：分期业务须突出展示折算年化利率",
+              "title": "安徽利辛一学生考上北大，房东免其房租并奖励 3 万元助学金，当事人称考前曾向租房的所有考生许诺",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_4",
-              "title": "长鑫科技将被纳入 MSCI 中国全股票指数，8 月 10 日生效",
+              "title": "我国将研究完善残疾人教育、成人监护等法律制度",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_5",
-              "title": "月之暗面全栈开源 Kimi K3，引爆全球开发者社区，登顶 “抱抱脸” 平台趋势榜榜首",
+              "title": "多地向新人发放结婚消费券，芜湖加推总计 50 万元喜宴券一天被领完",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_6",
-              "title": "AI 短剧上线安徽卫视，画面上明确标注 AI 制作，有人惊呼太超前，也有人吐槽没有人味",
+              "title": "时隔 8 年，腾讯宣布 “QQ 宠物” 正式回归，新版全面 3D 化，接入大模型并新增社交玩法",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_7",
-              "title": "教育部：国家助学贷款累计发放 6958 亿元，惠及学生超 3000 万人",
+              "title": "异种器官移植迎来 “中国时刻”：猪肾移植到猴身上，存活超 620 天刷新纪录",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_8",
-              "title": "河南 “三支一扶” 高分成绩引争议，当地再回应：正进行深入核查，查实一个取消一个",
+              "title": "长鑫科技上市首日大涨超 465%，市值突破 3.28 万亿元超越工商银行，成 A 股市值最高公司",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_9",
-              "title": "奥地利拟出台法案，限制 14 岁以下儿童青少年使用社交媒体",
+              "title": "日本计划收紧外国人永居条件，新增收入、日语能力及日本制度认知等审查标准",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_10",
-              "title": "日本熊本县 28 日发生 7.1 级强震，多处房屋倒塌，已确认数人遇难，财产损失严重",
+              "title": "调查显示日本 8 月将有近 1900 种食品涨价，全年涨价的食品预计将达到约 2 万种",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_11",
-              "title": "欧盟：法国和西班牙山火蔓延速度已超出现有应急处置能力",
+              "title": "韩前总统尹锡悦选举期间公布虚假事实获刑 1 年 6 个月，其 2022 年当选韩国总统或无效",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_12",
-              "title": "2026 年《财富》世界 500 强排行榜：亚马逊登顶，终结沃尔玛连续十二年领跑纪录",
+              "title": "法国首现 “火积云”、烈焰逼近波尔多：30 万人撤离，马克龙调军队驰援",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_13",
-              "title": "美国宣布和英国、德国、日本等 24 国组建 6G 研发联盟，旨在制定 6G 标准",
+              "title": "美国驻多伦多总领事馆遭枪击，这是该建筑今年第二次遇袭",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             },
             {
               "id": "60s_14",
-              "title": "俄罗斯决定组建建筑工程部队，并将俄武装力量编制总人数增至 242 万余人",
+              "title": "美伊停火延续至第三天，特朗普称双方正进行 “深度谈判”；伊朗称没有与美国进行任何谈判",
               "summary": "",
-              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498564&idx=1&sn=23f7bf38f3d1da7b888b2d0b6487c747",
+              "link": "http://mp.weixin.qq.com/s?__biz=MzkyNDE4NDQ0Nw==&mid=2247498560&idx=1&sn=9ad349ce806d1d22ecfbc0b93830829a",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-28T19:47:40.000Z"
+              "pubDate": "2026-07-27T19:20:38.000Z"
             }
           ],
-          "timestamp": 1785301388548
+          "timestamp": 1785229053209
         }
       },
       {
