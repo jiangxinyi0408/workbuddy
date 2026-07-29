@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-29T07:48:08.568Z",
+  "updatedAt": "2026-07-29T07:51:09.072Z",
   "data": {
     "tasks": [
       {
@@ -518,6 +518,19 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.237Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms5scm0hpscxxj",
+        "title": "给吴青情况说明盖项目章",
+        "type": "daily",
+        "dueDate": "2026-07-29",
+        "priority": "high",
+        "status": "pending",
+        "category": "上海路桥",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-29T07:51:04.049Z",
         "completedAt": null
       }
     ],
