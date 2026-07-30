@@ -11,49 +11,62 @@ export async function initWork() {
   if (initialized) return;
   initialized = true;
 
-  // 自动延续未完成的逾期任务到今天
+  // 1. 清理之前因旧版延续逻辑堆积的重复任务（一次性）
+  await dedupeCarriedOverTasks();
+
+  // 2. 未完成的逾期任务自动延续到今天（直接修改原任务日期，不复制新任务）
+  await carryOverOverdueTasks();
+}
+
+// 把所有未完成且逾期的任务直接顺延到今天，避免多天累积翻倍
+async function carryOverOverdueTasks() {
   const todayStr = today();
   const allTasks = await getAll('tasks');
-  const overduePending = allTasks.filter(t => t.status === 'pending' && t.dueDate < todayStr);
+  const overdue = allTasks.filter(t => t.status === 'pending' && t.dueDate < todayStr);
+  if (overdue.length === 0) return;
 
-  if (overduePending.length > 0) {
-    const todays = allTasks.filter(t => t.dueDate === todayStr);
-    const newTasks = [];
+  const toUpdate = [];
+  for (const task of overdue) {
+    task.originalDueDate = task.originalDueDate || task.dueDate;
+    task.dueDate = todayStr;
+    task.carriedOver = true;
+    task.updatedAt = new Date().toISOString();
+    toUpdate.push(task);
+  }
+  if (toUpdate.length > 0) {
+    await bulkPut('tasks', toUpdate);
+  }
+}
 
-    for (const task of overduePending) {
-      // 已被标记过延续指向，避免重复处理
-      if (task.carriedOverTo) continue;
+// 一次性清理：删除同一日期内 title+category 完全相同的重复任务
+// 保留 createdAt 最早的那一条，删除其余副本
+async function dedupeCarriedOverTasks() {
+  const allTasks = await getAll('tasks');
+  // 按 dueDate + title + category 分组
+  const groups = {};
+  for (const t of allTasks) {
+    if (t.status !== 'pending') continue;
+    const key = `${t.dueDate}||${(t.title || '').trim()}||${t.category || ''}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(t);
+  }
 
-      // 检查今天是否已有对应的延续副本（标题+分类一致）
-      const hasCopy = todays.some(t => t.carriedOver && t.title === task.title && t.category === (task.category || ''));
-      if (hasCopy) continue;
-
-      const newTask = {
-        id: genId(),
-        title: task.title,
-        type: task.type || 'daily',
-        dueDate: todayStr,
-        priority: task.priority || 'medium',
-        status: 'pending',
-        category: task.category || '',
-        estimateHours: task.estimateHours || null,
-        image: task.image || null,
-        carriedOver: true,
-        originalDueDate: task.dueDate,
-        createdAt: new Date().toISOString(),
-        completedAt: null,
-      };
-
-      // 标记原任务的延续指向
-      task.carriedOverTo = newTask.id;
-      newTasks.push(newTask);
-      await put('tasks', task);
-      todays.push(newTask);
+  const toDelete = [];
+  for (const key in groups) {
+    const group = groups[key];
+    if (group.length <= 1) continue;
+    // 保留 createdAt 最早的，删除其余
+    group.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    for (let i = 1; i < group.length; i++) {
+      toDelete.push(group[i]);
     }
+  }
 
-    if (newTasks.length > 0) {
-      await bulkPut('tasks', newTasks);
+  if (toDelete.length > 0) {
+    for (const t of toDelete) {
+      await del('tasks', t.id);
     }
+    console.log(`清理了 ${toDelete.length} 条重复任务`);
   }
 }
 
