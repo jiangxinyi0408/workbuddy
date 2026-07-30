@@ -1,21 +1,8 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T06:00:02.786Z",
+  "updatedAt": "2026-07-30T06:00:28.640Z",
   "data": {
     "tasks": [
-      {
-        "id": "ms1y9i2f02v1f9",
-        "title": "整理对账单",
-        "type": "daily",
-        "dueDate": "2026-07-27",
-        "priority": "medium",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "createdAt": "2026-07-26T15:25:31.959Z",
-        "completedAt": null,
-        "carriedOverTo": "ms3ez4ett6npzc"
-      },
       {
         "id": "ms2kpm1rcf60v3",
         "title": "环责险出单及电子保单发票发送邮件",
@@ -373,22 +360,6 @@
         "createdAt": "2026-07-29T05:34:05.231Z",
         "completedAt": null,
         "carriedOverTo": "ms73st6llm2vbl"
-      },
-      {
-        "id": "ms5nggc0y5k26t",
-        "title": "整理对账单",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:34:05.232Z",
-        "completedAt": null,
-        "carriedOverTo": "ms73st6mfpw6c9"
       },
       {
         "id": "ms5nggc18kq9b1",
