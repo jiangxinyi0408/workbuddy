@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T07:26:02.175Z",
+  "updatedAt": "2026-07-30T07:26:15.230Z",
   "data": {
     "tasks": [
       {
@@ -76,22 +76,6 @@
         "createdAt": "2026-07-27T01:56:47.484Z",
         "completedAt": null,
         "carriedOverTo": "ms3ez4ezukoxls",
-        "originalDueDate": "2026-07-27",
-        "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
-      },
-      {
-        "id": "ms2spb5aocuni7",
-        "title": "环责险电子保单及发票邮件",
-        "type": "daily",
-        "dueDate": "2026-07-30",
-        "priority": "medium",
-        "status": "pending",
-        "category": "天马",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T05:37:37.966Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5nggbyg2xqv6",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
         "updatedAt": "2026-07-30T07:25:39.360Z"
