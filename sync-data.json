@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T05:59:26.835Z",
+  "updatedAt": "2026-07-30T05:59:37.602Z",
   "data": {
     "tasks": [
       {
@@ -247,21 +247,6 @@
         "createdAt": "2026-07-27T17:51:41.180Z",
         "completedAt": null,
         "carriedOverTo": "ms5nggc3vh2rhs"
-      },
-      {
-        "id": "ms3ixttwc9fcda",
-        "title": "银行许可证盖章后上传供应商平台",
-        "type": "daily",
-        "dueDate": "2026-07-28",
-        "priority": "high",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "createdAt": "2026-07-27T17:52:05.444Z",
-        "completedAt": null,
-        "updatedAt": "2026-07-27T17:55:22.720Z",
-        "carriedOverTo": "ms5nggc4o86lhk"
       },
       {
         "id": "ms3iyxxrp3gfns",
