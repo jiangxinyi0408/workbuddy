@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-29T08:52:46.090Z",
+  "updatedAt": "2026-07-30T05:59:26.835Z",
   "data": {
     "tasks": [
       {
@@ -341,7 +341,8 @@
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-29T05:33:36.647Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6ipvcd3b"
       },
       {
         "id": "ms5nfu9zxiu03s",
@@ -353,7 +354,8 @@
         "category": "商汤",
         "estimateHours": null,
         "createdAt": "2026-07-29T05:33:36.647Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6ky9nbjw"
       },
       {
         "id": "ms5nggbyg2xqv6",
@@ -368,7 +370,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-29T05:34:05.230Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6l0w48kg"
       },
       {
         "id": "ms5nggbzcqtwz8",
@@ -383,7 +386,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.231Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6llm2vbl"
       },
       {
         "id": "ms5nggc0y5k26t",
@@ -398,7 +402,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.232Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6mfpw6c9"
       },
       {
         "id": "ms5nggc18kq9b1",
@@ -413,7 +418,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.233Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6mv7u51d"
       },
       {
         "id": "ms5nggc1tdg0p5",
@@ -428,7 +434,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.233Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6mhfg5qv"
       },
       {
         "id": "ms5nggc2d3rqql",
@@ -443,7 +450,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.234Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6n5bj1og"
       },
       {
         "id": "ms5nggc38ht3m5",
@@ -458,7 +466,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.235Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6ndyzbdg"
       },
       {
         "id": "ms5nggc3vh2rhs",
@@ -473,7 +482,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.235Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6ootcs3z"
       },
       {
         "id": "ms5nggc4m3guhm",
@@ -488,7 +498,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.236Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6p28g7z6"
       },
       {
         "id": "ms5nggc4o86lhk",
@@ -503,7 +514,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.236Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6pmpi0ny"
       },
       {
         "id": "ms5nggc5z2wd80",
@@ -518,7 +530,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-28",
         "createdAt": "2026-07-29T05:34:05.237Z",
-        "completedAt": null
+        "completedAt": null,
+        "carriedOverTo": "ms73st6q9ay5l9"
       },
       {
         "id": "ms5scm0hpscxxj",
@@ -532,6 +545,201 @@
         "image": null,
         "createdAt": "2026-07-29T07:51:04.049Z",
         "completedAt": "2026-07-29T08:20:01.900Z"
+      },
+      {
+        "id": "ms73st6ipvcd3b",
+        "title": "沟通慢性病扩张赔付药量病种范围",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.786Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6ky9nbjw",
+        "title": "和王志娟沟通离职员工如何申请弹福理赔",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.788Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6l0w48kg",
+        "title": "环责险电子保单及发票邮件",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "天马",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.789Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6llm2vbl",
+        "title": "弹福保费核销",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "low",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.789Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6mfpw6c9",
+        "title": "整理对账单",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "high",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.790Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6mhfg5qv",
+        "title": "供应商系统注册",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "常纺",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.790Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6mv7u51d",
+        "title": "弹福无主被的理赔问题沟通（需要太科加速提供理赔平台）",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.790Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6n5bj1og",
+        "title": "处理投诉咨询",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "pending",
+        "category": "太享保",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.791Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6ndyzbdg",
+        "title": "环责TIS服务费用结算",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "low",
+        "status": "pending",
+        "category": "环责险",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.791Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6ootcs3z",
+        "title": "嘉年华补充协议盖章后寄回",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "high",
+        "status": "pending",
+        "category": "常纺",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.792Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6p28g7z6",
+        "title": "（告知太科）离职员工需继续维护理赔入口",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "high",
+        "status": "pending",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.793Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6pmpi0ny",
+        "title": "银行许可证盖章后上传供应商平台",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "high",
+        "status": "pending",
+        "category": "常纺",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.793Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms73st6q9ay5l9",
+        "title": "发票两张整理",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "low",
+        "status": "pending",
+        "category": "报销",
+        "estimateHours": null,
+        "image": null,
+        "carriedOver": true,
+        "originalDueDate": "2026-07-29",
+        "createdAt": "2026-07-30T05:59:21.794Z",
+        "completedAt": null
       }
     ],
     "workLogs": [],
