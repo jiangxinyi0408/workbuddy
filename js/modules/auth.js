@@ -1,22 +1,22 @@
 // ============================================================
-// auth.js - 资产管理密码锁
-// 密码：8位数字，SHA-256 哈希存储（不存明文）
-// 锁定策略：错误5次锁60秒，错误10次锁300秒
+// auth.js - \u8d44\u4ea7\u7ba1\u7406\u5bc6\u7801\u9501
+// \u5bc6\u7801：8\u4f4d\u6570\u5b57，SHA-256 \u54c8\u5e0c\u5b58\u50a8（\u4e0d\u5b58\u660e\u6587）
+// \u9501\u5b9a\u7b56\u7565：\u9519\u8bef5\u6b21\u950160\u79d2，\u9519\u8bef10\u6b21\u9501300\u79d2
 // ============================================================
 
 const PWD_HASH_KEY = 'workbuddy_finance_pwd_hash';
 const FAIL_COUNT_KEY = 'workbuddy_finance_fail_count';
 const LOCK_UNTIL_KEY = 'workbuddy_finance_lock_until';
-const AUTH_OK_KEY = 'workbuddy_finance_authed'; // 本次页面内已验证标记（导航离开即清除）
+const AUTH_OK_KEY = 'workbuddy_finance_authed'; // \u672c\u6b21\u9875\u9762\u5185\u5df2\u9a8c\u8bc1\u6807\u8bb0（\u5bfc\u822a\u79bb\u5f00\u5373\u6e05\u9664）
 
-// 锁定阈值
+// \u9501\u5b9a\u9608\u503c
 const LOCK_5_TIMES = 5;
 const LOCK_10_TIMES = 10;
 const LOCK_60_SEC = 60 * 1000;
 const LOCK_300_SEC = 300 * 1000;
 
 /**
- * SHA-256 哈希
+ * SHA-256 \u54c8\u5e0c
  */
 async function sha256(text) {
   const encoder = new TextEncoder();
@@ -27,18 +27,18 @@ async function sha256(text) {
 }
 
 /**
- * 是否已设置密码
+ * \u662f\u5426\u5df2\u8bbe\u7f6e\u5bc6\u7801
  */
 export function hasPassword() {
   return !!localStorage.getItem(PWD_HASH_KEY);
 }
 
 /**
- * 设置密码（8位数字）
+ * \u8bbe\u7f6e\u5bc6\u7801（8\u4f4d\u6570\u5b57）
  */
 export async function setPassword(pwd) {
   if (!/^\d{8}$/.test(pwd)) {
-    return { success: false, error: '密码必须是8位数字' };
+    return { success: false, error: '\u5bc6\u7801\u5fc5\u987b\u662f8\u4f4d\u6570\u5b57' };
   }
   const hash = await sha256(pwd);
   localStorage.setItem(PWD_HASH_KEY, hash);
@@ -46,16 +46,16 @@ export async function setPassword(pwd) {
 }
 
 /**
- * 修改密码（需验证旧密码）
+ * \u4fee\u6539\u5bc6\u7801（\u9700\u9a8c\u8bc1\u65e7\u5bc6\u7801）
  */
 export async function changePassword(oldPwd, newPwd) {
   if (!/^\d{8}$/.test(newPwd)) {
-    return { success: false, error: '新密码必须是8位数字' };
+    return { success: false, error: '\u65b0\u5bc6\u7801\u5fc5\u987b\u662f8\u4f4d\u6570\u5b57' };
   }
   const stored = localStorage.getItem(PWD_HASH_KEY);
   const oldHash = await sha256(oldPwd);
   if (oldHash !== stored) {
-    return { success: false, error: '旧密码错误' };
+    return { success: false, error: '\u65e7\u5bc6\u7801\u9519\u8bef' };
   }
   const newHash = await sha256(newPwd);
   localStorage.setItem(PWD_HASH_KEY, newHash);
@@ -63,13 +63,13 @@ export async function changePassword(oldPwd, newPwd) {
 }
 
 /**
- * 关闭密码锁（清除密码）
+ * \u5173\u95ed\u5bc6\u7801\u9501（\u6e05\u9664\u5bc6\u7801）
  */
 export async function removePassword(pwd) {
   const stored = localStorage.getItem(PWD_HASH_KEY);
   const hash = await sha256(pwd);
   if (hash !== stored) {
-    return { success: false, error: '密码错误' };
+    return { success: false, error: '\u5bc6\u7801\u9519\u8bef' };
   }
   localStorage.removeItem(PWD_HASH_KEY);
   localStorage.removeItem(FAIL_COUNT_KEY);
@@ -79,21 +79,21 @@ export async function removePassword(pwd) {
 }
 
 /**
- * 本次会话是否已验证
+ * \u672c\u6b21\u4f1a\u8bdd\u662f\u5426\u5df2\u9a8c\u8bc1
  */
 export function isAuthed() {
   return sessionStorage.getItem(AUTH_OK_KEY) === '1';
 }
 
 /**
- * 清除会话验证状态（退出登录）
+ * \u6e05\u9664\u4f1a\u8bdd\u9a8c\u8bc1\u72b6\u6001（\u9000\u51fa\u767b\u5f55）
  */
 export function clearAuth() {
   sessionStorage.removeItem(AUTH_OK_KEY);
 }
 
 /**
- * 获取锁定剩余秒数（0=未锁定）
+ * \u83b7\u53d6\u9501\u5b9a\u5269\u4f59\u79d2\u6570（0=\u672a\u9501\u5b9a）
  */
 export function getLockRemaining() {
   const until = parseInt(localStorage.getItem(LOCK_UNTIL_KEY) || '0');
@@ -105,54 +105,54 @@ export function getLockRemaining() {
 }
 
 /**
- * 获取当前错误次数
+ * \u83b7\u53d6\u5f53\u524d\u9519\u8bef\u6b21\u6570
  */
 export function getFailCount() {
   return parseInt(localStorage.getItem(FAIL_COUNT_KEY) || '0');
 }
 
 /**
- * 验证密码
+ * \u9a8c\u8bc1\u5bc6\u7801
  * @returns {Object} {success, locked, lockRemaining, error}
  */
 export async function verifyPassword(pwd) {
-  // 检查是否锁定中
+  // \u68c0\u67e5\u662f\u5426\u9501\u5b9a\u4e2d
   const lockRemaining = getLockRemaining();
   if (lockRemaining > 0) {
-    return { success: false, locked: true, lockRemaining, error: `已锁定，请等待 ${lockRemaining} 秒` };
+    return { success: false, locked: true, lockRemaining, error: `\u5df2\u9501\u5b9a，\u8bf7\u7b49\u5f85 ${lockRemaining} \u79d2` };
   }
 
   const stored = localStorage.getItem(PWD_HASH_KEY);
   if (!stored) {
-    return { success: false, error: '未设置密码' };
+    return { success: false, error: '\u672a\u8bbe\u7f6e\u5bc6\u7801' };
   }
 
   const hash = await sha256(pwd);
   if (hash === stored) {
-    // 验证成功，清零错误计数
+    // \u9a8c\u8bc1\u6210\u529f，\u6e05\u96f6\u9519\u8bef\u8ba1\u6570
     localStorage.removeItem(FAIL_COUNT_KEY);
     localStorage.removeItem(LOCK_UNTIL_KEY);
     sessionStorage.setItem(AUTH_OK_KEY, '1');
     return { success: true };
   }
 
-  // 验证失败，累加错误次数
+  // \u9a8c\u8bc1\u5931\u8d25，\u7d2f\u52a0\u9519\u8bef\u6b21\u6570
   const failCount = getFailCount() + 1;
   localStorage.setItem(FAIL_COUNT_KEY, String(failCount));
 
-  // 判断是否触发锁定
+  // \u5224\u65ad\u662f\u5426\u89e6\u53d1\u9501\u5b9a
   if (failCount >= LOCK_10_TIMES) {
     const lockUntil = Date.now() + LOCK_300_SEC;
     localStorage.setItem(LOCK_UNTIL_KEY, String(lockUntil));
     localStorage.removeItem(FAIL_COUNT_KEY);
-    return { success: false, locked: true, lockRemaining: 300, error: '错误10次，锁定5分钟' };
+    return { success: false, locked: true, lockRemaining: 300, error: '\u9519\u8bef10\u6b21，\u9501\u5b9a5\u5206\u949f' };
   } else if (failCount >= LOCK_5_TIMES) {
     const lockUntil = Date.now() + LOCK_60_SEC;
     localStorage.setItem(LOCK_UNTIL_KEY, String(lockUntil));
     localStorage.removeItem(FAIL_COUNT_KEY);
-    return { success: false, locked: true, lockRemaining: 60, error: '错误5次，锁定1分钟' };
+    return { success: false, locked: true, lockRemaining: 60, error: '\u9519\u8bef5\u6b21，\u9501\u5b9a1\u5206\u949f' };
   }
 
   const remaining = LOCK_5_TIMES - failCount;
-  return { success: false, error: `密码错误，还可尝试 ${remaining} 次` };
+  return { success: false, error: `\u5bc6\u7801\u9519\u8bef，\u8fd8\u53ef\u5c1d\u8bd5 ${remaining} \u6b21` };
 }

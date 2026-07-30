@@ -1,6 +1,6 @@
 // ============================================================
-// backup.js - 数据备份与恢复（防 iOS Safari 清空 IndexedDB）
-// 策略：localStorage 冗余备份 + 启动时自动检测恢复
+// backup.js - \u6570\u636e\u5907\u4efd\u4e0e\u6062\u590d（\u9632 iOS Safari \u6e05\u7a7a IndexedDB）
+// \u7b56\u7565：localStorage \u5197\u4f59\u5907\u4efd + \u542f\u52a8\u65f6\u81ea\u52a8\u68c0\u6d4b\u6062\u590d
 // ============================================================
 
 import { getAll, bulkPut, setSetting, getSetting } from './db.js';
@@ -9,15 +9,15 @@ const BACKUP_KEY = 'workbuddy_backup';
 const BACKUP_TIME_KEY = 'workbuddy_backup_time';
 const BACKUP_VERSION = '1.0';
 
-// 需要备份的 store 列表（排除 newsCache 等可重建的临时数据）
+// \u9700\u8981\u5907\u4efd\u7684 store \u5217\u8868（\u6392\u9664 newsCache \u7b49\u53ef\u91cd\u5efa\u7684\u4e34\u65f6\u6570\u636e）
 const BACKUP_STORES = [
   'tasks', 'workLogs', 'pingpongSessions', 'englishProgress',
   'weights', 'meals', 'loans', 'incomes', 'repayments', 'settings',
 ];
 
 /**
- * 全量备份：把 IndexedDB 所有数据存到 localStorage
- * @returns {Object} 备份摘要 {success, count, size}
+ * \u5168\u91cf\u5907\u4efd：\u628a IndexedDB \u6240\u6709\u6570\u636e\u5b58\u5230 localStorage
+ * @returns {Object} \u5907\u4efd\u6458\u8981 {success, count, size}
  */
 export async function backupToLocalStorage() {
   try {
@@ -36,21 +36,21 @@ export async function backupToLocalStorage() {
     const json = JSON.stringify(payload);
     localStorage.setItem(BACKUP_KEY, json);
     localStorage.setItem(BACKUP_TIME_KEY, payload.createdAt);
-    // 触发云同步（动态import避免循环依赖）
+    // \u89e6\u53d1\u4e91\u540c\u6b65（\u52a8\u6001import\u907f\u514d\u5faa\u73af\u4f9d\u8d56）
     try {
       const { scheduleAutoSync } = await import('./sync.js');
       scheduleAutoSync();
     } catch (e) {}
     return { success: true, count: totalCount, size: json.length };
   } catch (e) {
-    // localStorage 满了或不可用，静默失败
-    console.warn('备份失败:', e);
+    // localStorage \u6ee1\u4e86\u6216\u4e0d\u53ef\u7528，\u9759\u9ed8\u5931\u8d25
+    console.warn('\u5907\u4efd\u5931\u8d25:', e);
     return { success: false, count: 0, size: 0, error: e.message };
   }
 }
 
 /**
- * 从 localStorage 读取备份
+ * \u4ece localStorage \u8bfb\u53d6\u5907\u4efd
  * @returns {Object|null}
  */
 export function readBackup() {
@@ -64,16 +64,16 @@ export function readBackup() {
 }
 
 /**
- * 获取上次备份时间
- * @returns {string|null} ISO 时间字符串
+ * \u83b7\u53d6\u4e0a\u6b21\u5907\u4efd\u65f6\u95f4
+ * @returns {string|null} ISO \u65f6\u95f4\u5b57\u7b26\u4e32
  */
 export function getLastBackupTime() {
   return localStorage.getItem(BACKUP_TIME_KEY);
 }
 
 /**
- * 恢复备份到 IndexedDB
- * @param {Object} [backupData] 可选，不传则用 localStorage 里的
+ * \u6062\u590d\u5907\u4efd\u5230 IndexedDB
+ * @param {Object} [backupData] \u53ef\u9009，\u4e0d\u4f20\u5219\u7528 localStorage \u91cc\u7684
  * @returns {Object} {success, restored}
  */
 export async function restoreFromBackup(backupData) {
@@ -93,11 +93,11 @@ export async function restoreFromBackup(backupData) {
 }
 
 /**
- * 检测 IndexedDB 是否被清空（核心数据 store 为空）
+ * \u68c0\u6d4b IndexedDB \u662f\u5426\u88ab\u6e05\u7a7a（\u6838\u5fc3\u6570\u636e store \u4e3a\u7a7a）
  * @returns {boolean}
  */
 export async function isIndexedDBEmpty() {
-  // 检查几个核心 store：只要有数据就不算空
+  // \u68c0\u67e5\u51e0\u4e2a\u6838\u5fc3 store：\u53ea\u8981\u6709\u6570\u636e\u5c31\u4e0d\u7b97\u7a7a
   for (const store of ['incomes', 'loans', 'weights', 'meals', 'tasks']) {
     const records = await getAll(store);
     if (records.length > 0) return false;
@@ -106,9 +106,9 @@ export async function isIndexedDBEmpty() {
 }
 
 /**
- * 启动时自动检测并恢复（关键防线）
- * 如果 IndexedDB 全空但 localStorage 有备份 → 自动恢复
- * @returns {Object} {restored, count} restored=true 表示执行了恢复
+ * \u542f\u52a8\u65f6\u81ea\u52a8\u68c0\u6d4b\u5e76\u6062\u590d（\u5173\u952e\u9632\u7ebf）
+ * \u5982\u679c IndexedDB \u5168\u7a7a\u4f46 localStorage \u6709\u5907\u4efd → \u81ea\u52a8\u6062\u590d
+ * @returns {Object} {restored, count} restored=true \u8868\u793a\u6267\u884c\u4e86\u6062\u590d
  */
 export async function autoRestoreIfNeeded() {
   try {
@@ -118,17 +118,17 @@ export async function autoRestoreIfNeeded() {
     const backup = readBackup();
     if (!backup || !backup.data) return { restored: false, count: 0 };
 
-    // IndexedDB 空且有备份 → 恢复
+    // IndexedDB \u7a7a\u4e14\u6709\u5907\u4efd → \u6062\u590d
     const result = await restoreFromBackup(backup);
     return { restored: result.success, count: result.restored };
   } catch (e) {
-    console.warn('自动恢复失败:', e);
+    console.warn('\u81ea\u52a8\u6062\u590d\u5931\u8d25:', e);
     return { restored: false, count: 0 };
   }
 }
 
 /**
- * 导出备份为 JSON 文件（手动下载到手机）
+ * \u5bfc\u51fa\u5907\u4efd\u4e3a JSON \u6587\u4ef6（\u624b\u52a8\u4e0b\u8f7d\u5230\u624b\u673a）
  */
 export async function exportBackupFile() {
   const data = {};
@@ -155,33 +155,33 @@ export async function exportBackupFile() {
 }
 
 /**
- * 从 JSON 文件导入备份
+ * \u4ece JSON \u6587\u4ef6\u5bfc\u5165\u5907\u4efd
  * @param {File} file
  * @returns {Object} {success, restored}
  */
 export async function importBackupFile(file) {
   const text = await file.text();
   const payload = JSON.parse(text);
-  if (!payload.data) throw new Error('备份文件格式错误');
+  if (!payload.data) throw new Error('\u5907\u4efd\u6587\u4ef6\u683c\u5f0f\u9519\u8bef');
   return await restoreFromBackup(payload);
 }
 
 /**
- * 格式化备份时间用于显示
+ * \u683c\u5f0f\u5316\u5907\u4efd\u65f6\u95f4\u7528\u4e8e\u663e\u793a
  * @returns {string}
  */
 export function formatBackupTime() {
   const time = getLastBackupTime();
-  if (!time) return '从未备份';
+  if (!time) return '\u4ece\u672a\u5907\u4efd';
   const d = new Date(time);
   const now = new Date();
   const diff = (now - d) / 1000;
-  if (diff < 60) return '刚刚备份';
-  if (diff < 3600) return `${Math.floor(diff / 60)}分钟前备份`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}小时前备份`;
+  if (diff < 60) return '\u521a\u521a\u5907\u4efd';
+  if (diff < 3600) return `${Math.floor(diff / 60)}\u5206\u949f\u524d\u5907\u4efd`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}\u5c0f\u65f6\u524d\u5907\u4efd`;
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   const h = String(d.getHours()).padStart(2, '0');
   const min = String(d.getMinutes()).padStart(2, '0');
-  return `${m}/${day} ${h}:${min} 备份`;
+  return `${m}/${day} ${h}:${min} \u5907\u4efd`;
 }

@@ -1,5 +1,5 @@
 // ============================================================
-// modules/weight.js - 模块5：减肥管理（体重+饮食）
+// modules/weight.js - \u6a21\u57575：\u51cf\u80a5\u7ba1\u7406（\u4f53\u91cd+\u996e\u98df）
 // ============================================================
 
 import { put, getAll, del, getByIndex, getByRange, getSetting, setSetting } from '../db.js';
@@ -7,209 +7,209 @@ import { genId, today, fmtDate, toast, openBottomSheet, confirmDialog, escapeHtm
 import { recognizeFood, generateDietRecommendation, ruleBasedDietAdvice } from '../ai.js';
 
 // ============================================================
-// 食物热量数据库（中国常见食物，单位：卡/100g 或 卡/份）
+// \u98df\u7269\u70ed\u91cf\u6570\u636e\u5e93（\u4e2d\u56fd\u5e38\u89c1\u98df\u7269，\u5355\u4f4d：\u5361/100g \u6216 \u5361/\u4efd）
 // ============================================================
 
 const FOOD_DB = [
-  // === 主食类 ===
-  { name: '白米饭', unit: '100g', calories: 116, cat: '主食' },
-  { name: '白米饭', unit: '1碗(200g)', calories: 232, cat: '主食' },
-  { name: '馒头', unit: '100g', calories: 223, cat: '主食' },
-  { name: '馒头', unit: '1个(100g)', calories: 223, cat: '主食' },
-  { name: '花卷', unit: '100g', calories: 211, cat: '主食' },
-  { name: '包子(猪肉)', unit: '1个(100g)', calories: 227, cat: '主食' },
-  { name: '饺子(猪肉)', unit: '1个(25g)', calories: 60, cat: '主食' },
-  { name: '饺子(猪肉)', unit: '10个', calories: 600, cat: '主食' },
-  { name: '面条(煮)', unit: '100g', calories: 110, cat: '主食' },
-  { name: '面条(煮)', unit: '1碗(300g)', calories: 330, cat: '主食' },
-  { name: '拉面', unit: '1碗(400g)', calories: 440, cat: '主食' },
-  { name: '馄饨', unit: '10个', calories: 350, cat: '主食' },
-  { name: '油条', unit: '1根(70g)', calories: 270, cat: '主食' },
-  { name: '烧饼', unit: '1个(100g)', calories: 326, cat: '主食' },
-  { name: '全麦面包', unit: '1片(50g)', calories: 123, cat: '主食' },
-  { name: '白面包', unit: '1片(50g)', calories: 133, cat: '主食' },
-  { name: '小米粥', unit: '1碗(300g)', calories: 138, cat: '主食' },
-  { name: '白粥', unit: '1碗(300g)', calories: 90, cat: '主食' },
-  { name: '八宝粥', unit: '1碗(300g)', calories: 195, cat: '主食' },
-  { name: '炒饭', unit: '1份(300g)', calories: 564, cat: '主食' },
-  { name: '炒面', unit: '1份(300g)', calories: 480, cat: '主食' },
-  { name: '玉米', unit: '1根(200g)', calories: 224, cat: '主食' },
-  { name: '红薯', unit: '100g', calories: 86, cat: '主食' },
-  { name: '紫薯', unit: '100g', calories: 82, cat: '主食' },
-  { name: '土豆', unit: '100g', calories: 76, cat: '主食' },
-  { name: '燕麦片', unit: '100g', calories: 377, cat: '主食' },
-  { name: '燕麦片', unit: '1碗(50g)', calories: 188, cat: '主食' },
-  { name: '粽子', unit: '1个(150g)', calories: 300, cat: '主食' },
-  { name: '年糕', unit: '100g', calories: 154, cat: '主食' },
+  // === \u4e3b\u98df\u7c7b ===
+  { name: '\u767d\u7c73\u996d', unit: '100g', calories: 116, cat: '\u4e3b\u98df' },
+  { name: '\u767d\u7c73\u996d', unit: '1\u7897(200g)', calories: 232, cat: '\u4e3b\u98df' },
+  { name: '\u9992\u5934', unit: '100g', calories: 223, cat: '\u4e3b\u98df' },
+  { name: '\u9992\u5934', unit: '1\u4e2a(100g)', calories: 223, cat: '\u4e3b\u98df' },
+  { name: '\u82b1\u5377', unit: '100g', calories: 211, cat: '\u4e3b\u98df' },
+  { name: '\u5305\u5b50(\u732a\u8089)', unit: '1\u4e2a(100g)', calories: 227, cat: '\u4e3b\u98df' },
+  { name: '\u997a\u5b50(\u732a\u8089)', unit: '1\u4e2a(25g)', calories: 60, cat: '\u4e3b\u98df' },
+  { name: '\u997a\u5b50(\u732a\u8089)', unit: '10\u4e2a', calories: 600, cat: '\u4e3b\u98df' },
+  { name: '\u9762\u6761(\u716e)', unit: '100g', calories: 110, cat: '\u4e3b\u98df' },
+  { name: '\u9762\u6761(\u716e)', unit: '1\u7897(300g)', calories: 330, cat: '\u4e3b\u98df' },
+  { name: '\u62c9\u9762', unit: '1\u7897(400g)', calories: 440, cat: '\u4e3b\u98df' },
+  { name: '\u9984\u9968', unit: '10\u4e2a', calories: 350, cat: '\u4e3b\u98df' },
+  { name: '\u6cb9\u6761', unit: '1\u6839(70g)', calories: 270, cat: '\u4e3b\u98df' },
+  { name: '\u70e7\u997c', unit: '1\u4e2a(100g)', calories: 326, cat: '\u4e3b\u98df' },
+  { name: '\u5168\u9ea6\u9762\u5305', unit: '1\u7247(50g)', calories: 123, cat: '\u4e3b\u98df' },
+  { name: '\u767d\u9762\u5305', unit: '1\u7247(50g)', calories: 133, cat: '\u4e3b\u98df' },
+  { name: '\u5c0f\u7c73\u7ca5', unit: '1\u7897(300g)', calories: 138, cat: '\u4e3b\u98df' },
+  { name: '\u767d\u7ca5', unit: '1\u7897(300g)', calories: 90, cat: '\u4e3b\u98df' },
+  { name: '\u516b\u5b9d\u7ca5', unit: '1\u7897(300g)', calories: 195, cat: '\u4e3b\u98df' },
+  { name: '\u7092\u996d', unit: '1\u4efd(300g)', calories: 564, cat: '\u4e3b\u98df' },
+  { name: '\u7092\u9762', unit: '1\u4efd(300g)', calories: 480, cat: '\u4e3b\u98df' },
+  { name: '\u7389\u7c73', unit: '1\u6839(200g)', calories: 224, cat: '\u4e3b\u98df' },
+  { name: '\u7ea2\u85af', unit: '100g', calories: 86, cat: '\u4e3b\u98df' },
+  { name: '\u7d2b\u85af', unit: '100g', calories: 82, cat: '\u4e3b\u98df' },
+  { name: '\u571f\u8c46', unit: '100g', calories: 76, cat: '\u4e3b\u98df' },
+  { name: '\u71d5\u9ea6\u7247', unit: '100g', calories: 377, cat: '\u4e3b\u98df' },
+  { name: '\u71d5\u9ea6\u7247', unit: '1\u7897(50g)', calories: 188, cat: '\u4e3b\u98df' },
+  { name: '\u7cbd\u5b50', unit: '1\u4e2a(150g)', calories: 300, cat: '\u4e3b\u98df' },
+  { name: '\u5e74\u7cd5', unit: '100g', calories: 154, cat: '\u4e3b\u98df' },
 
-  // === 肉类 ===
-  { name: '猪肉(瘦)', unit: '100g', calories: 143, cat: '肉类' },
-  { name: '猪肉(五花)', unit: '100g', calories: 395, cat: '肉类' },
-  { name: '猪排骨', unit: '100g', calories: 264, cat: '肉类' },
-  { name: '红烧肉', unit: '100g', calories: 479, cat: '肉类' },
-  { name: '回锅肉', unit: '100g', calories: 266, cat: '肉类' },
-  { name: '猪蹄', unit: '100g', calories: 260, cat: '肉类' },
-  { name: '牛肉(瘦)', unit: '100g', calories: 106, cat: '肉类' },
-  { name: '牛肉(肥牛)', unit: '100g', calories: 250, cat: '肉类' },
-  { name: '酱牛肉', unit: '100g', calories: 246, cat: '肉类' },
-  { name: '牛排', unit: '1份(200g)', calories: 350, cat: '肉类' },
-  { name: '羊肉', unit: '100g', calories: 203, cat: '肉类' },
-  { name: '涮羊肉', unit: '1份(200g)', calories: 400, cat: '肉类' },
-  { name: '鸡胸肉', unit: '100g', calories: 133, cat: '肉类' },
-  { name: '鸡腿', unit: '1个(150g)', calories: 270, cat: '肉类' },
-  { name: '鸡翅', unit: '1个(50g)', calories: 97, cat: '肉类' },
-  { name: '炸鸡腿', unit: '1个(150g)', calories: 390, cat: '肉类' },
-  { name: '烤鸭', unit: '100g', calories: 336, cat: '肉类' },
-  { name: '鸭肉', unit: '100g', calories: 240, cat: '肉类' },
-  { name: '香肠', unit: '1根(50g)', calories: 254, cat: '肉类' },
-  { name: '火腿肠', unit: '1根(50g)', calories: 106, cat: '肉类' },
-  { name: '培根', unit: '2片(30g)', calories: 162, cat: '肉类' },
-  { name: '午餐肉', unit: '100g', calories: 229, cat: '肉类' },
+  // === \u8089\u7c7b ===
+  { name: '\u732a\u8089(\u7626)', unit: '100g', calories: 143, cat: '\u8089\u7c7b' },
+  { name: '\u732a\u8089(\u4e94\u82b1)', unit: '100g', calories: 395, cat: '\u8089\u7c7b' },
+  { name: '\u732a\u6392\u9aa8', unit: '100g', calories: 264, cat: '\u8089\u7c7b' },
+  { name: '\u7ea2\u70e7\u8089', unit: '100g', calories: 479, cat: '\u8089\u7c7b' },
+  { name: '\u56de\u9505\u8089', unit: '100g', calories: 266, cat: '\u8089\u7c7b' },
+  { name: '\u732a\u8e44', unit: '100g', calories: 260, cat: '\u8089\u7c7b' },
+  { name: '\u725b\u8089(\u7626)', unit: '100g', calories: 106, cat: '\u8089\u7c7b' },
+  { name: '\u725b\u8089(\u80a5\u725b)', unit: '100g', calories: 250, cat: '\u8089\u7c7b' },
+  { name: '\u9171\u725b\u8089', unit: '100g', calories: 246, cat: '\u8089\u7c7b' },
+  { name: '\u725b\u6392', unit: '1\u4efd(200g)', calories: 350, cat: '\u8089\u7c7b' },
+  { name: '\u7f8a\u8089', unit: '100g', calories: 203, cat: '\u8089\u7c7b' },
+  { name: '\u6dae\u7f8a\u8089', unit: '1\u4efd(200g)', calories: 400, cat: '\u8089\u7c7b' },
+  { name: '\u9e21\u80f8\u8089', unit: '100g', calories: 133, cat: '\u8089\u7c7b' },
+  { name: '\u9e21\u817f', unit: '1\u4e2a(150g)', calories: 270, cat: '\u8089\u7c7b' },
+  { name: '\u9e21\u7fc5', unit: '1\u4e2a(50g)', calories: 97, cat: '\u8089\u7c7b' },
+  { name: '\u70b8\u9e21\u817f', unit: '1\u4e2a(150g)', calories: 390, cat: '\u8089\u7c7b' },
+  { name: '\u70e4\u9e2d', unit: '100g', calories: 336, cat: '\u8089\u7c7b' },
+  { name: '\u9e2d\u8089', unit: '100g', calories: 240, cat: '\u8089\u7c7b' },
+  { name: '\u9999\u80a0', unit: '1\u6839(50g)', calories: 254, cat: '\u8089\u7c7b' },
+  { name: '\u706b\u817f\u80a0', unit: '1\u6839(50g)', calories: 106, cat: '\u8089\u7c7b' },
+  { name: '\u57f9\u6839', unit: '2\u7247(30g)', calories: 162, cat: '\u8089\u7c7b' },
+  { name: '\u5348\u9910\u8089', unit: '100g', calories: 229, cat: '\u8089\u7c7b' },
 
-  // === 蛋类 ===
-  { name: '鸡蛋(煮)', unit: '1个(60g)', calories: 86, cat: '蛋类' },
-  { name: '鸡蛋(炒)', unit: '1个(60g)', calories: 110, cat: '蛋类' },
-  { name: '煎蛋', unit: '1个(60g)', calories: 118, cat: '蛋类' },
-  { name: '蛋白', unit: '1个', calories: 17, cat: '蛋类' },
-  { name: '蛋黄', unit: '1个', calories: 55, cat: '蛋类' },
-  { name: '咸鸭蛋', unit: '1个(70g)', calories: 133, cat: '蛋类' },
-  { name: '皮蛋', unit: '1个(60g)', calories: 103, cat: '蛋类' },
+  // === \u86cb\u7c7b ===
+  { name: '\u9e21\u86cb(\u716e)', unit: '1\u4e2a(60g)', calories: 86, cat: '\u86cb\u7c7b' },
+  { name: '\u9e21\u86cb(\u7092)', unit: '1\u4e2a(60g)', calories: 110, cat: '\u86cb\u7c7b' },
+  { name: '\u714e\u86cb', unit: '1\u4e2a(60g)', calories: 118, cat: '\u86cb\u7c7b' },
+  { name: '\u86cb\u767d', unit: '1\u4e2a', calories: 17, cat: '\u86cb\u7c7b' },
+  { name: '\u86cb\u9ec4', unit: '1\u4e2a', calories: 55, cat: '\u86cb\u7c7b' },
+  { name: '\u54b8\u9e2d\u86cb', unit: '1\u4e2a(70g)', calories: 133, cat: '\u86cb\u7c7b' },
+  { name: '\u76ae\u86cb', unit: '1\u4e2a(60g)', calories: 103, cat: '\u86cb\u7c7b' },
 
-  // === 水产类 ===
-  { name: '三文鱼', unit: '100g', calories: 139, cat: '水产' },
-  { name: '带鱼', unit: '100g', calories: 127, cat: '水产' },
-  { name: '鲫鱼', unit: '100g', calories: 108, cat: '水产' },
-  { name: '鲤鱼', unit: '100g', calories: 109, cat: '水产' },
-  { name: '虾', unit: '100g', calories: 93, cat: '水产' },
-  { name: '虾仁', unit: '100g', calories: 48, cat: '水产' },
-  { name: '螃蟹', unit: '1只(200g)', calories: 190, cat: '水产' },
-  { name: '生蚝', unit: '100g', calories: 57, cat: '水产' },
-  { name: '鱿鱼', unit: '100g', calories: 75, cat: '水产' },
-  { name: '蛤蜊', unit: '100g', calories: 56, cat: '水产' },
-  { name: '金枪鱼罐头', unit: '100g', calories: 198, cat: '水产' },
+  // === \u6c34\u4ea7\u7c7b ===
+  { name: '\u4e09\u6587\u9c7c', unit: '100g', calories: 139, cat: '\u6c34\u4ea7' },
+  { name: '\u5e26\u9c7c', unit: '100g', calories: 127, cat: '\u6c34\u4ea7' },
+  { name: '\u9cab\u9c7c', unit: '100g', calories: 108, cat: '\u6c34\u4ea7' },
+  { name: '\u9ca4\u9c7c', unit: '100g', calories: 109, cat: '\u6c34\u4ea7' },
+  { name: '\u867e', unit: '100g', calories: 93, cat: '\u6c34\u4ea7' },
+  { name: '\u867e\u4ec1', unit: '100g', calories: 48, cat: '\u6c34\u4ea7' },
+  { name: '\u8783\u87f9', unit: '1\u53ea(200g)', calories: 190, cat: '\u6c34\u4ea7' },
+  { name: '\u751f\u869d', unit: '100g', calories: 57, cat: '\u6c34\u4ea7' },
+  { name: '\u9c7f\u9c7c', unit: '100g', calories: 75, cat: '\u6c34\u4ea7' },
+  { name: '\u86e4\u870a', unit: '100g', calories: 56, cat: '\u6c34\u4ea7' },
+  { name: '\u91d1\u67aa\u9c7c\u7f50\u5934', unit: '100g', calories: 198, cat: '\u6c34\u4ea7' },
 
-  // === 豆制品 ===
-  { name: '豆腐', unit: '100g', calories: 76, cat: '豆制品' },
-  { name: '豆腐干', unit: '100g', calories: 140, cat: '豆制品' },
-  { name: '豆浆', unit: '1杯(250ml)', calories: 40, cat: '豆制品' },
-  { name: '豆浆(甜)', unit: '1杯(250ml)', calories: 83, cat: '豆制品' },
-  { name: '豆腐脑', unit: '1碗(300g)', calories: 45, cat: '豆制品' },
-  { name: '腐竹', unit: '100g', calories: 459, cat: '豆制品' },
+  // === \u8c46\u5236\u54c1 ===
+  { name: '\u8c46\u8150', unit: '100g', calories: 76, cat: '\u8c46\u5236\u54c1' },
+  { name: '\u8c46\u8150\u5e72', unit: '100g', calories: 140, cat: '\u8c46\u5236\u54c1' },
+  { name: '\u8c46\u6d46', unit: '1\u676f(250ml)', calories: 40, cat: '\u8c46\u5236\u54c1' },
+  { name: '\u8c46\u6d46(\u751c)', unit: '1\u676f(250ml)', calories: 83, cat: '\u8c46\u5236\u54c1' },
+  { name: '\u8c46\u8150\u8111', unit: '1\u7897(300g)', calories: 45, cat: '\u8c46\u5236\u54c1' },
+  { name: '\u8150\u7af9', unit: '100g', calories: 459, cat: '\u8c46\u5236\u54c1' },
 
-  // === 蔬菜类 ===
-  { name: '白菜', unit: '100g', calories: 13, cat: '蔬菜' },
-  { name: '菠菜', unit: '100g', calories: 23, cat: '蔬菜' },
-  { name: '西兰花', unit: '100g', calories: 34, cat: '蔬菜' },
-  { name: '番茄', unit: '100g', calories: 18, cat: '蔬菜' },
-  { name: '黄瓜', unit: '100g', calories: 15, cat: '蔬菜' },
-  { name: '胡萝卜', unit: '100g', calories: 37, cat: '蔬菜' },
-  { name: '白萝卜', unit: '100g', calories: 16, cat: '蔬菜' },
-  { name: '茄子', unit: '100g', calories: 21, cat: '蔬菜' },
-  { name: '青椒', unit: '100g', calories: 20, cat: '蔬菜' },
-  { name: '芹菜', unit: '100g', calories: 13, cat: '蔬菜' },
-  { name: '韭菜', unit: '100g', calories: 25, cat: '蔬菜' },
-  { name: '生菜', unit: '100g', calories: 13, cat: '蔬菜' },
-  { name: '油麦菜', unit: '100g', calories: 15, cat: '蔬菜' },
-  { name: '空心菜', unit: '100g', calories: 20, cat: '蔬菜' },
-  { name: '豆芽', unit: '100g', calories: 18, cat: '蔬菜' },
-  { name: '洋葱', unit: '100g', calories: 40, cat: '蔬菜' },
-  { name: '蒜苔', unit: '100g', calories: 36, cat: '蔬菜' },
-  { name: '藕', unit: '100g', calories: 73, cat: '蔬菜' },
-  { name: '南瓜', unit: '100g', calories: 22, cat: '蔬菜' },
-  { name: '冬瓜', unit: '100g', calories: 11, cat: '蔬菜' },
-  { name: '丝瓜', unit: '100g', calories: 20, cat: '蔬菜' },
-  { name: '苦瓜', unit: '100g', calories: 19, cat: '蔬菜' },
-  { name: '蘑菇', unit: '100g', calories: 22, cat: '蔬菜' },
-  { name: '香菇', unit: '100g', calories: 26, cat: '蔬菜' },
-  { name: '金针菇', unit: '100g', calories: 32, cat: '蔬菜' },
-  { name: '木耳', unit: '100g', calories: 21, cat: '蔬菜' },
-  { name: '海带', unit: '100g', calories: 12, cat: '蔬菜' },
-  { name: '紫菜', unit: '100g', calories: 35, cat: '蔬菜' },
+  // === \u852c\u83dc\u7c7b ===
+  { name: '\u767d\u83dc', unit: '100g', calories: 13, cat: '\u852c\u83dc' },
+  { name: '\u83e0\u83dc', unit: '100g', calories: 23, cat: '\u852c\u83dc' },
+  { name: '\u897f\u5170\u82b1', unit: '100g', calories: 34, cat: '\u852c\u83dc' },
+  { name: '\u756a\u8304', unit: '100g', calories: 18, cat: '\u852c\u83dc' },
+  { name: '\u9ec4\u74dc', unit: '100g', calories: 15, cat: '\u852c\u83dc' },
+  { name: '\u80e1\u841d\u535c', unit: '100g', calories: 37, cat: '\u852c\u83dc' },
+  { name: '\u767d\u841d\u535c', unit: '100g', calories: 16, cat: '\u852c\u83dc' },
+  { name: '\u8304\u5b50', unit: '100g', calories: 21, cat: '\u852c\u83dc' },
+  { name: '\u9752\u6912', unit: '100g', calories: 20, cat: '\u852c\u83dc' },
+  { name: '\u82b9\u83dc', unit: '100g', calories: 13, cat: '\u852c\u83dc' },
+  { name: '\u97ed\u83dc', unit: '100g', calories: 25, cat: '\u852c\u83dc' },
+  { name: '\u751f\u83dc', unit: '100g', calories: 13, cat: '\u852c\u83dc' },
+  { name: '\u6cb9\u9ea6\u83dc', unit: '100g', calories: 15, cat: '\u852c\u83dc' },
+  { name: '\u7a7a\u5fc3\u83dc', unit: '100g', calories: 20, cat: '\u852c\u83dc' },
+  { name: '\u8c46\u82bd', unit: '100g', calories: 18, cat: '\u852c\u83dc' },
+  { name: '\u6d0b\u8471', unit: '100g', calories: 40, cat: '\u852c\u83dc' },
+  { name: '\u849c\u82d4', unit: '100g', calories: 36, cat: '\u852c\u83dc' },
+  { name: '\u85d5', unit: '100g', calories: 73, cat: '\u852c\u83dc' },
+  { name: '\u5357\u74dc', unit: '100g', calories: 22, cat: '\u852c\u83dc' },
+  { name: '\u51ac\u74dc', unit: '100g', calories: 11, cat: '\u852c\u83dc' },
+  { name: '\u4e1d\u74dc', unit: '100g', calories: 20, cat: '\u852c\u83dc' },
+  { name: '\u82e6\u74dc', unit: '100g', calories: 19, cat: '\u852c\u83dc' },
+  { name: '\u8611\u83c7', unit: '100g', calories: 22, cat: '\u852c\u83dc' },
+  { name: '\u9999\u83c7', unit: '100g', calories: 26, cat: '\u852c\u83dc' },
+  { name: '\u91d1\u9488\u83c7', unit: '100g', calories: 32, cat: '\u852c\u83dc' },
+  { name: '\u6728\u8033', unit: '100g', calories: 21, cat: '\u852c\u83dc' },
+  { name: '\u6d77\u5e26', unit: '100g', calories: 12, cat: '\u852c\u83dc' },
+  { name: '\u7d2b\u83dc', unit: '100g', calories: 35, cat: '\u852c\u83dc' },
 
-  // === 水果类 ===
-  { name: '苹果', unit: '1个(200g)', calories: 106, cat: '水果' },
-  { name: '香蕉', unit: '1根(120g)', calories: 111, cat: '水果' },
-  { name: '橙子', unit: '1个(200g)', calories: 96, cat: '水果' },
-  { name: '橘子', unit: '1个(100g)', calories: 44, cat: '水果' },
-  { name: '西瓜', unit: '1块(300g)', calories: 93, cat: '水果' },
-  { name: '葡萄', unit: '100g', calories: 69, cat: '水果' },
-  { name: '草莓', unit: '100g', calories: 32, cat: '水果' },
-  { name: '蓝莓', unit: '100g', calories: 57, cat: '水果' },
-  { name: '猕猴桃', unit: '1个(100g)', calories: 61, cat: '水果' },
-  { name: '芒果', unit: '1个(200g)', calories: 70, cat: '水果' },
-  { name: '梨', unit: '1个(200g)', calories: 88, cat: '水果' },
-  { name: '桃子', unit: '1个(200g)', calories: 84, cat: '水果' },
-  { name: '樱桃', unit: '100g', calories: 50, cat: '水果' },
-  { name: '柚子', unit: '1瓣(100g)', calories: 42, cat: '水果' },
-  { name: '火龙果', unit: '1个(300g)', calories: 165, cat: '水果' },
-  { name: '石榴', unit: '100g', calories: 147, cat: '水果' },
-  { name: '牛油果', unit: '1个(150g)', calories: 240, cat: '水果' },
-  { name: '哈密瓜', unit: '1块(200g)', calories: 68, cat: '水果' },
-  { name: '菠萝', unit: '100g', calories: 44, cat: '水果' },
-  { name: '荔枝', unit: '10颗(200g)', calories: 142, cat: '水果' },
+  // === \u6c34\u679c\u7c7b ===
+  { name: '\u82f9\u679c', unit: '1\u4e2a(200g)', calories: 106, cat: '\u6c34\u679c' },
+  { name: '\u9999\u8549', unit: '1\u6839(120g)', calories: 111, cat: '\u6c34\u679c' },
+  { name: '\u6a59\u5b50', unit: '1\u4e2a(200g)', calories: 96, cat: '\u6c34\u679c' },
+  { name: '\u6a58\u5b50', unit: '1\u4e2a(100g)', calories: 44, cat: '\u6c34\u679c' },
+  { name: '\u897f\u74dc', unit: '1\u5757(300g)', calories: 93, cat: '\u6c34\u679c' },
+  { name: '\u8461\u8404', unit: '100g', calories: 69, cat: '\u6c34\u679c' },
+  { name: '\u8349\u8393', unit: '100g', calories: 32, cat: '\u6c34\u679c' },
+  { name: '\u84dd\u8393', unit: '100g', calories: 57, cat: '\u6c34\u679c' },
+  { name: '\u7315\u7334\u6843', unit: '1\u4e2a(100g)', calories: 61, cat: '\u6c34\u679c' },
+  { name: '\u8292\u679c', unit: '1\u4e2a(200g)', calories: 70, cat: '\u6c34\u679c' },
+  { name: '\u68a8', unit: '1\u4e2a(200g)', calories: 88, cat: '\u6c34\u679c' },
+  { name: '\u6843\u5b50', unit: '1\u4e2a(200g)', calories: 84, cat: '\u6c34\u679c' },
+  { name: '\u6a31\u6843', unit: '100g', calories: 50, cat: '\u6c34\u679c' },
+  { name: '\u67da\u5b50', unit: '1\u74e3(100g)', calories: 42, cat: '\u6c34\u679c' },
+  { name: '\u706b\u9f99\u679c', unit: '1\u4e2a(300g)', calories: 165, cat: '\u6c34\u679c' },
+  { name: '\u77f3\u69b4', unit: '100g', calories: 147, cat: '\u6c34\u679c' },
+  { name: '\u725b\u6cb9\u679c', unit: '1\u4e2a(150g)', calories: 240, cat: '\u6c34\u679c' },
+  { name: '\u54c8\u5bc6\u74dc', unit: '1\u5757(200g)', calories: 68, cat: '\u6c34\u679c' },
+  { name: '\u83e0\u841d', unit: '100g', calories: 44, cat: '\u6c34\u679c' },
+  { name: '\u8354\u679d', unit: '10\u9897(200g)', calories: 142, cat: '\u6c34\u679c' },
 
-  // === 奶制品 ===
-  { name: '全脂牛奶', unit: '1杯(250ml)', calories: 163, cat: '奶制品' },
-  { name: '脱脂牛奶', unit: '1杯(250ml)', calories: 88, cat: '奶制品' },
-  { name: '酸奶(原味)', unit: '1杯(200g)', calories: 144, cat: '奶制品' },
-  { name: '酸奶(果味)', unit: '1杯(200g)', calories: 180, cat: '奶制品' },
-  { name: '奶酪', unit: '1片(20g)', calories: 66, cat: '奶制品' },
+  // === \u5976\u5236\u54c1 ===
+  { name: '\u5168\u8102\u725b\u5976', unit: '1\u676f(250ml)', calories: 163, cat: '\u5976\u5236\u54c1' },
+  { name: '\u8131\u8102\u725b\u5976', unit: '1\u676f(250ml)', calories: 88, cat: '\u5976\u5236\u54c1' },
+  { name: '\u9178\u5976(\u539f\u5473)', unit: '1\u676f(200g)', calories: 144, cat: '\u5976\u5236\u54c1' },
+  { name: '\u9178\u5976(\u679c\u5473)', unit: '1\u676f(200g)', calories: 180, cat: '\u5976\u5236\u54c1' },
+  { name: '\u5976\u916a', unit: '1\u7247(20g)', calories: 66, cat: '\u5976\u5236\u54c1' },
 
-  // === 零食/饮料 ===
-  { name: '可乐', unit: '1罐(330ml)', calories: 139, cat: '饮料' },
-  { name: '雪碧', unit: '1罐(330ml)', calories: 151, cat: '饮料' },
-  { name: '橙汁', unit: '1杯(250ml)', calories: 113, cat: '饮料' },
-  { name: '啤酒', unit: '1罐(330ml)', calories: 106, cat: '饮料' },
-  { name: '红酒', unit: '1杯(150ml)', calories: 128, cat: '饮料' },
-  { name: '拿铁咖啡', unit: '1杯(360ml)', calories: 176, cat: '饮料' },
-  { name: '美式咖啡', unit: '1杯(360ml)', calories: 10, cat: '饮料' },
-  { name: '奶茶(珍珠)', unit: '1杯(500ml)', calories: 350, cat: '饮料' },
-  { name: '奶茶(原味)', unit: '1杯(500ml)', calories: 265, cat: '饮料' },
-  { name: '薯片', unit: '1包(75g)', calories: 410, cat: '零食' },
-  { name: '饼干', unit: '100g', calories: 433, cat: '零食' },
-  { name: '巧克力', unit: '1块(50g)', calories: 273, cat: '零食' },
-  { name: '冰淇淋', unit: '1球(100g)', calories: 207, cat: '零食' },
-  { name: '蛋糕', unit: '1块(100g)', calories: 347, cat: '零食' },
-  { name: '坚果(混合)', unit: '100g', calories: 607, cat: '零食' },
-  { name: '核桃', unit: '100g', calories: 654, cat: '零食' },
-  { name: '杏仁', unit: '100g', calories: 579, cat: '零食' },
-  { name: '瓜子', unit: '100g', calories: 574, cat: '零食' },
-  { name: '辣条', unit: '1包(100g)', calories: 450, cat: '零食' },
+  // === \u96f6\u98df/\u996e\u6599 ===
+  { name: '\u53ef\u4e50', unit: '1\u7f50(330ml)', calories: 139, cat: '\u996e\u6599' },
+  { name: '\u96ea\u78a7', unit: '1\u7f50(330ml)', calories: 151, cat: '\u996e\u6599' },
+  { name: '\u6a59\u6c41', unit: '1\u676f(250ml)', calories: 113, cat: '\u996e\u6599' },
+  { name: '\u5564\u9152', unit: '1\u7f50(330ml)', calories: 106, cat: '\u996e\u6599' },
+  { name: '\u7ea2\u9152', unit: '1\u676f(150ml)', calories: 128, cat: '\u996e\u6599' },
+  { name: '\u62ff\u94c1\u5496\u5561', unit: '1\u676f(360ml)', calories: 176, cat: '\u996e\u6599' },
+  { name: '\u7f8e\u5f0f\u5496\u5561', unit: '1\u676f(360ml)', calories: 10, cat: '\u996e\u6599' },
+  { name: '\u5976\u8336(\u73cd\u73e0)', unit: '1\u676f(500ml)', calories: 350, cat: '\u996e\u6599' },
+  { name: '\u5976\u8336(\u539f\u5473)', unit: '1\u676f(500ml)', calories: 265, cat: '\u996e\u6599' },
+  { name: '\u85af\u7247', unit: '1\u5305(75g)', calories: 410, cat: '\u96f6\u98df' },
+  { name: '\u997c\u5e72', unit: '100g', calories: 433, cat: '\u96f6\u98df' },
+  { name: '\u5de7\u514b\u529b', unit: '1\u5757(50g)', calories: 273, cat: '\u96f6\u98df' },
+  { name: '\u51b0\u6dc7\u6dcb', unit: '1\u7403(100g)', calories: 207, cat: '\u96f6\u98df' },
+  { name: '\u86cb\u7cd5', unit: '1\u5757(100g)', calories: 347, cat: '\u96f6\u98df' },
+  { name: '\u575a\u679c(\u6df7\u5408)', unit: '100g', calories: 607, cat: '\u96f6\u98df' },
+  { name: '\u6838\u6843', unit: '100g', calories: 654, cat: '\u96f6\u98df' },
+  { name: '\u674f\u4ec1', unit: '100g', calories: 579, cat: '\u96f6\u98df' },
+  { name: '\u74dc\u5b50', unit: '100g', calories: 574, cat: '\u96f6\u98df' },
+  { name: '\u8fa3\u6761', unit: '1\u5305(100g)', calories: 450, cat: '\u96f6\u98df' },
 
-  // === 外卖/快餐 ===
-  { name: '汉堡', unit: '1个(200g)', calories: 456, cat: '快餐' },
-  { name: '薯条(大)', unit: '1份(150g)', calories: 468, cat: '快餐' },
-  { name: '炸鸡', unit: '1块(100g)', calories: 289, cat: '快餐' },
-  { name: '披萨', unit: '1片(150g)', calories: 320, cat: '快餐' },
-  { name: '麻辣烫', unit: '1份(500g)', calories: 350, cat: '快餐' },
-  { name: '火锅', unit: '1顿(估算)', calories: 1500, cat: '快餐' },
-  { name: '麻辣香锅', unit: '1份(400g)', calories: 600, cat: '快餐' },
-  { name: '黄焖鸡米饭', unit: '1份', calories: 680, cat: '快餐' },
-  { name: '沙县小吃(鸡腿饭)', unit: '1份', calories: 550, cat: '快餐' },
-  { name: '兰州拉面', unit: '1碗', calories: 500, cat: '快餐' },
-  { name: '螺蛳粉', unit: '1碗', calories: 550, cat: '快餐' },
-  { name: '米线', unit: '1碗', calories: 480, cat: '快餐' },
-  { name: '酸辣粉', unit: '1碗', calories: 400, cat: '快餐' },
-  { name: '凉皮', unit: '1份(350g)', calories: 350, cat: '快餐' },
+  // === \u5916\u5356/\u5feb\u9910 ===
+  { name: '\u6c49\u5821', unit: '1\u4e2a(200g)', calories: 456, cat: '\u5feb\u9910' },
+  { name: '\u85af\u6761(\u5927)', unit: '1\u4efd(150g)', calories: 468, cat: '\u5feb\u9910' },
+  { name: '\u70b8\u9e21', unit: '1\u5757(100g)', calories: 289, cat: '\u5feb\u9910' },
+  { name: '\u62ab\u8428', unit: '1\u7247(150g)', calories: 320, cat: '\u5feb\u9910' },
+  { name: '\u9ebb\u8fa3\u70eb', unit: '1\u4efd(500g)', calories: 350, cat: '\u5feb\u9910' },
+  { name: '\u706b\u9505', unit: '1\u987f(\u4f30\u7b97)', calories: 1500, cat: '\u5feb\u9910' },
+  { name: '\u9ebb\u8fa3\u9999\u9505', unit: '1\u4efd(400g)', calories: 600, cat: '\u5feb\u9910' },
+  { name: '\u9ec4\u7116\u9e21\u7c73\u996d', unit: '1\u4efd', calories: 680, cat: '\u5feb\u9910' },
+  { name: '\u6c99\u53bf\u5c0f\u5403(\u9e21\u817f\u996d)', unit: '1\u4efd', calories: 550, cat: '\u5feb\u9910' },
+  { name: '\u5170\u5dde\u62c9\u9762', unit: '1\u7897', calories: 500, cat: '\u5feb\u9910' },
+  { name: '\u87ba\u86f3\u7c89', unit: '1\u7897', calories: 550, cat: '\u5feb\u9910' },
+  { name: '\u7c73\u7ebf', unit: '1\u7897', calories: 480, cat: '\u5feb\u9910' },
+  { name: '\u9178\u8fa3\u7c89', unit: '1\u7897', calories: 400, cat: '\u5feb\u9910' },
+  { name: '\u51c9\u76ae', unit: '1\u4efd(350g)', calories: 350, cat: '\u5feb\u9910' },
 
-  // === 家常菜 ===
-  { name: '西红柿炒蛋', unit: '1份(250g)', calories: 210, cat: '家常菜' },
-  { name: '麻婆豆腐', unit: '1份(250g)', calories: 290, cat: '家常菜' },
-  { name: '宫保鸡丁', unit: '1份(250g)', calories: 330, cat: '家常菜' },
-  { name: '鱼香肉丝', unit: '1份(250g)', calories: 310, cat: '家常菜' },
-  { name: '糖醋里脊', unit: '1份(250g)', calories: 410, cat: '家常菜' },
-  { name: '清蒸鱼', unit: '1条(300g)', calories: 270, cat: '家常菜' },
-  { name: '水煮鱼', unit: '1份(400g)', calories: 580, cat: '家常菜' },
-  { name: '酸菜鱼', unit: '1份(400g)', calories: 480, cat: '家常菜' },
-  { name: '红烧排骨', unit: '1份(250g)', calories: 520, cat: '家常菜' },
-  { name: '炒青菜', unit: '1份(200g)', calories: 60, cat: '家常菜' },
-  { name: '地三鲜', unit: '1份(300g)', calories: 330, cat: '家常菜' },
-  { name: '干煸四季豆', unit: '1份(200g)', calories: 260, cat: '家常菜' },
-  { name: '可乐鸡翅', unit: '1份(300g)', calories: 480, cat: '家常菜' },
-  { name: '蒜蓉西兰花', unit: '1份(200g)', calories: 80, cat: '家常菜' },
+  // === \u5bb6\u5e38\u83dc ===
+  { name: '\u897f\u7ea2\u67ff\u7092\u86cb', unit: '1\u4efd(250g)', calories: 210, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u9ebb\u5a46\u8c46\u8150', unit: '1\u4efd(250g)', calories: 290, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u5bab\u4fdd\u9e21\u4e01', unit: '1\u4efd(250g)', calories: 330, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u9c7c\u9999\u8089\u4e1d', unit: '1\u4efd(250g)', calories: 310, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u7cd6\u918b\u91cc\u810a', unit: '1\u4efd(250g)', calories: 410, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u6e05\u84b8\u9c7c', unit: '1\u6761(300g)', calories: 270, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u6c34\u716e\u9c7c', unit: '1\u4efd(400g)', calories: 580, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u9178\u83dc\u9c7c', unit: '1\u4efd(400g)', calories: 480, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u7ea2\u70e7\u6392\u9aa8', unit: '1\u4efd(250g)', calories: 520, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u7092\u9752\u83dc', unit: '1\u4efd(200g)', calories: 60, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u5730\u4e09\u9c9c', unit: '1\u4efd(300g)', calories: 330, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u5e72\u7178\u56db\u5b63\u8c46', unit: '1\u4efd(200g)', calories: 260, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u53ef\u4e50\u9e21\u7fc5', unit: '1\u4efd(300g)', calories: 480, cat: '\u5bb6\u5e38\u83dc' },
+  { name: '\u849c\u84c9\u897f\u5170\u82b1', unit: '1\u4efd(200g)', calories: 80, cat: '\u5bb6\u5e38\u83dc' },
 ];
 
-// 搜索食物
+// \u641c\u7d22\u98df\u7269
 function searchFood(query) {
   if (!query || query.length < 1) return [];
   const q = query.toLowerCase();
@@ -219,7 +219,7 @@ function searchFood(query) {
 }
 
 // ============================================================
-// 初始化
+// \u521d\u59cb\u5316
 // ============================================================
 
 let initialized = false;
@@ -231,7 +231,7 @@ export async function initWeight() {
 }
 
 // ============================================================
-// 体重记录
+// \u4f53\u91cd\u8bb0\u5f55
 // ============================================================
 
 async function addWeight(data) {
@@ -257,7 +257,7 @@ async function getWeightRecords(days = 30) {
 }
 
 // ============================================================
-// 饮食记录
+// \u996e\u98df\u8bb0\u5f55
 // ============================================================
 
 async function addMeal(data) {
@@ -287,7 +287,7 @@ async function getWeekMeals() {
 }
 
 // ============================================================
-// 渲染：减肥管理主页面
+// \u6e32\u67d3：\u51cf\u80a5\u7ba1\u7406\u4e3b\u9875\u9762
 // ============================================================
 
 let currentTab = 'weight';
@@ -295,9 +295,9 @@ let currentTab = 'weight';
 export async function renderWeight(container) {
   container.innerHTML = `
     <div class="filter-tabs">
-      <button class="filter-tab ${currentTab==='weight'?'active':''}" onclick="window.__weightTab('weight')">体重记录</button>
-      <button class="filter-tab ${currentTab==='diet'?'active':''}" onclick="window.__weightTab('diet')">饮食记录</button>
-      <button class="filter-tab ${currentTab==='advice'?'active':''}" onclick="window.__weightTab('advice')">饮食推荐</button>
+      <button class="filter-tab ${currentTab==='weight'?'active':''}" onclick="window.__weightTab('weight')">\u4f53\u91cd\u8bb0\u5f55</button>
+      <button class="filter-tab ${currentTab==='diet'?'active':''}" onclick="window.__weightTab('diet')">\u996e\u98df\u8bb0\u5f55</button>
+      <button class="filter-tab ${currentTab==='advice'?'active':''}" onclick="window.__weightTab('advice')">\u996e\u98df\u63a8\u8350</button>
     </div>
     <div id="weight-content"></div>
     <button class="fab" onclick="window.__weightAdd()">+</button>
@@ -327,7 +327,7 @@ async function renderWeightContent() {
 }
 
 // ============================================================
-// 体重 Tab
+// \u4f53\u91cd Tab
 // ============================================================
 
 async function renderWeightTab(container) {
@@ -342,23 +342,23 @@ async function renderWeightTab(container) {
     <div class="weight-display">
       <div class="weight-current">${latest ? latest.weight : '--'}<span class="weight-unit"> kg</span></div>
       ${change !== 0 ? `<div class="weight-change ${change < 0 ? 'down' : 'up'}">${change < 0 ? '↓' : '↑'} ${Math.abs(change)} kg</div>` : ''}
-      ${targetWeight ? `<div class="text-sm text-gray mt-8">目标体重：${targetWeight} kg</div>` : ''}
+      ${targetWeight ? `<div class="text-sm text-gray mt-8">\u76ee\u6807\u4f53\u91cd：${targetWeight} kg</div>` : ''}
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="title-left">? 体重趋势（30天）</span></div>
+      <div class="card-title"><span class="title-left">? \u4f53\u91cd\u8d8b\u52bf（30\u5929）</span></div>
       <div class="chart-container"><canvas id="weight-chart"></canvas></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="title-left">? 最近记录</span></div>
+      <div class="card-title"><span class="title-left">? \u6700\u8fd1\u8bb0\u5f55</span></div>
       ${records.length > 0 ? `
       <ul class="weight-record-list">
         ${records.slice(-10).reverse().map(r => `
           <li class="weight-record-item" onclick="window.__editWeight('${r.id}')" style="cursor:pointer">
             <div>
               <div class="text-sm font-bold">${r.weight} kg</div>
-              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '?早上' : '?晚上'}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div>
+              <div class="text-xs text-gray">${fmtDate(r.date)} ${r.time === 'morning' ? '?\u65e9\u4e0a' : '?\u665a\u4e0a'}${r.note ? ' · ' + escapeHtml(r.note) : ''}</div>
             </div>
             <div style="display:flex;gap:4px;align-items:center">
               <button class="task-edit" onclick="event.stopPropagation();window.__editWeight('${r.id}')">?</button>
@@ -366,12 +366,12 @@ async function renderWeightTab(container) {
             </div>
           </li>
         `).join('')}
-      </ul>` : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">暂无体重记录</div></div>'}
+      </ul>` : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">\u6682\u65e0\u4f53\u91cd\u8bb0\u5f55</div></div>'}
     </div>
   `;
 
   window.__delWeight = async (id) => {
-    if (await confirmDialog('删除这条记录？')) {
+    if (await confirmDialog('\u5220\u9664\u8fd9\u6761\u8bb0\u5f55？')) {
       await del('weights', id);
       renderWeightTab(container);
     }
@@ -400,7 +400,7 @@ function drawWeightChart(records, targetWeight) {
   const data = sorted.map(r => r.weight);
 
   const datasets = [{
-    label: '体重 (kg)',
+    label: '\u4f53\u91cd (kg)',
     data,
     borderColor: '#2563eb',
     backgroundColor: 'rgba(37,99,235,0.1)',
@@ -412,7 +412,7 @@ function drawWeightChart(records, targetWeight) {
 
   if (targetWeight) {
     datasets.push({
-      label: '目标',
+      label: '\u76ee\u6807',
       data: sorted.map(() => parseFloat(targetWeight)),
       borderColor: '#10b981',
       borderDash: [5, 5],
@@ -442,106 +442,106 @@ function round(num, decimals = 1) {
 }
 
 // ============================================================
-// 添加体重对话框
+// \u6dfb\u52a0\u4f53\u91cd\u5bf9\u8bdd\u6846
 // ============================================================
 
 function showAddWeightDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>日期</label>
+        <label>\u65e5\u671f</label>
         <input type="date" id="weight-date" value="${today()}">
       </div>
       <div class="form-group">
-        <label>体重 (kg)</label>
-        <input type="number" id="weight-value" step="0.1" placeholder="如：65.5" autofocus>
+        <label>\u4f53\u91cd (kg)</label>
+        <input type="number" id="weight-value" step="0.1" placeholder="\u5982：65.5" autofocus>
       </div>
       <div class="form-group">
-        <label>称重时间</label>
+        <label>\u79f0\u91cd\u65f6\u95f4</label>
         <select id="weight-time">
-          <option value="morning">? 早上</option>
-          <option value="evening">? 晚上</option>
+          <option value="morning">? \u65e9\u4e0a</option>
+          <option value="evening">? \u665a\u4e0a</option>
         </select>
       </div>
       <div class="form-group">
-        <label>备注（可选）</label>
-        <input type="text" id="weight-note" placeholder="如：运动后、空腹...">
+        <label>\u5907\u6ce8（\u53ef\u9009）</label>
+        <input type="text" id="weight-note" placeholder="\u5982：\u8fd0\u52a8\u540e、\u7a7a\u8179...">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__saveWeight()">保存</button>
+      <button class="btn-primary btn-full" onclick="window.__saveWeight()">\u4fdd\u5b58</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('记录体重', html);
+  const sheet = openBottomSheet('\u8bb0\u5f55\u4f53\u91cd', html);
   window.__currentSheet = sheet;
 
   window.__saveWeight = async () => {
     const weight = document.getElementById('weight-value').value;
-    if (!weight) { toast('请输入体重'); return; }
+    if (!weight) { toast('\u8bf7\u8f93\u5165\u4f53\u91cd'); return; }
     const date = document.getElementById('weight-date').value || today();
     const time = document.getElementById('weight-time').value;
     const note = document.getElementById('weight-note').value;
     await addWeight({ weight, date, time, note });
-    toast('体重已记录');
+    toast('\u4f53\u91cd\u5df2\u8bb0\u5f55');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 }
 
 // ============================================================
-// 编辑体重对话框
+// \u7f16\u8f91\u4f53\u91cd\u5bf9\u8bdd\u6846
 // ============================================================
 
 async function showEditWeightDialog(container, id) {
   const all = await getAll('weights');
   const record = all.find(r => r.id === id);
-  if (!record) { toast('记录不存在'); return; }
+  if (!record) { toast('\u8bb0\u5f55\u4e0d\u5b58\u5728'); return; }
 
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>日期</label>
+        <label>\u65e5\u671f</label>
         <input type="date" id="weight-date" value="${record.date}">
       </div>
       <div class="form-group">
-        <label>体重 (kg)</label>
+        <label>\u4f53\u91cd (kg)</label>
         <input type="number" id="weight-value" step="0.1" value="${record.weight}">
       </div>
       <div class="form-group">
-        <label>称重时间</label>
+        <label>\u79f0\u91cd\u65f6\u95f4</label>
         <select id="weight-time">
-          <option value="morning" ${record.time==='morning'?'selected':''}>? 早上</option>
-          <option value="evening" ${record.time==='evening'?'selected':''}>? 晚上</option>
+          <option value="morning" ${record.time==='morning'?'selected':''}>? \u65e9\u4e0a</option>
+          <option value="evening" ${record.time==='evening'?'selected':''}>? \u665a\u4e0a</option>
         </select>
       </div>
       <div class="form-group">
-        <label>备注（可选）</label>
+        <label>\u5907\u6ce8（\u53ef\u9009）</label>
         <input type="text" id="weight-note" value="${escapeHtml(record.note || '')}">
       </div>
-      <button class="btn-primary btn-full" onclick="window.__updateWeight()">保存修改</button>
-      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delWeightFromEdit('${id}')">删除此记录</button>
+      <button class="btn-primary btn-full" onclick="window.__updateWeight()">\u4fdd\u5b58\u4fee\u6539</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delWeightFromEdit('${id}')">\u5220\u9664\u6b64\u8bb0\u5f55</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('编辑体重', html);
+  const sheet = openBottomSheet('\u7f16\u8f91\u4f53\u91cd', html);
 
   window.__updateWeight = async () => {
     const weight = document.getElementById('weight-value').value;
-    if (!weight) { toast('请输入体重'); return; }
+    if (!weight) { toast('\u8bf7\u8f93\u5165\u4f53\u91cd'); return; }
     record.date = document.getElementById('weight-date').value || today();
     record.time = document.getElementById('weight-time').value;
     record.weight = parseFloat(weight);
     record.note = document.getElementById('weight-note').value;
     record.updatedAt = new Date().toISOString();
     await put('weights', record);
-    toast('已修改');
+    toast('\u5df2\u4fee\u6539');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__delWeightFromEdit = async (delId) => {
-    if (await confirmDialog('删除这条记录？')) {
+    if (await confirmDialog('\u5220\u9664\u8fd9\u6761\u8bb0\u5f55？')) {
       await del('weights', delId);
-      toast('已删除');
+      toast('\u5df2\u5220\u9664');
       sheet.close();
       renderWeight(document.getElementById('main-content'));
     }
@@ -549,7 +549,7 @@ async function showEditWeightDialog(container, id) {
 }
 
 // ============================================================
-// 饮食 Tab
+// \u996e\u98df Tab
 // ============================================================
 
 async function renderDietTab(container) {
@@ -561,15 +561,15 @@ async function renderDietTab(container) {
     <div class="calorie-summary">
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${totalCalories}</div>
-        <div class="calorie-summary-label">今日摄入(卡)</div>
+        <div class="calorie-summary-label">\u4eca\u65e5\u6444\u5165(\u5361)</div>
       </div>
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${targetCalories}</div>
-        <div class="calorie-summary-label">建议目标</div>
+        <div class="calorie-summary-label">\u5efa\u8bae\u76ee\u6807</div>
       </div>
       <div class="calorie-summary-item">
         <div class="calorie-summary-num">${Math.max(0, targetCalories - totalCalories)}</div>
-        <div class="calorie-summary-label">剩余</div>
+        <div class="calorie-summary-label">\u5269\u4f59</div>
       </div>
     </div>
 
@@ -577,25 +577,25 @@ async function renderDietTab(container) {
       <div class="meal-card">
         <div class="meal-header" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
           <span class="meal-type-badge">${m.mealType}</span>
-          <span class="meal-calories">${m.totalCalories} 卡</span>
+          <span class="meal-calories">${m.totalCalories} \u5361</span>
         </div>
         <div class="meal-foods" onclick="window.__editMeal('${m.id}')" style="cursor:pointer">
-          ${(m.foods || []).map(f => `<span class="meal-food-tag">${escapeHtml(f.name)} ${f.calories}卡</span>`).join('')}
+          ${(m.foods || []).map(f => `<span class="meal-food-tag">${escapeHtml(f.name)} ${f.calories}\u5361</span>`).join('')}
         </div>
-        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="食物" onclick="window.__editMeal('${m.id}')">` : ''}
+        ${m.imageBase64 ? `<img class="meal-image" src="${m.imageBase64}" alt="\u98df\u7269" onclick="window.__editMeal('${m.id}')">` : ''}
         <div class="flex-between mt-8">
-          <span class="text-xs text-gray">${m.source === 'ai' ? '? AI识别' : m.source === 'photo' ? '? 照片记录' : '?? 手动录入'} · ${fmtDate(m.date)}</span>
+          <span class="text-xs text-gray">${m.source === 'ai' ? '? AI\u8bc6\u522b' : m.source === 'photo' ? '? \u7167\u7247\u8bb0\u5f55' : '?? \u624b\u52a8\u5f55\u5165'} · ${fmtDate(m.date)}</span>
           <div style="display:flex;gap:4px">
             <button class="task-edit" onclick="window.__editMeal('${m.id}')">?</button>
             <button class="task-delete" onclick="window.__delMeal('${m.id}')">?</button>
           </div>
         </div>
       </div>
-    `).join('') : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">今天还没有饮食记录</div></div>'}
+    `).join('') : '<div class="empty-state"><div class="empty-icon">??</div><div class="empty-text">\u4eca\u5929\u8fd8\u6ca1\u6709\u996e\u98df\u8bb0\u5f55</div></div>'}
   `;
 
   window.__delMeal = async (id) => {
-    if (await confirmDialog('删除这条饮食记录？')) {
+    if (await confirmDialog('\u5220\u9664\u8fd9\u6761\u996e\u98df\u8bb0\u5f55？')) {
       await del('meals', id);
       renderDietTab(container);
     }
@@ -604,50 +604,50 @@ async function renderDietTab(container) {
 }
 
 // ============================================================
-// 添加饮食对话框（食物搜索 + 手动 + 拍照）
+// \u6dfb\u52a0\u996e\u98df\u5bf9\u8bdd\u6846（\u98df\u7269\u641c\u7d22 + \u624b\u52a8 + \u62cd\u7167）
 // ============================================================
 
 function showAddMealDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>日期</label>
+        <label>\u65e5\u671f</label>
         <input type="date" id="meal-date" value="${today()}">
       </div>
       <div class="form-group">
-        <label>用餐类型</label>
+        <label>\u7528\u9910\u7c7b\u578b</label>
         <select id="meal-type">
-          <option value="早餐">? 早餐</option>
-          <option value="午餐">?? 午餐</option>
-          <option value="晚餐">? 晚餐</option>
-          <option value="加餐">? 加餐</option>
+          <option value="\u65e9\u9910">? \u65e9\u9910</option>
+          <option value="\u5348\u9910">?? \u5348\u9910</option>
+          <option value="\u665a\u9910">? \u665a\u9910</option>
+          <option value="\u52a0\u9910">? \u52a0\u9910</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>? 搜索食物（输入名称搜索内置数据库）</label>
-        <input type="text" id="food-search" placeholder="如：米饭、鸡蛋、红烧肉..." autocomplete="off">
+        <label>? \u641c\u7d22\u98df\u7269（\u8f93\u5165\u540d\u79f0\u641c\u7d22\u5185\u7f6e\u6570\u636e\u5e93）</label>
+        <input type="text" id="food-search" placeholder="\u5982：\u7c73\u996d、\u9e21\u86cb、\u7ea2\u70e7\u8089..." autocomplete="off">
         <div id="food-search-results" style="max-height:200px;overflow-y:auto;margin-top:8px"></div>
       </div>
 
       <div class="form-group">
-        <label>已选食物</label>
+        <label>\u5df2\u9009\u98df\u7269</label>
         <div id="selected-foods-list">
-          <div class="text-xs text-gray" id="no-foods-hint">尚未添加食物，请搜索并点击添加</div>
+          <div class="text-xs text-gray" id="no-foods-hint">\u5c1a\u672a\u6dfb\u52a0\u98df\u7269，\u8bf7\u641c\u7d22\u5e76\u70b9\u51fb\u6dfb\u52a0</div>
         </div>
         <div class="flex-between mt-8">
-          <span class="text-sm text-gray">总计：<span id="foods-total-cal" class="font-bold">0</span> 卡</span>
-          <button class="btn-outline" onclick="window.__addManualFoodRow()" style="font-size:13px">+ 手动输入</button>
+          <span class="text-sm text-gray">\u603b\u8ba1：<span id="foods-total-cal" class="font-bold">0</span> \u5361</span>
+          <button class="btn-outline" onclick="window.__addManualFoodRow()" style="font-size:13px">+ \u624b\u52a8\u8f93\u5165</button>
         </div>
       </div>
 
       <div class="form-group">
-        <label>食物照片（可选）</label>
+        <label>\u98df\u7269\u7167\u7247（\u53ef\u9009）</label>
         <div class="meal-photo-area" onclick="document.getElementById('meal-photo-input').click()" style="border:2px dashed var(--gray-300);border-radius:12px;padding:20px;text-align:center;cursor:pointer">
           <div id="meal-photo-preview" class="meal-photo-placeholder">
             <div style="font-size:36px">?</div>
-            <div class="text-sm text-gray">点击拍照或选择图片</div>
-            <div class="text-xs text-gray mt-8">也可用AI识别卡路里（需配置API Key）</div>
+            <div class="text-sm text-gray">\u70b9\u51fb\u62cd\u7167\u6216\u9009\u62e9\u56fe\u7247</div>
+            <div class="text-xs text-gray mt-8">\u4e5f\u53ef\u7528AI\u8bc6\u522b\u5361\u8def\u91cc（\u9700\u914d\u7f6eAPI Key）</div>
           </div>
           <input type="file" id="meal-photo-input" accept="image/*" capture="environment" style="display:none">
         </div>
@@ -656,20 +656,20 @@ function showAddMealDialog(container) {
       <div id="ai-result-area"></div>
 
       <div class="flex gap-8 mt-16">
-        <button class="btn-outline" style="flex:1" onclick="window.__saveMealOnly()">仅保存照片</button>
-        <button class="btn-primary" style="flex:1" onclick="window.__saveMeal()">保存记录</button>
+        <button class="btn-outline" style="flex:1" onclick="window.__saveMealOnly()">\u4ec5\u4fdd\u5b58\u7167\u7247</button>
+        <button class="btn-primary" style="flex:1" onclick="window.__saveMeal()">\u4fdd\u5b58\u8bb0\u5f55</button>
       </div>
     </div>
   `;
 
-  const sheet = openBottomSheet('记录饮食', html);
+  const sheet = openBottomSheet('\u8bb0\u5f55\u996e\u98df', html);
   window.__currentSheet = sheet;
 
   let currentImageBase64 = null;
   let recognizedFoods = [];
-  let selectedFoods = []; // 用户已选的食物列表
+  let selectedFoods = []; // \u7528\u6237\u5df2\u9009\u7684\u98df\u7269\u5217\u8868
 
-  // ---- 食物搜索功能 ----
+  // ---- \u98df\u7269\u641c\u7d22\u529f\u80fd ----
   const searchInput = document.getElementById('food-search');
   const resultsDiv = document.getElementById('food-search-results');
   let searchTimer;
@@ -684,7 +684,7 @@ function showAddMealDialog(container) {
       }
       const results = searchFood(query);
       if (results.length === 0) {
-        resultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">未找到匹配食物，可手动输入</div>';
+        resultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">\u672a\u627e\u5230\u5339\u914d\u98df\u7269，\u53ef\u624b\u52a8\u8f93\u5165</div>';
         return;
       }
       resultsDiv.innerHTML = results.map((f, i) => `
@@ -695,10 +695,10 @@ function showAddMealDialog(container) {
             <span style="font-weight:500">${escapeHtml(f.name)}</span>
             <span class="text-xs text-gray" style="margin-left:6px">${escapeHtml(f.unit)}</span>
           </div>
-          <span style="font-weight:600;color:var(--warning)">${f.calories} 卡</span>
+          <span style="font-weight:600;color:var(--warning)">${f.calories} \u5361</span>
         </div>
       `).join('');
-      // 存储当前搜索结果供选择使用
+      // \u5b58\u50a8\u5f53\u524d\u641c\u7d22\u7ed3\u679c\u4f9b\u9009\u62e9\u4f7f\u7528
       window.__currentSearchResults = results;
     }, 200);
   });
@@ -708,7 +708,7 @@ function showAddMealDialog(container) {
   window.__selectFood = (idx) => {
     const food = window.__currentSearchResults[idx];
     if (!food) return;
-    // 添加到已选列表
+    // \u6dfb\u52a0\u5230\u5df2\u9009\u5217\u8868
     selectedFoods.push({ name: food.name, unit: food.unit, calories: food.calories, grams: 0 });
     renderSelectedFoods();
     searchInput.value = '';
@@ -720,7 +720,7 @@ function showAddMealDialog(container) {
     const list = document.getElementById('selected-foods-list');
     const hint = document.getElementById('no-foods-hint');
     if (selectedFoods.length === 0) {
-      list.innerHTML = '<div class="text-xs text-gray" id="no-foods-hint">尚未添加食物，请搜索并点击添加</div>';
+      list.innerHTML = '<div class="text-xs text-gray" id="no-foods-hint">\u5c1a\u672a\u6dfb\u52a0\u98df\u7269，\u8bf7\u641c\u7d22\u5e76\u70b9\u51fb\u6dfb\u52a0</div>';
     } else {
       list.innerHTML = selectedFoods.map((f, i) => `
         <div class="selected-food-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--gray-50);border-radius:8px;margin-bottom:6px">
@@ -729,13 +729,13 @@ function showAddMealDialog(container) {
             <div class="text-xs text-gray">${escapeHtml(f.unit)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-weight:600;font-size:14px;color:var(--warning);white-space:nowrap">${f.calories} 卡</span>
+            <span style="font-weight:600;font-size:14px;color:var(--warning);white-space:nowrap">${f.calories} \u5361</span>
             <button onclick="window.__removeSelectedFood(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px">?</button>
           </div>
         </div>
       `).join('');
     }
-    // 更新总卡路里
+    // \u66f4\u65b0\u603b\u5361\u8def\u91cc
     const total = selectedFoods.reduce((sum, f) => sum + f.calories, 0);
     document.getElementById('foods-total-cal').textContent = total;
   }
@@ -745,10 +745,10 @@ function showAddMealDialog(container) {
     renderSelectedFoods();
   };
 
-  // ---- 手动输入 ----
+  // ---- \u624b\u52a8\u8f93\u5165 ----
   window.__addManualFoodRow = () => {
     const list = document.getElementById('selected-foods-list');
-    // 隐藏提示
+    // \u9690\u85cf\u63d0\u793a
     const hint = document.getElementById('no-foods-hint');
     if (hint) hint.remove();
 
@@ -756,8 +756,8 @@ function showAddMealDialog(container) {
     row.className = 'manual-food-row';
     row.style.cssText = 'display:flex;gap:8px;align-items:center;padding:8px;background:var(--warning-bg);border-radius:8px;margin-bottom:6px';
     row.innerHTML = `
-      <input type="text" placeholder="食物名" style="flex:1;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-name>
-      <input type="number" placeholder="卡路里" style="width:70px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-cal>
+      <input type="text" placeholder="\u98df\u7269\u540d" style="flex:1;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-name>
+      <input type="number" placeholder="\u5361\u8def\u91cc" style="width:70px;padding:6px 8px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px" data-manual-cal>
       <button onclick="this.parentElement.remove();window.__recalcManualTotal()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px">?</button>
     `;
     list.appendChild(row);
@@ -772,27 +772,27 @@ function showAddMealDialog(container) {
     document.getElementById('foods-total-cal').textContent = dbTotal + manualTotal;
   };
 
-  // 监听手动输入变化
+  // \u76d1\u542c\u624b\u52a8\u8f93\u5165\u53d8\u5316
   document.getElementById('selected-foods-list').addEventListener('input', (e) => {
     if (e.target.dataset.manualCal) {
       window.__recalcManualTotal();
     }
   });
 
-  // ---- 拍照 + AI 识别 ----
+  // ---- \u62cd\u7167 + AI \u8bc6\u522b ----
   document.getElementById('meal-photo-input').onchange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const preview = document.getElementById('meal-photo-preview');
-    preview.innerHTML = '<div class="spinner"></div><p>处理中...</p>';
+    preview.innerHTML = '<div class="spinner"></div><p>\u5904\u7406\u4e2d...</p>';
 
     try {
       currentImageBase64 = await compressImage(file, 800);
       preview.innerHTML = `<img src="${currentImageBase64}" style="width:100%;border-radius:8px">`;
 
       const resultArea = document.getElementById('ai-result-area');
-      resultArea.innerHTML = '<div class="text-sm text-gray" style="padding:12px">? AI识别中...</div>';
+      resultArea.innerHTML = '<div class="text-sm text-gray" style="padding:12px">? AI\u8bc6\u522b\u4e2d...</div>';
 
       const result = await recognizeFood(currentImageBase64);
       if (result.success) {
@@ -800,16 +800,16 @@ function showAddMealDialog(container) {
         resultArea.innerHTML = `
           <div class="card" style="margin:0;background:var(--success-bg);box-shadow:none">
             <div class="flex-between mb-8">
-              <span class="font-bold" style="color:var(--success)">? AI识别成功</span>
-              <span class="font-bold">${result.data.totalCalories} 卡</span>
+              <span class="font-bold" style="color:var(--success)">? AI\u8bc6\u522b\u6210\u529f</span>
+              <span class="font-bold">${result.data.totalCalories} \u5361</span>
             </div>
             <div id="recognized-foods">
               ${result.data.foods.map((f, i) => `
                 <div class="flex-between text-sm" style="padding:4px 0">
                   <input type="text" value="${escapeHtml(f.name)}" style="flex:1;border:none;background:transparent;font-size:14px" data-food-idx="${i}" data-field="name">
                   <input type="number" value="${f.calories}" style="width:60px;text-align:right;border:1px solid var(--gray-200);border-radius:4px;padding:2px 4px;font-size:13px" data-food-idx="${i}" data-field="calories">
-                  <span class="text-xs text-gray">卡</span>
-                  <button onclick="window.__addAiFoodToSelected(${i})" style="background:var(--success);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px">+添加</button>
+                  <span class="text-xs text-gray">\u5361</span>
+                  <button onclick="window.__addAiFoodToSelected(${i})" style="background:var(--success);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px">+\u6dfb\u52a0</button>
                 </div>
               `).join('')}
             </div>
@@ -822,14 +822,14 @@ function showAddMealDialog(container) {
             <div class="text-sm" style="color:var(--warning)">
               ?? ${result.message}
             </div>
-            <div class="text-xs text-gray mt-8">可使用上方食物搜索功能查找卡路里</div>
+            <div class="text-xs text-gray mt-8">\u53ef\u4f7f\u7528\u4e0a\u65b9\u98df\u7269\u641c\u7d22\u529f\u80fd\u67e5\u627e\u5361\u8def\u91cc</div>
           </div>
         `;
       } else {
-        resultArea.innerHTML = `<div class="text-sm" style="color:var(--danger)">? 识别失败：${escapeHtml(result.error)}</div>`;
+        resultArea.innerHTML = `<div class="text-sm" style="color:var(--danger)">? \u8bc6\u522b\u5931\u8d25：${escapeHtml(result.error)}</div>`;
       }
     } catch (err) {
-      preview.innerHTML = '<div style="color:var(--danger)">图片处理失败</div>';
+      preview.innerHTML = '<div style="color:var(--danger)">\u56fe\u7247\u5904\u7406\u5931\u8d25</div>';
     }
   };
 
@@ -840,13 +840,13 @@ function showAddMealDialog(container) {
     renderSelectedFoods();
   };
 
-  // ---- 保存 ----
+  // ---- \u4fdd\u5b58 ----
   window.__saveMeal = async () => {
     const date = document.getElementById('meal-date').value || today();
     const mealType = document.getElementById('meal-type').value;
     const foods = [...selectedFoods];
 
-    // 收集手动输入
+    // \u6536\u96c6\u624b\u52a8\u8f93\u5165
     document.querySelectorAll('.manual-food-row').forEach(row => {
       const nameInput = row.querySelector('[data-manual-name]');
       const calInput = row.querySelector('[data-manual-cal]');
@@ -856,7 +856,7 @@ function showAddMealDialog(container) {
     });
 
     if (foods.length === 0) {
-      toast('请添加至少一种食物');
+      toast('\u8bf7\u6dfb\u52a0\u81f3\u5c11\u4e00\u79cd\u98df\u7269');
       return;
     }
 
@@ -870,14 +870,14 @@ function showAddMealDialog(container) {
       source: currentImageBase64 ? 'manual' : 'manual',
     });
 
-    toast('饮食已记录');
+    toast('\u996e\u98df\u5df2\u8bb0\u5f55');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__saveMealOnly = async () => {
     if (!currentImageBase64) {
-      toast('请先上传食物照片');
+      toast('\u8bf7\u5148\u4e0a\u4f20\u98df\u7269\u7167\u7247');
       return;
     }
     const date = document.getElementById('meal-date').value || today();
@@ -890,72 +890,72 @@ function showAddMealDialog(container) {
       imageBase64: currentImageBase64,
       source: 'photo',
     });
-    toast('照片已保存');
+    toast('\u7167\u7247\u5df2\u4fdd\u5b58');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 }
 
 // ============================================================
-// 编辑饮食对话框（含食物搜索）
+// \u7f16\u8f91\u996e\u98df\u5bf9\u8bdd\u6846（\u542b\u98df\u7269\u641c\u7d22）
 // ============================================================
 
 async function showEditMealDialog(container, id) {
   const all = await getAll('meals');
   const meal = all.find(m => m.id === id);
-  if (!meal) { toast('记录不存在'); return; }
+  if (!meal) { toast('\u8bb0\u5f55\u4e0d\u5b58\u5728'); return; }
 
   const html = `
     <div class="settings-form">
       <div class="form-group">
-        <label>日期</label>
+        <label>\u65e5\u671f</label>
         <input type="date" id="meal-date" value="${meal.date}">
       </div>
       <div class="form-group">
-        <label>用餐类型</label>
+        <label>\u7528\u9910\u7c7b\u578b</label>
         <select id="meal-type">
-          <option value="早餐" ${meal.mealType==='早餐'?'selected':''}>? 早餐</option>
-          <option value="午餐" ${meal.mealType==='午餐'?'selected':''}>?? 午餐</option>
-          <option value="晚餐" ${meal.mealType==='晚餐'?'selected':''}>? 晚餐</option>
-          <option value="加餐" ${meal.mealType==='加餐'?'selected':''}>? 加餐</option>
+          <option value="\u65e9\u9910" ${meal.mealType==='\u65e9\u9910'?'selected':''}>? \u65e9\u9910</option>
+          <option value="\u5348\u9910" ${meal.mealType==='\u5348\u9910'?'selected':''}>?? \u5348\u9910</option>
+          <option value="\u665a\u9910" ${meal.mealType==='\u665a\u9910'?'selected':''}>? \u665a\u9910</option>
+          <option value="\u52a0\u9910" ${meal.mealType==='\u52a0\u9910'?'selected':''}>? \u52a0\u9910</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>? 搜索食物添加到列表</label>
-        <input type="text" id="edit-food-search" placeholder="如：米饭、鸡蛋、红烧肉..." autocomplete="off">
+        <label>? \u641c\u7d22\u98df\u7269\u6dfb\u52a0\u5230\u5217\u8868</label>
+        <input type="text" id="edit-food-search" placeholder="\u5982：\u7c73\u996d、\u9e21\u86cb、\u7ea2\u70e7\u8089..." autocomplete="off">
         <div id="edit-food-search-results" style="max-height:200px;overflow-y:auto;margin-top:8px"></div>
       </div>
 
       <div class="form-group">
-        <label>食物列表</label>
+        <label>\u98df\u7269\u5217\u8868</label>
         <div id="edit-foods-list"></div>
         <div class="flex-between mt-8">
-          <span class="text-sm text-gray">总计：<span id="edit-foods-total" class="font-bold">${meal.totalCalories || 0}</span> 卡</span>
-          <button class="btn-outline" onclick="window.__addEditManualFood()" style="font-size:13px">+ 手动输入</button>
+          <span class="text-sm text-gray">\u603b\u8ba1：<span id="edit-foods-total" class="font-bold">${meal.totalCalories || 0}</span> \u5361</span>
+          <button class="btn-outline" onclick="window.__addEditManualFood()" style="font-size:13px">+ \u624b\u52a8\u8f93\u5165</button>
         </div>
       </div>
 
       ${meal.imageBase64 ? `
       <div class="form-group">
-        <label>已有照片</label>
+        <label>\u5df2\u6709\u7167\u7247</label>
         <img src="${meal.imageBase64}" style="max-height:120px;border-radius:8px">
       </div>
       ` : ''}
-      <button class="btn-primary btn-full" onclick="window.__updateMeal()">保存修改</button>
-      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delMealFromEdit('${id}')">删除此记录</button>
+      <button class="btn-primary btn-full" onclick="window.__updateMeal()">\u4fdd\u5b58\u4fee\u6539</button>
+      <button class="btn-danger-outline btn-full mt-8" onclick="window.__delMealFromEdit('${id}')">\u5220\u9664\u6b64\u8bb0\u5f55</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('编辑饮食', html);
+  const sheet = openBottomSheet('\u7f16\u8f91\u996e\u98df', html);
 
-  // 当前编辑中的食物列表（从已有记录初始化）
+  // \u5f53\u524d\u7f16\u8f91\u4e2d\u7684\u98df\u7269\u5217\u8868（\u4ece\u5df2\u6709\u8bb0\u5f55\u521d\u59cb\u5316）
   let editFoods = (meal.foods || []).map(f => ({ ...f }));
 
   function renderEditFoods() {
     const list = document.getElementById('edit-foods-list');
     if (editFoods.length === 0) {
-      list.innerHTML = '<div class="text-xs text-gray">暂无食物，请搜索添加</div>';
+      list.innerHTML = '<div class="text-xs text-gray">\u6682\u65e0\u98df\u7269，\u8bf7\u641c\u7d22\u6dfb\u52a0</div>';
     } else {
       list.innerHTML = editFoods.map((f, i) => `
         <div class="edit-food-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--gray-50);border-radius:8px;margin-bottom:6px">
@@ -965,20 +965,20 @@ async function showEditMealDialog(container, id) {
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="number" value="${f.calories}" style="width:65px;text-align:right;border:1px solid var(--gray-200);border-radius:4px;padding:2px 4px;font-size:13px" data-edit-cal="${i}">
-            <span class="text-xs text-gray">卡</span>
+            <span class="text-xs text-gray">\u5361</span>
             <button onclick="window.__removeEditFood(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px">?</button>
           </div>
         </div>
       `).join('');
     }
-    // 更新总计
+    // \u66f4\u65b0\u603b\u8ba1
     const total = editFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
     document.getElementById('edit-foods-total').textContent = total;
   }
 
   renderEditFoods();
 
-  // 监听食物名和卡路里的编辑
+  // \u76d1\u542c\u98df\u7269\u540d\u548c\u5361\u8def\u91cc\u7684\u7f16\u8f91
   document.getElementById('edit-foods-list').addEventListener('input', (e) => {
     if (e.target.dataset.editName !== undefined) {
       editFoods[parseInt(e.target.dataset.editName)].name = e.target.value;
@@ -986,7 +986,7 @@ async function showEditMealDialog(container, id) {
     if (e.target.dataset.editCal !== undefined) {
       const idx = parseInt(e.target.dataset.editCal);
       editFoods[idx].calories = parseInt(e.target.value) || 0;
-      // 更新总计
+      // \u66f4\u65b0\u603b\u8ba1
       const total = editFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
       document.getElementById('edit-foods-total').textContent = total;
     }
@@ -1000,14 +1000,14 @@ async function showEditMealDialog(container, id) {
   window.__addEditManualFood = () => {
     editFoods.push({ name: '', unit: '', calories: 0, grams: 0 });
     renderEditFoods();
-    // 聚焦到新添加的食物名输入框
+    // \u805a\u7126\u5230\u65b0\u6dfb\u52a0\u7684\u98df\u7269\u540d\u8f93\u5165\u6846
     setTimeout(() => {
       const inputs = document.querySelectorAll('[data-edit-name]');
       if (inputs.length > 0) inputs[inputs.length - 1].focus();
     }, 100);
   };
 
-  // ---- 食物搜索 ----
+  // ---- \u98df\u7269\u641c\u7d22 ----
   const editSearchInput = document.getElementById('edit-food-search');
   const editResultsDiv = document.getElementById('edit-food-search-results');
   let editSearchTimer;
@@ -1022,7 +1022,7 @@ async function showEditMealDialog(container, id) {
       }
       const results = searchFood(query);
       if (results.length === 0) {
-        editResultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">未找到匹配食物</div>';
+        editResultsDiv.innerHTML = '<div class="text-xs text-gray" style="padding:8px">\u672a\u627e\u5230\u5339\u914d\u98df\u7269</div>';
         return;
       }
       editResultsDiv.innerHTML = results.map((f, i) => `
@@ -1033,7 +1033,7 @@ async function showEditMealDialog(container, id) {
             <span style="font-weight:500">${escapeHtml(f.name)}</span>
             <span class="text-xs text-gray" style="margin-left:6px">${escapeHtml(f.unit)}</span>
           </div>
-          <span style="font-weight:600;color:var(--warning)">${f.calories} 卡</span>
+          <span style="font-weight:600;color:var(--warning)">${f.calories} \u5361</span>
         </div>
       `).join('');
       window.__editCurrentResults = results;
@@ -1051,12 +1051,12 @@ async function showEditMealDialog(container, id) {
     editResultsDiv.innerHTML = '';
   };
 
-  // ---- 保存修改 ----
+  // ---- \u4fdd\u5b58\u4fee\u6539 ----
   window.__updateMeal = async () => {
     const date = document.getElementById('meal-date').value || today();
     const mealType = document.getElementById('meal-type').value;
 
-    // 从 DOM 收集最新数据
+    // \u4ece DOM \u6536\u96c6\u6700\u65b0\u6570\u636e
     const foods = [];
     document.querySelectorAll('[data-edit-name]').forEach((input, i) => {
       const name = input.value.trim();
@@ -1073,15 +1073,15 @@ async function showEditMealDialog(container, id) {
     meal.totalCalories = totalCalories;
     meal.updatedAt = new Date().toISOString();
     await put('meals', meal);
-    toast('已修改');
+    toast('\u5df2\u4fee\u6539');
     sheet.close();
     renderWeight(document.getElementById('main-content'));
   };
 
   window.__delMealFromEdit = async (delId) => {
-    if (await confirmDialog('删除这条饮食记录？')) {
+    if (await confirmDialog('\u5220\u9664\u8fd9\u6761\u996e\u98df\u8bb0\u5f55？')) {
       await del('meals', delId);
-      toast('已删除');
+      toast('\u5df2\u5220\u9664');
       sheet.close();
       renderWeight(document.getElementById('main-content'));
     }
@@ -1089,7 +1089,7 @@ async function showEditMealDialog(container, id) {
 }
 
 // ============================================================
-// 饮食推荐 Tab
+// \u996e\u98df\u63a8\u8350 Tab
 // ============================================================
 
 async function renderAdviceTab(container) {
@@ -1101,8 +1101,8 @@ async function renderAdviceTab(container) {
       ${cachedAdvice ? renderAdviceContent(cachedAdvice, adviceDate) : `
         <div class="empty-state">
           <div class="empty-icon">?</div>
-          <div class="empty-text">暂无饮食推荐</div>
-          <div class="text-xs text-gray mt-8">点击右下角 + 生成每周饮食推荐</div>
+          <div class="empty-text">\u6682\u65e0\u996e\u98df\u63a8\u8350</div>
+          <div class="text-xs text-gray mt-8">\u70b9\u51fb\u53f3\u4e0b\u89d2 + \u751f\u6210\u6bcf\u5468\u996e\u98df\u63a8\u8350</div>
         </div>
       `}
     </div>
@@ -1114,79 +1114,79 @@ function renderAdviceContent(advice, dateStr) {
   return `
     <div class="card">
       <div class="flex-between mb-8">
-        <span class="font-bold">? 饮食推荐</span>
-        <span class="text-xs text-gray">${dateStr || ''} ${isRuleBased ? '· 基础版' : '· AI版'}</span>
+        <span class="font-bold">? \u996e\u98df\u63a8\u8350</span>
+        <span class="text-xs text-gray">${dateStr || ''} ${isRuleBased ? '· \u57fa\u7840\u7248' : '· AI\u7248'}</span>
       </div>
 
       ${advice.assessment ? `
       <div class="mb-16">
-        <div class="text-sm font-bold mb-8">? 本周评估</div>
+        <div class="text-sm font-bold mb-8">? \u672c\u5468\u8bc4\u4f30</div>
         <div class="text-sm" style="color:var(--gray-600);line-height:1.6">${escapeHtml(advice.assessment)}</div>
       </div>` : ''}
 
       ${advice.advice ? `
       <div class="mb-16">
-        <div class="text-sm font-bold mb-8">? 健康建议</div>
+        <div class="text-sm font-bold mb-8">? \u5065\u5eb7\u5efa\u8bae</div>
         <div class="text-sm" style="color:var(--gray-600);line-height:1.6">${escapeHtml(advice.advice)}</div>
       </div>` : ''}
     </div>
 
     ${advice.recommendations ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">?? 推荐食谱</span></div>
+      <div class="card-title"><span class="title-left">?? \u63a8\u8350\u98df\u8c31</span></div>
       ${advice.recommendations.breakfast ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">? 早餐</div>
-          ${advice.recommendations.breakfast.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}卡)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">? \u65e9\u9910</div>
+          ${advice.recommendations.breakfast.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}\u5361)</span></div>`).join('')}
         </div>` : ''}
       ${advice.recommendations.lunch ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">?? 午餐</div>
-          ${advice.recommendations.lunch.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}卡)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">?? \u5348\u9910</div>
+          ${advice.recommendations.lunch.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}\u5361)</span></div>`).join('')}
         </div>` : ''}
       ${advice.recommendations.dinner ? `
         <div class="mb-16">
-          <div class="text-sm font-bold text-warning mb-8">? 晚餐</div>
-          ${advice.recommendations.dinner.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}卡)</span></div>`).join('')}
+          <div class="text-sm font-bold text-warning mb-8">? \u665a\u9910</div>
+          ${advice.recommendations.dinner.map(m => `<div class="text-sm" style="padding:4px 0">? ${escapeHtml(m.name)} <span class="text-gray">(${m.calories}\u5361)</span></div>`).join('')}
         </div>` : ''}
     </div>` : ''}
 
     ${advice.avoid ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">? 需避免食物</span></div>
+      <div class="card-title"><span class="title-left">? \u9700\u907f\u514d\u98df\u7269</span></div>
       ${advice.avoid.map(a => `<div class="text-sm" style="padding:4px 0;color:var(--danger)">? ${escapeHtml(typeof a === 'string' ? a : a.name)}</div>`).join('')}
     </div>` : ''}
 
     ${advice.recommend ? `
     <div class="card">
-      <div class="card-title"><span class="title-left">? 推荐食物</span></div>
+      <div class="card-title"><span class="title-left">? \u63a8\u8350\u98df\u7269</span></div>
       ${advice.recommend.map(r => `<div class="text-sm" style="padding:4px 0;color:var(--success)">? ${escapeHtml(typeof r === 'string' ? r : r.name)}</div>`).join('')}
     </div>` : ''}
   `;
 }
 
 // ============================================================
-// 生成饮食推荐
+// \u751f\u6210\u996e\u98df\u63a8\u8350
 // ============================================================
 
 function showGenerateAdviceDialog(container) {
   const html = `
     <div class="settings-form">
       <div class="text-sm" style="color:var(--gray-600);line-height:1.6;margin-bottom:16px">
-        将根据你本周的饮食记录、体重变化和健康指标（低密度脂蛋白过高、胆固醇过高）生成个性化饮食推荐。
+        \u5c06\u6839\u636e\u4f60\u672c\u5468\u7684\u996e\u98df\u8bb0\u5f55、\u4f53\u91cd\u53d8\u5316\u548c\u5065\u5eb7\u6307\u6807（\u4f4e\u5bc6\u5ea6\u8102\u86cb\u767d\u8fc7\u9ad8、\u80c6\u56fa\u9187\u8fc7\u9ad8）\u751f\u6210\u4e2a\u6027\u5316\u996e\u98df\u63a8\u8350。
       </div>
       <div class="form-group">
-        <label>生成方式</label>
+        <label>\u751f\u6210\u65b9\u5f0f</label>
         <select id="advice-mode">
-          <option value="ai">? AI生成（需配置API Key，更精准）</option>
-          <option value="rule">? 基础版（基于健康指标，无需API Key）</option>
+          <option value="ai">? AI\u751f\u6210（\u9700\u914d\u7f6eAPI Key，\u66f4\u7cbe\u51c6）</option>
+          <option value="rule">? \u57fa\u7840\u7248（\u57fa\u4e8e\u5065\u5eb7\u6307\u6807，\u65e0\u9700API Key）</option>
         </select>
       </div>
-      <button class="btn-primary btn-full" onclick="window.__genAdvice()">生成推荐</button>
+      <button class="btn-primary btn-full" onclick="window.__genAdvice()">\u751f\u6210\u63a8\u8350</button>
     </div>
   `;
 
-  const sheet = openBottomSheet('生成饮食推荐', html);
+  const sheet = openBottomSheet('\u751f\u6210\u996e\u98df\u63a8\u8350', html);
   window.__currentSheet = sheet;
 
   window.__genAdvice = async () => {
@@ -1194,13 +1194,13 @@ function showGenerateAdviceDialog(container) {
     sheet.close();
 
     const content = document.getElementById('weight-content');
-    content.innerHTML = '<div class="loading"><div class="spinner"></div><p>生成中...</p></div>';
+    content.innerHTML = '<div class="loading"><div class="spinner"></div><p>\u751f\u6210\u4e2d...</p></div>';
 
     const weekMeals = await getWeekMeals();
     const weightRecords = await getWeightRecords(7);
     const healthProfile = await getSetting('healthProfile', {
-      healthIndicators: ['低密度脂蛋白过高', '胆固醇过高'],
-      dietRestrictions: ['低胆固醇', '低饱和脂肪', '高纤维', '少油炸'],
+      healthIndicators: ['\u4f4e\u5bc6\u5ea6\u8102\u86cb\u767d\u8fc7\u9ad8', '\u80c6\u56fa\u9187\u8fc7\u9ad8'],
+      dietRestrictions: ['\u4f4e\u80c6\u56fa\u9187', '\u4f4e\u9971\u548c\u8102\u80aa', '\u9ad8\u7ea4\u7ef4', '\u5c11\u6cb9\u70b8'],
     });
 
     let weightTrend = null;
@@ -1220,7 +1220,7 @@ function showGenerateAdviceDialog(container) {
       result = await generateDietRecommendation(weekMeals, weightTrend, healthProfile);
       if (!result.success && result.error === 'NO_API_KEY') {
         result = { success: true, data: ruleBasedDietAdvice(weekMeals, healthProfile) };
-        toast('未配置API Key，已使用基础版推荐');
+        toast('\u672a\u914d\u7f6eAPI Key，\u5df2\u4f7f\u7528\u57fa\u7840\u7248\u63a8\u8350');
       }
     }
 
@@ -1228,15 +1228,15 @@ function showGenerateAdviceDialog(container) {
       await setSetting('lastDietAdvice', result.data);
       await setSetting('lastAdviceDate', fmtDate(new Date()));
       renderAdviceTab(content);
-      toast('饮食推荐已生成');
+      toast('\u996e\u98df\u63a8\u8350\u5df2\u751f\u6210');
     } else {
-      content.innerHTML = `<div class="empty-state"><div class="empty-icon">?</div><div class="empty-text">生成失败：${escapeHtml(result.error)}</div></div>`;
+      content.innerHTML = `<div class="empty-state"><div class="empty-icon">?</div><div class="empty-text">\u751f\u6210\u5931\u8d25：${escapeHtml(result.error)}</div></div>`;
     }
   };
 }
 
 // ============================================================
-// 首页 Dashboard 卡片
+// \u9996\u9875 Dashboard \u5361\u7247
 // ============================================================
 
 export async function dashboardWeight() {
@@ -1251,21 +1251,21 @@ export async function dashboardWeight() {
   return `
     <div class="dash-card" onclick="window.__navigate('weight')" style="cursor:pointer">
       <div class="dash-card-header">
-        <div class="dash-card-title">?? 健康管理</div>
-        <div class="dash-card-more">查看详情 ?</div>
+        <div class="dash-card-title">?? \u5065\u5eb7\u7ba1\u7406</div>
+        <div class="dash-card-more">\u67e5\u770b\u8be6\u60c5 ?</div>
       </div>
       <div class="dash-stats">
         <div class="dash-stat primary">
           <div class="dash-stat-num">${latest ? latest.weight : '--'}</div>
-          <div class="dash-stat-label">当前体重(kg)</div>
+          <div class="dash-stat-label">\u5f53\u524d\u4f53\u91cd(kg)</div>
         </div>
         <div class="dash-stat ${change < 0 ? 'success' : change > 0 ? 'danger' : ''}">
           <div class="dash-stat-num">${change === 0 ? '--' : (change < 0 ? '↓' : '↑') + Math.abs(change)}</div>
-          <div class="dash-stat-label">本周变化</div>
+          <div class="dash-stat-label">\u672c\u5468\u53d8\u5316</div>
         </div>
         <div class="dash-stat warning">
           <div class="dash-stat-num">${totalCalories}</div>
-          <div class="dash-stat-label">今日卡路里</div>
+          <div class="dash-stat-label">\u4eca\u65e5\u5361\u8def\u91cc</div>
         </div>
       </div>
     </div>

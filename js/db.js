@@ -1,11 +1,11 @@
 // ============================================================
-// db.js - IndexedDB 封装
+// db.js - IndexedDB \u5c01\u88c5
 // ============================================================
 
 const DB_NAME = 'WorkBuddyDB';
 const DB_VERSION = 2;
 
-// 数据库 store 定义
+// \u6570\u636e\u5e93 store \u5b9a\u4e49
 const STORES = {
   tasks: { keyPath: 'id', indexes: ['dueDate', 'status', 'type'] },
   workLogs: { keyPath: 'id', indexes: ['date'] },
@@ -26,7 +26,7 @@ const STORES = {
 
 let dbInstance = null;
 
-/** 打开数据库 */
+/** \u6253\u5f00\u6570\u636e\u5e93 */
 export function openDB() {
   return new Promise((resolve, reject) => {
     if (dbInstance) return resolve(dbInstance);
@@ -50,7 +50,7 @@ export function openDB() {
   });
 }
 
-/** 添加/更新记录 */
+/** \u6dfb\u52a0/\u66f4\u65b0\u8bb0\u5f55 */
 export async function put(storeName, data) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -58,14 +58,14 @@ export async function put(storeName, data) {
     tx.objectStore(storeName).put(data);
     tx.oncomplete = () => {
       resolve(data);
-      // 触发云同步（防抖）
+      // \u89e6\u53d1\u4e91\u540c\u6b65（\u9632\u6296）
       try { import('./sync.js').then(m => m.scheduleAutoSync()).catch(() => {}); } catch (e) {}
     };
     tx.onerror = () => reject(tx.error);
   });
 }
 
-/** 批量添加 */
+/** \u6279\u91cf\u6dfb\u52a0 */
 export async function bulkPut(storeName, dataList) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -74,14 +74,14 @@ export async function bulkPut(storeName, dataList) {
     dataList.forEach(d => store.put(d));
     tx.oncomplete = () => {
       resolve(dataList);
-      // 触发云同步（防抖）
+      // \u89e6\u53d1\u4e91\u540c\u6b65（\u9632\u6296）
       try { import('./sync.js').then(m => m.scheduleAutoSync()).catch(() => {}); } catch (e) {}
     };
     tx.onerror = () => reject(tx.error);
   });
 }
 
-/** 获取单条 */
+/** \u83b7\u53d6\u5355\u6761 */
 export async function get(storeName, id) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ export async function get(storeName, id) {
   });
 }
 
-/** 获取全部 */
+/** \u83b7\u53d6\u5168\u90e8 */
 export async function getAll(storeName) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -102,13 +102,13 @@ export async function getAll(storeName) {
       req.onsuccess = () => resolve(req.result || []);
       req.onerror = () => reject(req.error);
     } catch (e) {
-      // store 不存在时返回空数组
+      // store \u4e0d\u5b58\u5728\u65f6\u8fd4\u56de\u7a7a\u6570\u7ec4
       resolve([]);
     }
   });
 }
 
-/** 按索引查询 */
+/** \u6309\u7d22\u5f15\u67e5\u8be2 */
 export async function getByIndex(storeName, indexName, value) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -124,7 +124,7 @@ export async function getByIndex(storeName, indexName, value) {
   });
 }
 
-/** 按索引范围查询 */
+/** \u6309\u7d22\u5f15\u8303\u56f4\u67e5\u8be2 */
 export async function getByRange(storeName, indexName, lower, upper) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -141,7 +141,7 @@ export async function getByRange(storeName, indexName, lower, upper) {
   });
 }
 
-/** 删除记录 */
+/** \u5220\u9664\u8bb0\u5f55 */
 export async function del(storeName, id) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -155,7 +155,7 @@ export async function del(storeName, id) {
   });
 }
 
-/** 清空 store */
+/** \u6e05\u7a7a store */
 export async function clear(storeName) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -166,18 +166,18 @@ export async function clear(storeName) {
   });
 }
 
-/** 设置项 */
+/** \u8bbe\u7f6e\u9879 */
 export async function setSetting(key, value) {
   return put('settings', { key, value });
 }
 
-/** 获取设置项 */
+/** \u83b7\u53d6\u8bbe\u7f6e\u9879 */
 export async function getSetting(key, defaultVal = null) {
   const row = await get('settings', key);
   return row ? row.value : defaultVal;
 }
 
-/** 统计 store 记录数 */
+/** \u7edf\u8ba1 store \u8bb0\u5f55\u6570 */
 export async function count(storeName) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
