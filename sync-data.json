@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T07:26:15.230Z",
+  "updatedAt": "2026-07-30T07:26:27.006Z",
   "data": {
     "tasks": [
       {
@@ -32,21 +32,6 @@
         "completedAt": "2026-07-27T06:44:49.282Z",
         "image": null,
         "updatedAt": "2026-07-27T05:58:48.733Z"
-      },
-      {
-        "id": "ms2kqhiyl59bs6",
-        "title": "供应商系统注册",
-        "type": "daily",
-        "dueDate": "2026-07-30",
-        "priority": "medium",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T01:54:35.962Z",
-        "completedAt": null,
-        "originalDueDate": "2026-07-27",
-        "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
       },
       {
         "id": "ms2krg03culbuy",
