@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T07:27:12.216Z",
+  "updatedAt": "2026-07-30T07:27:23.166Z",
   "data": {
     "tasks": [
       {
@@ -55,11 +55,11 @@
         "type": "daily",
         "dueDate": "2026-07-30",
         "priority": "medium",
-        "status": "pending",
+        "status": "done",
         "category": "太享保",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:56:47.484Z",
-        "completedAt": null,
+        "completedAt": "2026-07-30T07:27:13.494Z",
         "carriedOverTo": "ms3ez4ezukoxls",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
