@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T07:28:07.715Z",
+  "updatedAt": "2026-07-30T07:28:17.678Z",
   "data": {
     "tasks": [
       {
@@ -110,21 +110,6 @@
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.357Z",
         "completedAt": "2026-07-27T16:01:52.195Z"
-      },
-      {
-        "id": "ms3ez4f4jxq46k",
-        "title": "q1总结材料（发邮件让太科准备）",
-        "type": "daily",
-        "dueDate": "2026-07-28",
-        "priority": "high",
-        "status": "done",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-27",
-        "createdAt": "2026-07-27T16:01:07.360Z",
-        "completedAt": "2026-07-27T16:01:35.605Z"
       },
       {
         "id": "ms3iwej6q1gl2r",
