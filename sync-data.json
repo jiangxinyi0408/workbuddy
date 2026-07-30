@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T06:00:42.236Z",
+  "updatedAt": "2026-07-30T06:01:27.118Z",
   "data": {
     "tasks": [
       {
@@ -16,19 +16,6 @@
         "completedAt": "2026-07-27T06:44:49.282Z",
         "image": null,
         "updatedAt": "2026-07-27T05:58:48.733Z"
-      },
-      {
-        "id": "ms2kqhiyl59bs6",
-        "title": "供应商系统注册",
-        "type": "daily",
-        "dueDate": "2026-07-27",
-        "priority": "medium",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T01:54:35.962Z",
-        "completedAt": null,
-        "carriedOverTo": "ms3ez4evriock6"
       },
       {
         "id": "ms2krg03culbuy",
@@ -144,22 +131,6 @@
         "createdAt": "2026-07-27T16:01:07.351Z",
         "completedAt": null,
         "carriedOverTo": "ms5nggc18kq9b1"
-      },
-      {
-        "id": "ms3ez4ezukoxls",
-        "title": "处理投诉咨询",
-        "type": "daily",
-        "dueDate": "2026-07-28",
-        "priority": "medium",
-        "status": "pending",
-        "category": "太享保",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-27",
-        "createdAt": "2026-07-27T16:01:07.355Z",
-        "completedAt": null,
-        "carriedOverTo": "ms5nggc2d3rqql"
       },
       {
         "id": "ms3ez4f1wtrs3p",
@@ -301,19 +272,6 @@
         "carriedOverTo": "ms73st6ipvcd3b"
       },
       {
-        "id": "ms5nfu9zxiu03s",
-        "title": "和王志娟沟通离职员工如何申请弹福理赔",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "createdAt": "2026-07-29T05:33:36.647Z",
-        "completedAt": null,
-        "carriedOverTo": "ms73st6ky9nbjw"
-      },
-      {
         "id": "ms5nggbyg2xqv6",
         "title": "环责险电子保单及发票邮件",
         "type": "daily",
@@ -360,22 +318,6 @@
         "createdAt": "2026-07-29T05:34:05.233Z",
         "completedAt": null,
         "carriedOverTo": "ms73st6mv7u51d"
-      },
-      {
-        "id": "ms5nggc1tdg0p5",
-        "title": "供应商系统注册",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "medium",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:34:05.233Z",
-        "completedAt": null,
-        "carriedOverTo": "ms73st6mhfg5qv"
       },
       {
         "id": "ms5nggc2d3rqql",
