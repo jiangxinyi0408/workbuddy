@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T05:59:37.602Z",
+  "updatedAt": "2026-07-30T05:59:49.967Z",
   "data": {
     "tasks": [
       {
@@ -469,22 +469,6 @@
         "createdAt": "2026-07-29T05:34:05.235Z",
         "completedAt": null,
         "carriedOverTo": "ms73st6ootcs3z"
-      },
-      {
-        "id": "ms5nggc4m3guhm",
-        "title": "（告知太科）离职员工需继续维护理赔入口",
-        "type": "daily",
-        "dueDate": "2026-07-29",
-        "priority": "high",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-28",
-        "createdAt": "2026-07-29T05:34:05.236Z",
-        "completedAt": null,
-        "carriedOverTo": "ms73st6p28g7z6"
       },
       {
         "id": "ms5nggc4o86lhk",
