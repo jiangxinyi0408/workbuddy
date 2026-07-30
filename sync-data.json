@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T05:59:55.416Z",
+  "updatedAt": "2026-07-30T06:00:02.786Z",
   "data": {
     "tasks": [
       {
@@ -560,21 +560,6 @@
         "completedAt": null
       },
       {
-        "id": "ms73st6mfpw6c9",
-        "title": "整理对账单",
-        "type": "daily",
-        "dueDate": "2026-07-30",
-        "priority": "high",
-        "status": "pending",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-29",
-        "createdAt": "2026-07-30T05:59:21.790Z",
-        "completedAt": null
-      },
-      {
         "id": "ms73st6mhfg5qv",
         "title": "供应商系统注册",
         "type": "daily",
@@ -632,21 +617,6 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-29",
         "createdAt": "2026-07-30T05:59:21.791Z",
-        "completedAt": null
-      },
-      {
-        "id": "ms73st6ootcs3z",
-        "title": "嘉年华补充协议盖章后寄回",
-        "type": "daily",
-        "dueDate": "2026-07-30",
-        "priority": "high",
-        "status": "pending",
-        "category": "常纺",
-        "estimateHours": null,
-        "image": null,
-        "carriedOver": true,
-        "originalDueDate": "2026-07-29",
-        "createdAt": "2026-07-30T05:59:21.792Z",
         "completedAt": null
       },
       {
