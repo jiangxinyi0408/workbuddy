@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:04:04.375Z",
+  "updatedAt": "2026-07-31T07:04:19.917Z",
   "data": {
     "tasks": [
       {
@@ -39,11 +39,11 @@
         "type": "daily",
         "dueDate": "2026-07-31",
         "priority": "medium",
-        "status": "pending",
+        "status": "done",
         "category": "常纺",
         "estimateHours": null,
         "createdAt": "2026-07-27T01:54:35.962Z",
-        "completedAt": null,
+        "completedAt": "2026-07-31T07:04:12.691Z",
         "carriedOverTo": "ms3ez4evriock6",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
@@ -87,11 +87,11 @@
         "type": "daily",
         "dueDate": "2026-07-31",
         "priority": "medium",
-        "status": "pending",
+        "status": "done",
         "category": "天马",
         "estimateHours": null,
         "createdAt": "2026-07-27T05:37:37.966Z",
-        "completedAt": null,
+        "completedAt": "2026-07-31T07:04:14.901Z",
         "carriedOverTo": "ms5nggbyg2xqv6",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
