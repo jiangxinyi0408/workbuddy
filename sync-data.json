@@ -1,13 +1,13 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-30T07:42:18.979Z",
+  "updatedAt": "2026-07-31T07:02:16.433Z",
   "data": {
     "tasks": [
       {
         "id": "ms1y9i2f02v1f9",
         "title": "整理对账单",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -17,7 +17,7 @@
         "carriedOverTo": "ms76vczucmesl0",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms2kpm1rcf60v3",
@@ -37,7 +37,7 @@
         "id": "ms2kqhiyl59bs6",
         "title": "供应商系统注册",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "常纺",
@@ -47,7 +47,7 @@
         "carriedOverTo": "ms3ez4evriock6",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:15.767Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms2krg03culbuy",
@@ -85,7 +85,7 @@
         "id": "ms2spb5aocuni7",
         "title": "环责险电子保单及发票邮件",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "天马",
@@ -95,7 +95,7 @@
         "carriedOverTo": "ms5nggbyg2xqv6",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:15.767Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms2spl0ebwhlei",
@@ -115,7 +115,7 @@
         "id": "ms2sq922l7zr0z",
         "title": "弹福保费核销",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "low",
         "status": "pending",
         "category": "商汤",
@@ -123,7 +123,7 @@
         "image": null,
         "createdAt": "2026-07-27T05:38:21.914Z",
         "completedAt": null,
-        "updatedAt": "2026-07-30T07:25:39.360Z",
+        "updatedAt": "2026-07-31T07:01:54.586Z",
         "carriedOverTo": "ms5nggbzcqtwz8",
         "originalDueDate": "2026-07-28",
         "carriedOver": true
@@ -146,7 +146,7 @@
         "id": "ms3ez4evz2zcdb",
         "title": "弹福无主被的理赔问题沟通（需要太科加速提供理赔平台）",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -157,13 +157,13 @@
         "createdAt": "2026-07-27T16:01:07.351Z",
         "completedAt": null,
         "carriedOverTo": "ms5nggc18kq9b1",
-        "updatedAt": "2026-07-30T07:25:15.767Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms3ez4ezukoxls",
         "title": "处理投诉咨询",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "太享保",
@@ -174,7 +174,7 @@
         "createdAt": "2026-07-27T16:01:07.355Z",
         "completedAt": null,
         "carriedOverTo": "ms5mcnp52gfptd",
-        "updatedAt": "2026-07-30T07:25:15.767Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms3ez4f1wtrs3p",
@@ -210,7 +210,7 @@
         "id": "ms3iwej6q1gl2r",
         "title": "环责TIS服务费用结算",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "low",
         "status": "pending",
         "category": "环责险",
@@ -221,13 +221,13 @@
         "carriedOverTo": "ms5nggc38ht3m5",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms3ixb3w4g1stg",
         "title": "嘉年华补充协议盖章后寄回",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "high",
         "status": "pending",
         "category": "常纺",
@@ -238,13 +238,13 @@
         "carriedOverTo": "ms5nggc3vh2rhs",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms3ixttwc9fcda",
         "title": "银行许可证盖章后上传供应商平台",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "high",
         "status": "pending",
         "category": "常纺",
@@ -252,7 +252,7 @@
         "image": null,
         "createdAt": "2026-07-27T17:52:05.444Z",
         "completedAt": null,
-        "updatedAt": "2026-07-30T07:25:15.767Z",
+        "updatedAt": "2026-07-31T07:01:54.586Z",
         "carriedOverTo": "ms5mcnp5tww57l",
         "originalDueDate": "2026-07-28",
         "carriedOver": true
@@ -275,7 +275,7 @@
         "id": "ms3j07s9z6cy8o",
         "title": "（告知太科）离职员工需继续维护理赔入口",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "high",
         "status": "pending",
         "category": "商汤",
@@ -286,7 +286,7 @@
         "carriedOverTo": "ms5nggc4m3guhm",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms477edae80ek1",
@@ -305,7 +305,7 @@
         "id": "ms48btyybbevvr",
         "title": "发票两张整理",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "low",
         "status": "pending",
         "category": "报销",
@@ -316,7 +316,7 @@
         "carriedOverTo": "ms5nggc5z2wd80",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms4bdb92nyd0vz",
@@ -364,7 +364,7 @@
         "id": "ms73st6ipvcd3b",
         "title": "沟通慢性病扩张赔付药量病种范围",
         "type": "daily",
-        "dueDate": "2026-07-30",
+        "dueDate": "2026-07-31",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -373,7 +373,8 @@
         "carriedOver": true,
         "originalDueDate": "2026-07-29",
         "createdAt": "2026-07-30T05:59:21.786Z",
-        "completedAt": null
+        "completedAt": null,
+        "updatedAt": "2026-07-31T07:01:54.586Z"
       },
       {
         "id": "ms73st6ky9nbjw",
