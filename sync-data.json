@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:03:10.181Z",
+  "updatedAt": "2026-07-31T07:03:48.826Z",
   "data": {
     "tasks": [
       {
@@ -402,6 +402,19 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-31T07:03:05.155Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms8ljfsvhvd9pd",
+        "title": "提供物资（集团 、项目部）",
+        "type": "daily",
+        "dueDate": "2026-07-31",
+        "priority": "medium",
+        "status": "pending",
+        "category": "路桥",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-31T07:03:43.807Z",
         "completedAt": null
       }
     ],
