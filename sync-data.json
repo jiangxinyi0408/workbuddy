@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:06:50.391Z",
+  "updatedAt": "2026-07-31T07:08:35.742Z",
   "data": {
     "tasks": [
       {
@@ -355,6 +355,19 @@
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-31T07:03:43.807Z",
+        "completedAt": null
+      },
+      {
+        "id": "ms8lpl6m027jgb",
+        "title": "拜访浦建姜总",
+        "type": "daily",
+        "dueDate": "2026-07-31",
+        "priority": "medium",
+        "status": "pending",
+        "category": "",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-31T07:08:30.718Z",
         "completedAt": null
       }
     ],
