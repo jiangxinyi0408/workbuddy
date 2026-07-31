@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:05:25.993Z",
+  "updatedAt": "2026-07-31T07:05:54.262Z",
   "data": {
     "tasks": [
       {
@@ -18,20 +18,6 @@
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
         "updatedAt": "2026-07-31T07:01:54.586Z"
-      },
-      {
-        "id": "ms2kpm1rcf60v3",
-        "title": "环责险出单及电子保单发票发送邮件",
-        "type": "daily",
-        "dueDate": "2026-07-27",
-        "priority": "high",
-        "status": "done",
-        "category": "天马",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T01:53:55.167Z",
-        "completedAt": "2026-07-27T06:44:49.282Z",
-        "image": null,
-        "updatedAt": "2026-07-27T05:58:48.733Z"
       },
       {
         "id": "ms2kqhiyl59bs6",
@@ -127,20 +113,6 @@
         "carriedOverTo": "ms5nggbzcqtwz8",
         "originalDueDate": "2026-07-28",
         "carriedOver": true
-      },
-      {
-        "id": "ms2uwvr2rvzpl7",
-        "title": "q1总结材料（发邮件让太科准备）",
-        "type": "daily",
-        "dueDate": "2026-07-27",
-        "priority": "high",
-        "status": "done",
-        "category": "商汤",
-        "estimateHours": null,
-        "image": null,
-        "createdAt": "2026-07-27T06:39:30.494Z",
-        "completedAt": "2026-07-29T08:19:57.552Z",
-        "carriedOverTo": "ms3ez4f4jxq46k"
       },
       {
         "id": "ms3ez4evz2zcdb",
