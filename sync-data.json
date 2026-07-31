@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:05:54.262Z",
+  "updatedAt": "2026-07-31T07:06:14.398Z",
   "data": {
     "tasks": [
       {
@@ -47,22 +47,6 @@
         "createdAt": "2026-07-27T01:55:20.643Z",
         "completedAt": "2026-07-30T07:26:39.126Z",
         "carriedOverTo": "ms3ez4evz2zcdb",
-        "originalDueDate": "2026-07-27",
-        "carriedOver": true,
-        "updatedAt": "2026-07-30T07:25:39.360Z"
-      },
-      {
-        "id": "ms2ktb0c9u9wha",
-        "title": "处理投诉咨询",
-        "type": "daily",
-        "dueDate": "2026-07-30",
-        "priority": "medium",
-        "status": "done",
-        "category": "太享保",
-        "estimateHours": null,
-        "createdAt": "2026-07-27T01:56:47.484Z",
-        "completedAt": "2026-07-30T07:27:13.494Z",
-        "carriedOverTo": "ms3ez4ezukoxls",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
         "updatedAt": "2026-07-30T07:25:39.360Z"
