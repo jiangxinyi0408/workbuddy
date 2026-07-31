@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:05:05.380Z",
+  "updatedAt": "2026-07-31T07:05:13.409Z",
   "data": {
     "tasks": [
       {
@@ -165,14 +165,14 @@
         "type": "daily",
         "dueDate": "2026-07-31",
         "priority": "medium",
-        "status": "pending",
+        "status": "done",
         "category": "太享保",
         "estimateHours": null,
         "image": null,
         "carriedOver": true,
         "originalDueDate": "2026-07-27",
         "createdAt": "2026-07-27T16:01:07.355Z",
-        "completedAt": null,
+        "completedAt": "2026-07-31T07:05:08.391Z",
         "carriedOverTo": "ms5mcnp52gfptd",
         "updatedAt": "2026-07-31T07:01:54.586Z"
       },
