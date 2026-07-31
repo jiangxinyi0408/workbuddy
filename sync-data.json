@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:03:48.826Z",
+  "updatedAt": "2026-07-31T07:04:04.375Z",
   "data": {
     "tasks": [
       {
@@ -246,12 +246,12 @@
         "type": "daily",
         "dueDate": "2026-07-31",
         "priority": "high",
-        "status": "pending",
+        "status": "done",
         "category": "常纺",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-27T17:52:05.444Z",
-        "completedAt": null,
+        "completedAt": "2026-07-31T07:03:59.361Z",
         "updatedAt": "2026-07-31T07:01:54.586Z",
         "carriedOverTo": "ms5mcnp5tww57l",
         "originalDueDate": "2026-07-28",
