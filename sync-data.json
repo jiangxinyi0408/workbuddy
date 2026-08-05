@@ -1,13 +1,13 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-07-31T07:51:50.279Z",
+  "updatedAt": "2026-08-05T05:13:41.319Z",
   "data": {
     "tasks": [
       {
         "id": "ms1y9i2f02v1f9",
         "title": "整理对账单",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -17,7 +17,21 @@
         "carriedOverTo": "ms76vczucmesl0",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
-        "updatedAt": "2026-07-31T07:01:54.586Z"
+        "updatedAt": "2026-08-05T05:13:35.178Z"
+      },
+      {
+        "id": "ms2kpm1rcf60v3",
+        "title": "环责险出单及电子保单发票发送邮件",
+        "type": "daily",
+        "dueDate": "2026-07-27",
+        "priority": "high",
+        "status": "done",
+        "category": "天马",
+        "estimateHours": null,
+        "createdAt": "2026-07-27T01:53:55.167Z",
+        "completedAt": "2026-07-27T06:44:49.282Z",
+        "image": null,
+        "updatedAt": "2026-07-27T05:58:48.733Z"
       },
       {
         "id": "ms2kqhiyl59bs6",
@@ -34,6 +48,38 @@
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
         "updatedAt": "2026-07-31T07:01:54.586Z"
+      },
+      {
+        "id": "ms2krg03culbuy",
+        "title": "弹福无主被的理赔问题沟通（需要太科加速提供理赔平台）",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "done",
+        "category": "商汤",
+        "estimateHours": null,
+        "createdAt": "2026-07-27T01:55:20.643Z",
+        "completedAt": "2026-07-30T07:26:39.126Z",
+        "carriedOverTo": "ms3ez4evz2zcdb",
+        "originalDueDate": "2026-07-27",
+        "carriedOver": true,
+        "updatedAt": "2026-07-30T07:25:39.360Z"
+      },
+      {
+        "id": "ms2ktb0c9u9wha",
+        "title": "处理投诉咨询",
+        "type": "daily",
+        "dueDate": "2026-07-30",
+        "priority": "medium",
+        "status": "done",
+        "category": "太享保",
+        "estimateHours": null,
+        "createdAt": "2026-07-27T01:56:47.484Z",
+        "completedAt": "2026-07-30T07:27:13.494Z",
+        "carriedOverTo": "ms3ez4ezukoxls",
+        "originalDueDate": "2026-07-27",
+        "carriedOver": true,
+        "updatedAt": "2026-07-30T07:25:39.360Z"
       },
       {
         "id": "ms2spb5aocuni7",
@@ -81,6 +127,20 @@
         "carriedOverTo": "ms5nggbzcqtwz8",
         "originalDueDate": "2026-07-28",
         "carriedOver": true
+      },
+      {
+        "id": "ms2uwvr2rvzpl7",
+        "title": "q1总结材料（发邮件让太科准备）",
+        "type": "daily",
+        "dueDate": "2026-07-27",
+        "priority": "high",
+        "status": "done",
+        "category": "商汤",
+        "estimateHours": null,
+        "image": null,
+        "createdAt": "2026-07-27T06:39:30.494Z",
+        "completedAt": "2026-07-29T08:19:57.552Z",
+        "carriedOverTo": "ms3ez4f4jxq46k"
       },
       {
         "id": "ms3ez4evz2zcdb",
@@ -150,7 +210,7 @@
         "id": "ms3iwej6q1gl2r",
         "title": "环责TIS服务费用结算",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "low",
         "status": "pending",
         "category": "环责险",
@@ -161,13 +221,13 @@
         "carriedOverTo": "ms5nggc38ht3m5",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-31T07:01:54.586Z"
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       },
       {
         "id": "ms3ixb3w4g1stg",
         "title": "嘉年华补充协议盖章后寄回",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "high",
         "status": "pending",
         "category": "常纺",
@@ -178,7 +238,7 @@
         "carriedOverTo": "ms5nggc3vh2rhs",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-31T07:01:54.586Z"
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       },
       {
         "id": "ms3ixttwc9fcda",
@@ -245,7 +305,7 @@
         "id": "ms48btyybbevvr",
         "title": "发票两张整理",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "low",
         "status": "pending",
         "category": "报销",
@@ -256,7 +316,7 @@
         "carriedOverTo": "ms5nggc5z2wd80",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-07-31T07:01:54.586Z"
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       },
       {
         "id": "ms4bdb92nyd0vz",
@@ -275,7 +335,7 @@
         "id": "ms5nfu9zidnsmt",
         "title": "沟通慢性病扩张赔付药量病种范围",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -285,7 +345,7 @@
         "carriedOverTo": "ms73st6ipvcd3b",
         "originalDueDate": "2026-07-29",
         "carriedOver": true,
-        "updatedAt": "2026-07-31T07:05:00.303Z"
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       },
       {
         "id": "ms5scm0hpscxxj",
@@ -348,27 +408,33 @@
         "id": "ms8ljfsvhvd9pd",
         "title": "提供物资（集团 、项目部）",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "medium",
         "status": "pending",
         "category": "路桥",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-31T07:03:43.807Z",
-        "completedAt": null
+        "completedAt": null,
+        "originalDueDate": "2026-07-31",
+        "carriedOver": true,
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       },
       {
         "id": "ms8lpl6m027jgb",
         "title": "拜访浦建姜总",
         "type": "daily",
-        "dueDate": "2026-07-31",
+        "dueDate": "2026-08-05",
         "priority": "medium",
         "status": "pending",
         "category": "",
         "estimateHours": null,
         "image": null,
         "createdAt": "2026-07-31T07:08:30.718Z",
-        "completedAt": null
+        "completedAt": null,
+        "originalDueDate": "2026-07-31",
+        "carriedOver": true,
+        "updatedAt": "2026-08-05T05:13:35.178Z"
       }
     ],
     "workLogs": [],
@@ -590,6 +656,14 @@
         "weight": 64.1,
         "note": "吃完满晶自助后骑单车45分钟",
         "createdAt": "2026-07-27T17:01:20.366Z"
+      },
+      {
+        "id": "msfmt1zs795h8j",
+        "date": "2026-08-05",
+        "time": "morning",
+        "weight": 63.2,
+        "note": "空腹",
+        "createdAt": "2026-08-05T05:13:35.320Z"
       }
     ],
     "meals": [
@@ -1073,141 +1147,141 @@
           "news": [
             {
               "id": "60s_0",
-              "title": "宁夏固原发现战国时期 3740 毫升粮食酒遗存，距今已 2300 年，基本保存完整，挥发较少",
+              "title": "气象局：发生超强厄尔尼诺事件概率增大，8 月我国暴雨、高温、台风偏多",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_1",
-              "title": "2026 年上半年全国社会物流总额为 181.1 万亿元，同比增长 5.1%",
+              "title": "上半年我国服务进出口总额 37797.5 亿元，同比增长 8.3%；其中出口增长 17.6%，进口增长 2.9%",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_2",
-              "title": "智驾 “小蓝灯” 因不符合国标被禁用，业内表示属实，新认证车型将不再搭载",
+              "title": "7 月楼市淡季不淡：多城成交同比保持增长，上海豪宅项目开盘日光",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_3",
-              "title": "我国消费金融公司去年共发放个人消费贷款 5.24 万亿元，服务客户 5.81 亿人次",
+              "title": "首个高阶自动驾驶强制性国标发布：L3 须标配驾驶人接管监测，拟于 2027 年 7 月 1 日起实施",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_4",
-              "title": "江苏全面修订未成年人保护条例，设立 “网络保护” 专章，拟明确不得诱导未成年人盲目追星、盲目消费",
+              "title": "多地停车计费试行取消 “向上取整”，“按分钟计费” 试点加速落地",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_5",
-              "title": "《反网络暴力法（征求意见稿）》拟明确：煽动网暴将被列入黑名单",
+              "title": "广东深圳电动自行车违法与个人信用挂钩，有 50 人被录入征信",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_6",
-              "title": "最高法明确：参加单位支持的全日制教育后不返岗，须担违约责任",
+              "title": "A 股又现 “大肉签”：上市首日狂飙超 140%，中一签最高赚 7.5 万元",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_7",
-              "title": "广西日报王虹特稿《王的猜想》火了，一份报纸被炒到 65 元，报社最新回应：在加急赶印",
+              "title": "3 家中国车企跻身全球销量前十：比亚迪排名第六，吉利排名第七，奇瑞与福特并列第九",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_8",
-              "title": "Kimi 完成 F 轮超 35 亿美元融资，投后估值涨至 350 亿美元",
+              "title": "马斯克宣布开放 Model S 和 Model X 的设计资料与软件，陶琳：技术领先不能靠守专利",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_9",
-              "title": "美国 FCC 宣布禁止进口人形机器人，中方：保护主义提升不了美国竞争力",
+              "title": "SpaceX 股价跌回地表，马斯克财富一个月缩水超 2 万亿元，相当于亏掉 2 个 “黄仁勋”",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_10",
-              "title": "OpenAI 模型被发现入侵另一家公司，奥特曼呼吁放缓 AI 开发速度",
+              "title": "韩媒宣扬 “中国游客是韩国赌场核心增长动力”，中方：深感震惊、坚决反对",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_11",
-              "title": "韩国股市年内触发 9 次熔断机制，创全球主要市场纪录，散户损失严重，韩国财政部长道歉",
+              "title": "日本拟提高外国人永久居留申请门槛：要求年收入超过日本平均水平；配偶申请门槛大幅提高",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_12",
-              "title": "韩国自研战机 KF-21 结项，首架量产机将于今年 9 月交付韩国空军",
+              "title": "美国拟关闭在加拿大、日本等国的 5 处驻外机构，美方回应：将确保美国外交布局兼顾 “效率与作用”",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_13",
-              "title": "日本人口时隔 42 年再次跌破 1.2 亿，较上年减少约 91.7 万人，创 1968 年开始统计以来最大年度降幅",
+              "title": "全美 25 州提起诉讼，反对美国最新关税措施，要求废止并暂停执行",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             },
             {
               "id": "60s_14",
-              "title": "国际足联拟出售部分 “世界杯股权”，欧足联怒了：出卖 “足球灵魂”，考虑抵制世界杯",
+              "title": "美国拉响感染警报：罕见病毒首现纽约，已波及全美 45 个州，生菜成疫情源头，无特效药无疫苗",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s?__biz=MzYzNTg5NjkwMQ==&mid=2247484507&idx=1&sn=eb0a5884de35219a9e2f1a424fb78a09",
+              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-07-29T19:47:00.000Z"
+              "pubDate": "2026-08-04T23:27:37.920Z"
             }
           ],
-          "timestamp": 1785397164128
+          "timestamp": 1785906815210
         }
       },
       {
