@@ -1,13 +1,13 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-08-05T05:13:41.319Z",
+  "updatedAt": "2026-08-12T02:19:22.915Z",
   "data": {
     "tasks": [
       {
         "id": "ms1y9i2f02v1f9",
         "title": "整理对账单",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -17,7 +17,7 @@
         "carriedOverTo": "ms76vczucmesl0",
         "originalDueDate": "2026-07-27",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms2kpm1rcf60v3",
@@ -210,7 +210,7 @@
         "id": "ms3iwej6q1gl2r",
         "title": "环责TIS服务费用结算",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "low",
         "status": "pending",
         "category": "环责险",
@@ -221,13 +221,13 @@
         "carriedOverTo": "ms5nggc38ht3m5",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms3ixb3w4g1stg",
         "title": "嘉年华补充协议盖章后寄回",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "high",
         "status": "pending",
         "category": "常纺",
@@ -238,7 +238,7 @@
         "carriedOverTo": "ms5nggc3vh2rhs",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms3ixttwc9fcda",
@@ -305,7 +305,7 @@
         "id": "ms48btyybbevvr",
         "title": "发票两张整理",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "low",
         "status": "pending",
         "category": "报销",
@@ -316,7 +316,7 @@
         "carriedOverTo": "ms5nggc5z2wd80",
         "originalDueDate": "2026-07-28",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms4bdb92nyd0vz",
@@ -335,7 +335,7 @@
         "id": "ms5nfu9zidnsmt",
         "title": "沟通慢性病扩张赔付药量病种范围",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "medium",
         "status": "pending",
         "category": "商汤",
@@ -345,7 +345,7 @@
         "carriedOverTo": "ms73st6ipvcd3b",
         "originalDueDate": "2026-07-29",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms5scm0hpscxxj",
@@ -408,7 +408,7 @@
         "id": "ms8ljfsvhvd9pd",
         "title": "提供物资（集团 、项目部）",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "medium",
         "status": "pending",
         "category": "路桥",
@@ -418,13 +418,13 @@
         "completedAt": null,
         "originalDueDate": "2026-07-31",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       },
       {
         "id": "ms8lpl6m027jgb",
         "title": "拜访浦建姜总",
         "type": "daily",
-        "dueDate": "2026-08-05",
+        "dueDate": "2026-08-12",
         "priority": "medium",
         "status": "pending",
         "category": "",
@@ -434,7 +434,7 @@
         "completedAt": null,
         "originalDueDate": "2026-07-31",
         "carriedOver": true,
-        "updatedAt": "2026-08-05T05:13:35.178Z"
+        "updatedAt": "2026-08-12T02:19:16.914Z"
       }
     ],
     "workLogs": [],
@@ -1147,141 +1147,141 @@
           "news": [
             {
               "id": "60s_0",
-              "title": "气象局：发生超强厄尔尼诺事件概率增大，8 月我国暴雨、高温、台风偏多",
+              "title": "国产大飞机 C919 首次执飞国际商业航线，北京首都至乌兰巴托",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_1",
-              "title": "上半年我国服务进出口总额 37797.5 亿元，同比增长 8.3%；其中出口增长 17.6%，进口增长 2.9%",
+              "title": "上半年规上互联网企业完成互联网业务收入超万亿，同比增长 10.1%",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_2",
-              "title": "7 月楼市淡季不淡：多城成交同比保持增长，上海豪宅项目开盘日光",
+              "title": "7 月乘用车销量榜出炉：前 10 仅剩 1 款燃油车入围，今年 1 月还有 7 款",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_3",
-              "title": "首个高阶自动驾驶强制性国标发布：L3 须标配驾驶人接管监测，拟于 2027 年 7 月 1 日起实施",
+              "title": "山西中阳残存明代城墙遭 “拆旧建新”，墙砖被按废物丢弃，当地回应：正开展调查",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_4",
-              "title": "多地停车计费试行取消 “向上取整”，“按分钟计费” 试点加速落地",
+              "title": "甘肃兰州公交被指将能耗和绩效挂钩，致部分司机不敢开空调，公司回应：已暂停实施这一考核办法",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_5",
-              "title": "广东深圳电动自行车违法与个人信用挂钩，有 50 人被录入征信",
+              "title": "多家期刊发布 AI 使用规范：严禁 AI 洗稿或替代人工学术把关",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_6",
-              "title": "A 股又现 “大肉签”：上市首日狂飙超 140%，中一签最高赚 7.5 万元",
+              "title": "宇树科技中签号出炉：中签号码共有 19414 个，每个中签号码只能认购 500 股",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_7",
-              "title": "3 家中国车企跻身全球销量前十：比亚迪排名第六，吉利排名第七，奇瑞与福特并列第九",
+              "title": "7 月计算机价格同比上涨 17.4%，平板电脑上涨 17.2%，专家称最快明年下半年缓解压力",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_8",
-              "title": "马斯克宣布开放 Model S 和 Model X 的设计资料与软件，陶琳：技术领先不能靠守专利",
+              "title": "现货黄金突破 4400 美元 / 盎司，过去一周涨幅超 7%；国内金饰克价飙升至 1336 元",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_9",
-              "title": "SpaceX 股价跌回地表，马斯克财富一个月缩水超 2 万亿元，相当于亏掉 2 个 “黄仁勋”",
+              "title": "李嘉诚家族再售海外资产，澳洲能源资产项目最高套现 166 亿港元，一年多英国已回笼 1672 亿",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_10",
-              "title": "韩媒宣扬 “中国游客是韩国赌场核心增长动力”，中方：深感震惊、坚决反对",
+              "title": "马斯克发帖鼓励大家来中国旅游，其母亲跟帖 “花式” 夸赞中国旅游体验",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_11",
-              "title": "日本拟提高外国人永久居留申请门槛：要求年收入超过日本平均水平；配偶申请门槛大幅提高",
+              "title": "马斯克平均每天赚 59 亿，年财富增长 2.16 万亿，超过全球大多数国家全年 GDP",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_12",
-              "title": "美国拟关闭在加拿大、日本等国的 5 处驻外机构，美方回应：将确保美国外交布局兼顾 “效率与作用”",
+              "title": "美国不断收紧移民政策，自去年初以来已吊销逾 17.5 万份非移民签证",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_13",
-              "title": "全美 25 州提起诉讼，反对美国最新关税措施，要求废止并暂停执行",
+              "title": "特朗普发文力挺因凡蒂诺，警告国际足联不要考虑更换主席",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             },
             {
               "id": "60s_14",
-              "title": "美国拉响感染警报：罕见病毒首现纽约，已波及全美 45 个州，生菜成疫情源头，无特效药无疫苗",
+              "title": "哥伦比亚强震遇难人数升至 188 人，震中位于最贫困地区，新总统就职 3 天便遇考验",
               "summary": "",
-              "link": "https://mp.weixin.qq.com/s/YJUjzyXpmwQRdZJ16ggFMw",
+              "link": "https://mp.weixin.qq.com/s/ukzR2RfUQWOxFoqY6nJBhA",
               "hot": "",
               "source": "每日60秒",
-              "pubDate": "2026-08-04T23:27:37.920Z"
+              "pubDate": "2026-08-12T00:03:14.922Z"
             }
           ],
-          "timestamp": 1785906815210
+          "timestamp": 1786501156950
         }
       },
       {
