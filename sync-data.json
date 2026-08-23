@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-08-23T14:02:27.671Z",
+  "updatedAt": "2026-08-23T14:02:40.875Z",
   "data": {
     "tasks": [
       {
@@ -745,8 +745,8 @@
       {
         "id": "ms3ire6gz7473j",
         "bank": "酷桔",
-        "principal": 330000,
-        "currentBalance": 330000,
+        "principal": 350000,
+        "currentBalance": 350000,
         "monthlyPayment": 0,
         "paymentType": "fixed",
         "remainingPeriods": 0,
@@ -755,7 +755,8 @@
         "endDate": "",
         "interestRate": 0,
         "note": "",
-        "createdAt": "2026-07-27T17:47:05.224Z"
+        "createdAt": "2026-07-27T17:47:05.224Z",
+        "updatedAt": "2026-08-23T14:02:35.858Z"
       },
       {
         "id": "ms3isik795p09q",
